@@ -1,0 +1,119 @@
+{
+	"easycom": {
+		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#75b0f0",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#ffffff",
+				"backgroundColorTop": "#ffffff,",
+				"backgroundColorBottom": "#ffffff"
+			}
+		},
+		{
+			"path": "pages/personInfo/personInfo",
+			"style": {
+				"navigationBarTitleText": "个人资料",
+				"navigationBarBackgroundColor": "#75b0f0",
+				"navigationBarTextStyle": "white",
+				"backgroundColorBottom": "#f7f7f7"
+			}
+		}
+	],
+	"subPackages": [
+		{
+			"root": "qualityPackage",
+			"pages": [
+				{
+					"path": "pages/examineDetails/examineDetails",
+					"style": {
+						"navigationBarTitleText": "检查详情",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/grade/grade",
+					"style": {
+						"navigationBarTitleText": "评分",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/qualityManagement/index/index",
+					"style": {
+						"navigationBarTitleText": "任务列表",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/examineItemDetails/examineItemDetails",
+					"style": {
+						"navigationBarTitleText": "检查项详情",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/examineRecord/examineRecord",
+					"style": {
+						"navigationBarTitleText": "检查记录",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				}
+			]
+		}
+	],
+	"preloadRule": {
+		"qualityPackage/pages/qualityManagement/index/index": {
+				"network": "all",
+				"packages": ["qualityPackage"]
+		}
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#fff",
+		"backgroundColor": "#FFFFFF",
+		"navigationStyle": "custom"
+	},
+	"tabBar":{
+	"color":"#333",
+	"selectedColor":"#75b0f0",
+	"backgroundColor":"#fff",
+	"borderStyle":"white",
+	"list":[
+			{
+				"pagePath":"pages/index/index",
+				"text":"首页",
+				"iconPath":"static/img/index.png",
+				"selectedIconPath":"static/img/index-current.png"
+			},
+			{
+				"pagePath":"pages/personInfo/personInfo",
+				"text":"我的",
+				"iconPath":"static/img/my.png",
+				"selectedIconPath":"static/img/my-current.png"
+			}
+		]
+	}
+}
