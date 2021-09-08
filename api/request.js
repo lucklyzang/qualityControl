@@ -1,5 +1,6 @@
 import axios from 'axios-miniprogram'
 import store from '@/store'
+import Qs from 'qs'
 import { setCache, getCache, removeAllLocalStorage } from '@/common/js/utils'
 const instance = axios.create({
   baseURL: 'http://blink.blinktech.cn/nblink',
@@ -41,15 +42,15 @@ instance.interceptors.response.use(function (response) {
 		   };
 		   removeAllLocalStorage();
 		   if (!store.getters.overDueWay) {
-        uni.showToast({
-          title: 'token已过期,请重新登录',
-          duration: 1000
-        });
-        setTimeout(() => {
-          uni.redirectTo({
-           url: '/pages/login/login'
-          })
-        },2000);
+        // uni.showToast({
+        //   title: 'token已过期,请重新登录',
+        //   duration: 1000
+        // });
+        // setTimeout(() => {
+        //   uni.redirectTo({
+        //    url: '/pages/login/login'
+        //   })
+        // },2000);
 		   } else {
 			  uni.redirectTo({
 			    url: '/pages/login/login'

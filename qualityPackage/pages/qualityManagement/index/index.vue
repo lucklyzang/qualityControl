@@ -31,11 +31,11 @@
 			<view class="not-start" v-show="current === 0" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
-						<text>请完成检查</text>
+						<text>{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 					</view>
 					<view class="status-content-top">
 						<view class="specific-status">
-							<text>状态 : {{item.status}}</text>
+							<text>状态 : {{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
 					<view class="status-content-middle">
@@ -65,11 +65,11 @@
 						</view>
 						<view class="content-assessment-format">
 							<text>评价方式 : </text>
-							<text>{{item.assessmentFormat}}</text>
+							<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
 						</view>
 						<view class="content-isQuery">
 							<text>质疑 : </text>
-							<text>{{item.isQuery}}</text>
+							<text>{{queryTransfer(item.isQuery)}}</text>
 						</view>
 						<view class="content-fullMark">
 							<text>满分 : </text>
@@ -81,7 +81,7 @@
 						</view>
 					</view>
 					<view class="status-content-bottom">
-						<text @click="enterTask(item,index)">进入任务</text>
+						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 						<text @click="viewMore(item,index)">查看更多</text>
 					</view>
 				</view>
@@ -89,11 +89,11 @@
 			<view class="is-going" v-show="current === 1">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
-						<text>请完成检查</text>
+						<text>{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 					</view>
 					<view class="status-content-top">
 						<view class="specific-status">
-							<text>状态 : {{item.status}}</text>
+							<text>状态 : {{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
 					<view class="status-content-middle">
@@ -123,11 +123,11 @@
 						</view>
 						<view class="content-assessment-format">
 							<text>评价方式 : </text>
-							<text>{{item.assessmentFormat}}</text>
+							<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
 						</view>
 						<view class="content-isQuery">
 							<text>质疑 : </text>
-							<text>{{item.isQuery}}</text>
+							<text>{{queryTransfer(item.isQuery)}}</text>
 						</view>
 						<view class="content-fullMark">
 							<text>满分 : </text>
@@ -139,7 +139,7 @@
 						</view>
 					</view>
 					<view class="status-content-bottom">
-						<text @click="enterTask(item,index)">进入任务</text>
+						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 						<text @click="viewMore(item,index)">查看更多</text>
 					</view>
 				</view>
@@ -147,11 +147,11 @@
 			<view class="is-completed" v-show="current === 2" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
-						<text>请完成检查</text>
+						<text>{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 					</view>
 					<view class="status-content-top">
 						<view class="specific-status">
-							<text>状态 : {{item.status}}</text>
+							<text>状态 : {{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
 					<view class="status-content-middle">
@@ -181,11 +181,11 @@
 						</view>
 						<view class="content-assessment-format">
 							<text>评价方式 : </text>
-							<text>{{item.assessmentFormat}}</text>
+							<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
 						</view>
 						<view class="content-isQuery">
 							<text>质疑 : </text>
-							<text>{{item.isQuery}}</text>
+							<text>{{queryTransfer(item.isQuery)}}</text>
 						</view>
 						<view class="content-fullMark">
 							<text>满分 : </text>
@@ -197,7 +197,7 @@
 						</view>
 					</view>
 					<view class="status-content-bottom">
-						<text @click="enterTask(item,index)">进入任务</text>
+						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 						<text @click="viewMore(item,index)">查看更多</text>
 					</view>
 				</view>
@@ -239,50 +239,26 @@
 				showLoadingHint: false,
 				statusList: [{name: '未开始'},{name: '进行中'},{name: '已完成'}],
 				flowList: ['全部','检查中','确认结果中','复核质疑中','整改中','复查中'],
-				current: 0,
+				current: 1,
 				goingState: '',
-				statusContentList: [
-					{
-						status: '检查中',
-						serialNumber: '12121',
-						examinationItem: '擦卓子',
-						examinationTime: '2021年秋季',
-						examinationType: 'QPE季度检查',
-						examinationPrincipal: '站办公',
-						examinationStartTime: '2021年4月12日',
-						assessmentFormat: '打分',
-						isQuery: '有',
-						fullMark: 100,
-						remark: '撒啊飒飒看来大家都撒啊飒飒看来大家都撒啊飒飒看来大家都撒啊飒飒看来大家都撒啊飒飒看来大家都'
-					},
-					{
-						status: '请完成检查',
-						serialNumber: '12121',
-						examinationItem: '擦卓子',
-						examinationTime: '2021年秋季',
-						examinationType: 'QPE季度检查',
-						examinationPrincipal: '站办公',
-						examinationStartTime: '2021年4月12日',
-						assessmentFormat: '打分',
-						isQuery: '有',
-						fullMark: 100,
-						remark: '撒啊飒飒看来大家都'
-					},
-					{
-						status: '请完成检查',
-						serialNumber: '12121',
-						examinationItem: '擦卓子',
-						examinationTime: '2021年秋季',
-						examinationType: 'QPE季度检查',
-						examinationPrincipal: '站办公',
-						examinationStartTime: '2021年4月12日',
-						assessmentFormat: '打分',
-						isQuery: '有',
-						fullMark: 100,
-						remark: '撒啊飒飒看来大家都'
-					}
-				]
+				statusContentList: []
 			}
+		},
+		
+		mounted () {
+			let data = {
+				hospitals : this.proId, //检查项目(指的是医院)
+				mode : 1, //评价方式
+				type : 1, //任务类型
+				persons : this.workerId, //任务负责人
+				subPersons : "", //子任务负责人
+				startTime: "",//检查时间
+				createTime : "", //创建时间
+				state : -1, //主任务状态
+				page : 1, //页码
+				limit : 20 //条数
+			};
+			this.getAllMainTasks(data,1)
 		},
 		
 		// 监听页面下拉刷新事件
@@ -327,8 +303,7 @@
 		
 		methods: {
 			...mapMutations([
-				'changeTitleText',
-				'changeBottomBarIndex'
+				'changeMainTaskId'
 			]),
 			// 返回上一页
 			backTo() {
@@ -344,69 +319,185 @@
 					return '未开始'
 					break;
 			    case 1 :
-			    return '进行中'
-			    break;
-			    case 2 :
 			    return '检查中'
 			    break;
-			    case 3 :
+			    case 2 :
 			    return '确认检查结果'
 			    break;
-			    case 4 :
+			    case 3 :
 			    return '复核质疑'
+			    break;
+			    case 4 :
+			    return '整改中'
 					break;
 					case 5 :
-					return '问题整改'
+					return '整改复合'
 					break;
 					case 6 :
-					return '复查'
+					return '已完成'
 			    break;
 			  }
 			},
 			
-			// 是否质疑转换
+			// 任务状态提示语转换
+			statusInfoTransfer (item,itemSubTask,state) {
+				let ownSubTaskList = itemSubTask.filter((innerItem) => { return innerItem['persons'].indexOf(innerItem['persons'].filter((k) => {return k.id == this.workerId})[0]) != -1});
+				let otherSubTaskList = itemSubTask.filter((innerItem) => { return innerItem['persons'].indexOf(innerItem['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1});
+				console.log('自己',ownSubTaskList,'他人',otherSubTaskList);
+				let markedWords = '';
+				if (state == 0) {
+					markedWords = "还未到达开始时间"
+				} else if (state == 1) {
+					if (otherSubTaskList.length == 0) {
+						if (this.judgeSubTaskItemState(ownSubTaskList,state)) {
+							markedWords = "请完成检查"
+						} else {
+							markedWords = "请等待负责人提交"
+						}
+					} else {
+						if (!this.judgeSubTaskItemState(ownSubTaskList,state)) {
+							if (this.judgeSubTaskItemState(otherSubTaskList,state)) {
+								markedWords = "请等待其它检查者完成检查"
+							} else {
+								markedWords = "请等待负责人提交"
+							}
+						} else {
+							markedWords = "请完成检查"
+						}
+					}
+				} else if (state == 2) {
+					markedWords = "请等待被检查者确认检查结果"
+				} else if (state == 3) {
+					if (otherSubTaskList.length == 0) {
+						if (this.judgeSubTaskItemState(ownSubTaskList,state)) {
+							markedWords = "请完成复核质疑"
+						} else {
+							markedWords = "请等待负责人提交"
+						}
+					} else {
+						if (!this.judgeSubTaskItemState(ownSubTaskList,state)) {
+							if (this.judgeSubTaskItemState(otherSubTaskList,state)) {
+								markedWords = "请等待其他检查者完成复核质疑"
+							} else {
+								markedWords = "请等待负责人提交"
+							}
+						} else {
+							markedWords = "请完成复核质疑"
+						}
+					}
+				} else if (state == 4) {
+					markedWords = "请等待被检查者完成整改"
+				} else if (state == 5) {
+					if (otherSubTaskList.length == 0) {
+						if (this.judgeSubTaskItemState(ownSubTaskList,state)) {
+							markedWords = "请完成复查"
+						} else {
+							markedWords = "请等待负责人提交"
+						}
+					} else {
+						if (!this.judgeSubTaskItemState(ownSubTaskList,state)) {
+							if (this.judgeSubTaskItemState(otherSubTaskList,state)) {
+								markedWords = "请等待其他检查者完成复查"
+							} else {
+								markedWords = "请等待负责人提交"
+							}
+						} else {
+							markedWords = "请完成复查"
+						}
+					}
+				};
+				return markedWords
+			},
+			
+			// 是否允许质疑转换
 			queryTransfer (index) {
 			  switch(index) {
 					case 0 :
-					return '无'
+					return '允许'
 					break;
 					case 1 :
-					return '有'
+					return '允许'
 					break;
 			  }
 			},
 			
+			// 评价方式
+			evaluationMethodTransfer (index) {
+				 switch(index) {
+					case 1 :
+					return '打分'
+					break;
+			  }
+			},
+			// 根据主任务状态判断对应子任务检查项状态
+			judgeCheckItemState (state) {
+				let itemState;
+				if (state == 1) {
+					itemState = 1
+				} else if (state == 2) {
+					itemState = 1
+				} else if (state == 3) {
+					itemState = 3
+				} else if (state == 4) {
+					itemState = 5
+				} else if (state == 5) {
+					itemState = 4
+				};
+				return itemState		
+			},
+			
+			// 判断子任务对应状态是否全部更改完成
+			judgeSubTaskItemState (data,majorTaskState) {
+				let temporaryFlag = false;
+				for (let i = 0, len = data.length; i < len; i++) {
+					for (let k = 0, len = data[i]['checkItems'].length; k < len; k++) {
+						let temporaryData = data[i]['checkItems'];
+						if (majorTaskState == 2 || majorTaskState == 5 || this.judgeCheckItemState(majorTaskState) == 7) {
+							temporaryFlag = temporaryData.some((item) => { return item['state'] == this.judgeCheckItemState(majorTaskState)})
+						} else {
+							temporaryFlag = temporaryData.some((item) => { return item['state'] != this.judgeCheckItemState(majorTaskState)})
+						};
+						if (temporaryFlag) {
+							return true
+						} 
+					}
+				};
+				return temporaryFlag
+			},
+			
 			// 查询所有主任务
-			getAllMainTasks(data,state) {
+			getAllMainTasks(dataParams) {
 				this.noDataShow = false;
 				this.showLoadingHint = true;
-				queryAllMainTasks(data).then((res) => {
+				queryAllMainTasks(dataParams).then((res) => {
 					this.showLoadingHint = false;
 					this.statusContentList = [];
-					let temporaryStatusContentList = [];
-					temporaryStatusContentList = res.data.data.filter((item) => {return item['list']['state'] == state})
 					if (this.isFresh) {
 					  uni.stopPullDownRefresh();
 					  this.isFresh = false
 					};
 					if (res && res.data.code == 200) {
-						if (res.data.data.length > 0) {
+						if (res.data.data.list.length > 0) {
 							this.noDataShow = false;
-							for (let item of temporaryStatusContentList) {
+							for (let item of res.data.data.list) {
 								this.statusContentList.push({
 									status: item.state,
 									serialNumber: item.number,
-									examinationItem: item.hospitals[0]['name'],
+									examinationItem: item.hospatils[0]['name'],
 									examinationTime: item.assess,
 									examinationType: item.type,
 									examinationPrincipal: item.persons[0]['name'],
 									examinationStartTime: item.startTime,
 									assessmentFormat: item.mode,
 									isQuery: item.question,
-									fullMark: item.socre,
-									remark: ''
+									fullMark: item.score,
+									id: item.id,
+									persons: item.persons,
+									remark: item.remarks,
+									subTaskList: item.subTaskList
 								})
-							}
+							};
+							console.log('处理数据',this.statusContentList);
 						} else {
 							this.noDataShow = true
 						}
@@ -422,7 +513,7 @@
 				.catch((err) => {
 					this.$refs.uToast.show({
 						title: `${err}`,
-						type: 'warning'
+						type: 'error'
 					});
 					this.showLoadingHint = false;
 					this.noDataShow = true;
@@ -432,20 +523,56 @@
 					}
 				})
 			},
+			
 			// tab切换改变事件
 			tabChange (index) {
 				this.current = index;
-				let data = {};
-				this.getAllMainTasks(data,this.current)
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : 1, //任务类型
+					persons : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.current, //主任务状态
+					page : 1, //页码
+					limit : 20 //条数
+				};
+				if (index == 2) {
+					data.state = 6
+				};
+				if (index == 1) {
+					data.state = -1
+				};
+				this.getAllMainTasks(data)
 			},
 			// 任务状态下拉事件
 			statusChange (val) {
 				this.goingState = val.index;
-				let data = {};
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : 1, //任务类型
+					persons : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.goingState, //主任务状态
+					page : 1, //页码
+					limit : 20 //条数
+				};
+				if (val.index == 0) {
+					data.state = -1
+				};
 				this.getAllMainTasks(data,this.goingState)
 			},
 			// 进入任务
 			enterTask (item,index) {
+				// if (item.status === 0) {
+				// 	return
+				// };
+				this.changeMainTaskId(item.id);
 				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'
 				});
@@ -582,6 +709,10 @@
 					display: flex;
 					justify-content: space-between;
 					align-items: center;
+					.btnRightStyle {
+						background: #e8e8e8;
+						color: #989898
+					};
 					text {
 						width: 90px;
 						height: 40px;

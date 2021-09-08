@@ -1,5 +1,13 @@
 <template>
 	<view class="container">
+		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
+		<u-toast ref="uToast" />
+		<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
+			<view class="slot-content">
+				<u-icon name="close-circle-fill" @click="closeImageEvent"></u-icon>
+				<image :src="enlargeImg"></image>
+			</view>
+		</u-modal>
 		<view class="nav">
 			<nav-bar backState="3000" bgColor="#2c9af1" fontColor="#FFF" title="检查记录" @backClick="backTo">
 			</nav-bar>
@@ -15,9 +23,15 @@
 				v-for="(item,index) in recordList"
 				>
 					<view class="tripItem">
-						<view class="title">问题描述: {{item.problemDescription}}</view>
-						<view class="tips">备注: {{item.remark}}</view>
-						<view class="tips">质疑理由: {{item.queryReason}}</view>
+						<view class="title" v-if="item.problemDescription">问题描述: {{item.problemDescription.replace('问题描述:','')}}</view>
+						<view class="record-img" v-if="item.images">
+							<text v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
+							 @click="imageEvent(innerItem,innerIndex)"
+							>
+								<image :src="`http://blink.blinktech.cn/image/${innerItem}`">
+							</text>
+						</view>
+						<view class="tips" v-if="item.remark">备注: {{item.remark.replace('备注:','')}}</view>
 					</view>
 				</timelineItem>
 			</timeline>
@@ -30,6 +44,9 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
+	import {
+		queryItemDetails
+	} from '@/api/task.js'
 	import {
 		setCache,
 		getCache
@@ -46,37 +63,18 @@
 		data() {
 			return {
 				taskTypeText: '',
-				recordList: [
-					{
-						scrutator: '扎根三',
-						startTime: '2020-01-01',
-						problemDescription: '撒德哈打卡杀伤力的哈手机卡季后赛',
-						remark: '飒飒飒飒飒飒',
-						queryReason: '飒飒撒'
-					},
-					{
-						scrutator: '阿萨飒',
-						startTime: '2021-03-21',
-						problemDescription: '撒德哈打卡杀伤力的哈手机卡季后赛',
-						remark: '飒飒飒飒飒飒',
-						queryReason: '飒飒撒'
-					},
-					{
-						scrutator: '财政赤字',
-						startTime: '2022-07-04',
-						problemDescription: '撒德哈打卡杀伤力的哈手机卡季后赛',
-						remark: '飒飒飒飒飒飒',
-						queryReason: '飒飒撒'
-					}
-				]
+				infoText: '',
+				enlargeImg: '',
+				recordList: [],
+				showLoadingHint: false,
+				enlargePhotoShow: false
 			}
 		},
 		computed: {
 			...mapGetters([
 				'titleText',
-				'isToCallTaskPage',
 				'userInfo',
-				'isMedicalMan'
+				'subtaskInfo'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -99,15 +97,60 @@
 		},
 		
 		onLoad(options) {
-			this.taskTypeText = this.titleText
+			this.taskTypeText = this.titleText;
+			this.getItemDetails(this.subtaskInfo['taskItemId']);
+			console.log('啥数据',this.subtaskInfo);
 		},
 		
 		methods: {
 			...mapMutations([
-				'changeTitleText',
-				'changeBottomBarIndex',
-				'changeIsToCallTaskPage'
 			]),
+			
+			// 查询检查项详情
+			getItemDetails (checkId) {
+				this.recordList = [];
+				this.infoText = '加载中···';
+				this.showLoadingHint = true;
+				queryItemDetails(checkId).then((res) => {
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 200) {
+						if (res.data.data.length > 0) {
+							for (let item of res.data.data) {
+								this.recordList.push({
+									scrutator: item['operator'],
+									startTime: item['operationTime'],
+									problemDescription: item['describe'],
+									remark: item['remarks'],
+									images: item['images']
+								})
+							}
+						}
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					});
+					this.showLoadingHint = false
+				})
+			},
+			
+			// 图片放大事件
+			imageEvent (item,index) {
+				this.enlargePhotoShow = true;
+				this.enlargeImg = `http://blink.blinktech.cn/image/${item}`
+			},
+			
+			// 图片关闭事件
+			closeImageEvent () {
+				this.enlargePhotoShow = false
+			},
 			
 			// 返回上一页
 			backTo() {
@@ -132,6 +175,31 @@
 		font-size: 14px;
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
+		/deep/ .u-model {
+			height: 600px;
+			padding: 15px;
+			position: relative;
+			box-sizing: border-box;
+			.u-model__content {
+				.slot-content {
+					height: 580px;
+					.u-icon {
+						position: absolute;
+						top: 0;
+						right: 0;
+						z-index: 100;
+						font-size: 34px
+					}
+					image {
+						width: 100%;
+						height: 100%
+					}
+				}
+			}
+			.u-model__footer {
+				display: none
+			}
+		};
 		::-webkit-scrollbar {
 			width: 0;
 			height: 0;
@@ -160,24 +228,42 @@
 			margin: 0 auto;
 			overflow: auto;
 			flex: 1;
+			/deep/ .timeline {
+				height: 100%
+			};
 			.tripItem {
-					padding: 10px 20px;
+					padding: 10px;
 					box-sizing: border-box;
 					background:rgba(255,255,255,1);
 					box-shadow:0px 0px 20px 0px rgba(0,0,0,0.08);
 					border-radius:10px;
 					margin-bottom: 30px;
 					.title {
-							font-size:18px;
+							font-size:14px;
 							font-weight:500;
 							color:rgba(51,51,51,1);
+					}
+					.record-img {
+						display: flex;
+						flex-flow: row wrap;
+						margin-top: 10px;
+						text {
+							display: inline-block;
+							width: 50px;
+							height: 50px;
+							margin-right: 4px;
+							margin-bottom: 4px;
+							image {
+								width: 100%;
+								height: 100%
+							}
+						}
 					}
 					.tips {
 							font-size:14px;
 							font-weight:400;
 							color:rgba(153,153,153,1);
-							margin-top: 20px;
-
+							margin-top: 10px
 					}
 			}
 		}
