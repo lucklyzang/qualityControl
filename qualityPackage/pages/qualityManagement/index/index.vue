@@ -31,7 +31,7 @@
 			<view class="not-start" v-show="current === 0" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
-						<text>{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
+						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 					</view>
 					<view class="status-content-top">
 						<view class="specific-status">
@@ -89,7 +89,7 @@
 			<view class="is-going" v-show="current === 1">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
-						<text>{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
+						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 					</view>
 					<view class="status-content-top">
 						<view class="specific-status">
@@ -147,7 +147,7 @@
 			<view class="is-completed" v-show="current === 2" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
-						<text>{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
+						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 					</view>
 					<view class="status-content-top">
 						<view class="specific-status">
@@ -258,18 +258,34 @@
 				page : 1, //页码
 				limit : 20 //条数
 			};
-			this.getAllMainTasks(data,1)
+			this.getAllMainTasks(data)
 		},
 		
 		// 监听页面下拉刷新事件
 		onPullDownRefresh() {
-			let data = {};
+			let data = {
+				hospitals : this.proId, //检查项目(指的是医院)
+				mode : 1, //评价方式
+				type : 1, //任务类型
+				persons : this.workerId, //任务负责人
+				subPersons : "", //子任务负责人
+				startTime: "",//检查时间
+				createTime : "", //创建时间
+				state : this.goingState, //主任务状态
+				page : 1, //页码
+				limit : 20 //条数
+			};
 			this.isFresh = true;
 			if (this.current === 1) {
-				this.getAllMainTasks(data,this.goingState)
+				if (this.goingState == 0) {
+					data.state = -1
+				}
+			} else if (this.current == 0) {
+				data.state = 0
 			} else {
-				this.getAllMainTasks(data,this.current)
-			}
+				data.state = 6
+			};
+			this.getAllMainTasks(data)
 		},
 		
 		computed: {
@@ -405,7 +421,9 @@
 							markedWords = "请完成复查"
 						}
 					}
-				};
+				} else if (state == 6) {
+					markedWords = "检查已完成"
+				}
 				return markedWords
 			},
 			
@@ -439,9 +457,9 @@
 				} else if (state == 3) {
 					itemState = 3
 				} else if (state == 4) {
-					itemState = 5
-				} else if (state == 5) {
 					itemState = 4
+				} else if (state == 5) {
+					itemState = 5
 				};
 				return itemState		
 			},
@@ -452,10 +470,14 @@
 				for (let i = 0, len = data.length; i < len; i++) {
 					for (let k = 0, len = data[i]['checkItems'].length; k < len; k++) {
 						let temporaryData = data[i]['checkItems'];
-						if (majorTaskState == 2 || majorTaskState == 5 || this.judgeCheckItemState(majorTaskState) == 7) {
+						if ( majorTaskState == 2 || majorTaskState == 5 || this.judgeCheckItemState(majorTaskState) == 7) {
 							temporaryFlag = temporaryData.some((item) => { return item['state'] == this.judgeCheckItemState(majorTaskState)})
 						} else {
-							temporaryFlag = temporaryData.some((item) => { return item['state'] != this.judgeCheckItemState(majorTaskState)})
+							if (majorTaskState == 4) {
+								temporaryFlag = temporaryData.some((item) => { return item['state'] == this.judgeCheckItemState(majorTaskState) || item['state'] == 7})
+							} else {
+								temporaryFlag = temporaryData.some((item) => { return item['state'] != this.judgeCheckItemState(majorTaskState)})
+							}
 						};
 						if (temporaryFlag) {
 							return true
@@ -565,7 +587,7 @@
 				if (val.index == 0) {
 					data.state = -1
 				};
-				this.getAllMainTasks(data,this.goingState)
+				this.getAllMainTasks(data)
 			},
 			// 进入任务
 			enterTask (item,index) {
@@ -631,7 +653,10 @@
 					font-weight: bold
 				};
 				&:last-child {
-					width: 80%
+					width: 80%;
+					.show-box {
+						height: 40px
+					}
 				}
 			}
 		}
@@ -653,6 +678,8 @@
 				};
 				.status-info {
 					width: 50%;
+					padding-left: 4px;
+					box-sizing: border-box;
 					border-left: 1px solid #ddd;
 					border-bottom: 1px solid #ddd;
 					text-align: center;
@@ -662,7 +689,24 @@
 					top: 0;
 					right: 0;
 					color: #2c9af1;
-					font-size: 13px
+					font-size: 13px;
+					overflow: hidden;
+					> text {
+						width: 100%;
+						display: inline-block
+					}
+					.animate-center {
+						white-space: nowrap;
+						animation: 4s wordsLoop linear infinite normal
+					}
+					@keyframes wordsLoop {
+						0% {
+							transform: translateX(100%)
+						}
+						100% {
+							transform: translateX(-100%)
+						}
+					}
 				}
 				.status-content-top {
 					color: #2c9af1;
@@ -711,7 +755,7 @@
 					align-items: center;
 					.btnRightStyle {
 						background: #e8e8e8;
-						color: #989898
+						color: #666
 					};
 					text {
 						width: 90px;

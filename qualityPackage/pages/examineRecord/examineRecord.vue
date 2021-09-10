@@ -23,7 +23,7 @@
 				v-for="(item,index) in recordList"
 				>
 					<view class="tripItem">
-						<view class="title" v-if="item.problemDescription">问题描述: {{item.problemDescription.replace('问题描述:','')}}</view>
+						<view class="title" v-if="item.problemDescription">{{item.problemDescription}}</view>
 						<view class="record-img" v-if="item.images">
 							<text v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
 							 @click="imageEvent(innerItem,innerIndex)"
@@ -31,7 +31,7 @@
 								<image :src="`http://blink.blinktech.cn/image/${innerItem}`">
 							</text>
 						</view>
-						<view class="tips" v-if="item.remark">备注: {{item.remark.replace('备注:','')}}</view>
+						<view class="tips" v-if="item.remark">{{item.remark}}</view>
 					</view>
 				</timelineItem>
 			</timeline>

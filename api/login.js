@@ -20,7 +20,7 @@ export function logIn(data) {
 // 用户退出登录
 export function userSignOut(proId,workerId) {
   return request({
-    url: `login/signOut/${proId}/${workerId}`,
+    url: `auth/logOut/${proId}/${workerId}`,
     method: 'get'
   })
 };

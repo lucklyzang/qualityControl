@@ -744,10 +744,14 @@
 					for (let j = 0, len = data[i]['checkItem'].length; j < len; j++) {
 						for (let k = 0, len = data[i]['checkItem'][j]['checkItemList'].length; k < len; k++) {
 							let temporaryData = data[i]['checkItem'][j]['checkItemList'];
-							if (this.flowState == 2 || this.flowState == 5 || state == 7) {
+							if (this.flowState == 0 || this.flowState == 1 || this.flowState == 2 || this.flowState == 5 || state == 7) {
 								temporaryFlag = temporaryData.some((item) => { return item['checkState'] == state})
 							} else {
-								temporaryFlag = temporaryData.some((item) => { return item['checkState'] != state})
+								if (this.flowState == 4) {
+									temporaryFlag = temporaryData.some((item) => { return item['checkState'] == state || item['checkState'] == 7 })
+								} else {
+									temporaryFlag = temporaryData.some((item) => { return item['checkState'] != state})
+								}
 							};
 							if (temporaryFlag) {
 								return true
@@ -817,14 +821,14 @@
 				};
 				let flag;
 				// 根据主任务状态判断子任务对应状态是否全部更改完成
-				if (this.flowState == 1) {
-					flag = this.judgeSubTaskItemState(this.subtaskList,1)
+				if (this.flowState == 0 || this.flowState == 1) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,0)
 				} else if (this.flowState == 2) {
 					flag = this.judgeSubTaskItemState(this.subtaskList,1)
 				} else if (this.flowState == 3) {
 					flag = this.judgeSubTaskItemState(this.subtaskList,3)
 				} else if (this.flowState == 4) {
-					flag = this.judgeSubTaskItemState(this.subtaskList,5)
+					flag = this.judgeSubTaskItemState(this.subtaskList,4)
 				} else if (this.flowState == 5) {
 					flag = this.judgeSubTaskItemState(this.subtaskList,5)
 				};		
@@ -1009,7 +1013,7 @@
 			}
 			.btn-right {
 				background: #e8e8e8;
-				color: #989898
+				color: #666
 			}
 		}
 	}	

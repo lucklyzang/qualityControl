@@ -152,7 +152,9 @@
 					this.gradeValue = this.subtaskInfo['score']
 				} else if (this.subtaskInfo['operation'] == 7 || this.subtaskInfo['operation'] == 8) {
 					this.isDisabled = true;
-					this.gradeValue = this.subtaskInfo['score']
+					this.gradeValue = this.subtaskInfo['score'];
+					this.problemDescribeValue = '';
+					this.remark = ''
 				}
 			},
 			// 弹框取消按钮
