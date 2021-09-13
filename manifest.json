@@ -50,18 +50,14 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx84a2d3ace3c4dc9d",
+        "appid" : "wx4e932860ea01034b",
         "setting" : {
             "urlCheck" : true,
             "es6" : true,
             "minified" : true
         },
         "usingComponents" : true,
-        "permission" : {
-            "scope.userLocation" : {
-                "desc" : ""
-            }
-        }
+        "permission" : {}
     },
     "mp-alipay" : {
         "usingComponents" : true

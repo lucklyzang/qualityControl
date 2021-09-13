@@ -3,7 +3,7 @@ import store from '@/store'
 import Qs from 'qs'
 import { setCache, getCache, removeAllLocalStorage } from '@/common/js/utils'
 const instance = axios.create({
-  baseURL: 'http://blink.blinktech.cn/nblink',
+  baseURL: 'https://blink.blinktech.cn/nblink',
   headers: {
     // common: {
     //   'Accept': 'application/json, test/plain,'

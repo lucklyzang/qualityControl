@@ -133,7 +133,7 @@
 				userSignOut().then((res) => {
 					if (res && res.data.code == 200) {
 						removeAllLocalStorage();
-						uni.redirectT({
+						uni.redirectTo({
 							url: '/pages/login/login'
 						})
 					} else {

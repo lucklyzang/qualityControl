@@ -32,8 +32,8 @@
 				<view class="subtask-list-title" @click="subtaskEvent(item,index)">
 					<view class="subtask-list-left">
 						<view class="subtask-icon">
-							<u-icon name="play-right-fill" v-show="!item.unfold"></u-icon>
-							<u-icon name="arrow-down-fill" v-show="item.unfold"></u-icon>
+							<u-icon name="play-right-fill" v-if="!item.unfold"></u-icon>
+							<u-icon name="arrow-down-fill" v-if="item.unfold"></u-icon>
 						</view>
 					</view>
 					<view class="subtask-list-center-wrapper">
@@ -61,10 +61,10 @@
 						</view>
 					</view>
 				</view>
-				<view class="subtask-list-content" v-show="item.unfold">
+				<view class="subtask-list-content" v-if="item.unfold">
 					<view class="subtask-item-wrapper">
 						<view class="subtask-item" v-for="(itemInner,indexInner) in item.checkItem" :key="indexInner">
-							<view class="subtask-item-title" v-show="itemInner.checkItemList.length > 0">
+							<view class="subtask-item-title" v-if="itemInner.checkItemList.length > 0">
 								<text>
 									<u-icon name="list"></u-icon>
 								</text>

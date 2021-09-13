@@ -26,8 +26,8 @@
 					<u-input v-model="problemDescribeValue" placeholder="请输入问题描述" type="textarea" :border="true"  />
 				</view>
 			</view>
-			<view class="problem-photo" v-show="this.subtaskInfo.operation == 2">
-				<view>
+			<view class="problem-photo" v-show="subtaskInfo.operation == 2">
+				<view> 
 					<text>问题拍照</text>
 				</view>
 				<view>
@@ -81,7 +81,7 @@
 		},
 		data() {
 			return {
-				gradeValue: '',
+				gradeValue: '0',
 				infoText: '',
 				problemDescribeValue: '',
 				taskTypeText: '',
@@ -124,8 +124,7 @@
 		
 		onLoad(options) {
 			this.judgeScoreWay();
-			this.taskTypeText = this.titleText;
-			console.log('缓存数据',this.subtaskInfo);
+			this.taskTypeText = this.titleText
 		},
 		
 		methods: {
@@ -143,16 +142,16 @@
 				 // 判断打分方式(1满分2扣分0不参评-1重新评价7不通过8通过);
 				if (this.subtaskInfo['operation'] == 1) {
 					this.isDisabled = true;
-					this.gradeValue = this.subtaskInfo['fullScore']
+					this.gradeValue = this.subtaskInfo['fullScore'].toString()
 				} else if (this.subtaskInfo['operation'] === 0) {
 					this.isDisabled = true;
-					this.gradeValue = 0
+					this.gradeValue = '0'
 				} else if (this.subtaskInfo['operation'] == 2 || this.subtaskInfo['operation'] == -1) {
 					this.isDisabled = false;
-					this.gradeValue = this.subtaskInfo['score']
+					this.gradeValue = this.subtaskInfo['score'].toString()
 				} else if (this.subtaskInfo['operation'] == 7 || this.subtaskInfo['operation'] == 8) {
 					this.isDisabled = true;
-					this.gradeValue = this.subtaskInfo['score'];
+					this.gradeValue = this.subtaskInfo['score'].toString();
 					this.problemDescribeValue = '';
 					this.remark = ''
 				}

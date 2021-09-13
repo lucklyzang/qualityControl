@@ -8,20 +8,20 @@
 		</view>
 		<view class="score-box">
 			<text>得分: </text>
-			<text v-show="subtaskInfo.state == 0">未评价</text>
-			<text v-show="subtaskInfo.itemMode == 2 && subtaskInfo.majorState != 3">不参评</text>
-			<text v-show="(subtaskInfo.itemMode != 2 && subtaskInfo.state != 0) || subtaskInfo.majorState == 3">{{`${subtaskInfo.score}/${subtaskInfo.fullScore}`}}</text>
+			<text v-if="subtaskInfo.state == 0">未评价</text>
+			<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState != 3">不参评</text>
+			<text v-if="(subtaskInfo.itemMode != 2 && subtaskInfo.state != 0) || subtaskInfo.majorState == 3">{{`${subtaskInfo.score}/${subtaskInfo.fullScore}`}}</text>
 		</view>
-		<view class="operite-btn-box" v-show="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
-			<view @click="gradeEvent(1)" v-show="fullScoreShow">满分</view>
-			<view @click="gradeEvent(2)" v-show="deductMarkShow">扣分</view>
-			<view @click="gradeEvent(0)" v-show="notMarkShow">不参评</view>
+		<view class="operite-btn-box" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
+			<view @click="gradeEvent(1)" v-if="fullScoreShow">满分</view>
+			<view @click="gradeEvent(2)" v-if="deductMarkShow">扣分</view>
+			<view @click="gradeEvent(0)" v-if="notMarkShow">不参评</view>
 		</view>
-		<view class="operite-query-btn-box" v-show="subtaskInfo.majorState == 3">
+		<view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 3">
 			<view @click="gradeEvent(-1)">重新评价</view>
 			<view @click="gradeEvent(5)">驳回</view>
 		</view>
-		<view class="operite-query-btn-box" v-show="subtaskInfo.majorState == 5">
+		<view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 5">
 			<view @click="gradeEvent(8)">通过</view>
 			<view @click="gradeEvent(7)">不通过</view>
 		</view>

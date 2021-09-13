@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<u-toast ref="uToast" />
-		<view class="empty-info" v-show="noDataShow">
+		<view class="empty-info" v-if="noDataShow">
 			<u-empty text="数据为空" mode="list"></u-empty>
 		</view>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="加载中···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
@@ -28,7 +28,7 @@
 			</view>
 		</view>
 		<view class="status-content-wrapper">
-			<view class="not-start" v-show="current === 0" :class="{'statusStyle':current != 1}">
+			<view class="not-start" v-if="current === 0" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
 						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
@@ -86,7 +86,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="is-going" v-show="current === 1">
+			<view class="is-going" v-if="current === 1">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
 						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
@@ -144,7 +144,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="is-completed" v-show="current === 2" :class="{'statusStyle':current != 1}">
+			<view class="is-completed" v-if="current === 2" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-info">
 						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
