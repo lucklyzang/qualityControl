@@ -4,14 +4,18 @@ export default {
     bottomBarIndex: 0,
 		mainTaskId: '',
 		subtaskInfo: {},
-		disposeSubTaskData: []
+		disposeSubTaskData: [],
+		cacheIndex: {},
+		isSkipDetails: false
   },
   getters:{
     titleText: state => state.titleText,
     bottomBarIndex: state => state.bottomBarIndex,
 		mainTaskId: state => state.mainTaskId,
 		subtaskInfo: state => state.subtaskInfo,
-		disposeSubTaskData: state => state.disposeSubTaskData
+		disposeSubTaskData: state => state.disposeSubTaskData,
+		cacheIndex: state => state.cacheIndex,
+		isSkipDetails: state => state.isSkipDetails
   },
   mutations:{
     changeTitleText (state, playLoad) {
@@ -28,6 +32,12 @@ export default {
 		},
 		changeDisposeSubTaskData (state, playLoad) {
 			state.disposeSubTaskData = playLoad
+		},
+		changeCacheIndex (state, playLoad) {
+			state.cacheIndex = playLoad
+		},
+		changeIsSkipDetails (state, playLoad) {
+			state.isSkipDetails = playLoad
 		}
   },
   actions:{}

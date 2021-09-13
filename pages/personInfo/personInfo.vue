@@ -130,9 +130,12 @@
 				this.showLoadingHint = true;
 				this.changeOverDueWay(true);
 				setCache('storeOverDueWay', true);
-				userSignOut(this.proId, this.workerId).then((res) => {
+				userSignOut().then((res) => {
 					if (res && res.data.code == 200) {
 						removeAllLocalStorage();
+						uni.redirectT({
+							url: '/pages/login/login'
+						})
 					} else {
 						this.$refs.uToast.show({
 							title: `${res.data.msg}`,
@@ -145,7 +148,7 @@
 				}).
 				catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.message}`,
+						title: `${err.msg}`,
 						type: 'warning'
 					});
 					this.changeOverDueWay(false);

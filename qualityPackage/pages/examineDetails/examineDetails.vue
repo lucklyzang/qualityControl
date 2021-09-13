@@ -725,7 +725,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err}`,
+						title: `${err.msg}`,
 						type: 'warning'
 					});
 					this.showLoadingHint = false
@@ -807,7 +807,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err}`,
+						title: `${err.msg}`,
 						type: 'warning'
 					});
 					this.showLoadingHint = false

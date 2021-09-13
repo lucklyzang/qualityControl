@@ -21,7 +21,7 @@
 					:showItemNum="5"
 					 @change="statusChange"
 					:placeholder = "'placeholder'"
-					:initValue="'全部'"
+					:initValue="initValue"
 					:selectHideType="'hideAll'"
 				>
 				</xfl-select>
@@ -239,7 +239,8 @@
 				showLoadingHint: false,
 				statusList: [{name: '未开始'},{name: '进行中'},{name: '已完成'}],
 				flowList: ['全部','检查中','确认结果中','复核质疑中','整改中','复查中'],
-				current: 1,
+				initValue: '全部',
+				current: 0,
 				goingState: '',
 				statusContentList: []
 			}
@@ -254,10 +255,20 @@
 				subPersons : "", //子任务负责人
 				startTime: "",//检查时间
 				createTime : "", //创建时间
-				state : -1, //主任务状态
+				state : 0, //主任务状态
 				page : 1, //页码
 				limit : 20 //条数
 			};
+			if (this.isSkipDetails) {
+				this.current = this.cacheIndex['current'];
+				if (this.cacheIndex['isGoingTask']) {
+					data.state = this.cacheIndex['selectIndex'] == 0 ? -1 : this.cacheIndex['selectIndex'];
+					this.initValue = this.statusOtherTransfer(this.cacheIndex['selectIndex'])
+				} else {
+					data.state = this.cacheIndex['current'] == 2 ? 6 : this.cacheIndex['current']
+				}
+			};
+			this.changeIsSkipDetails(false);
 			this.getAllMainTasks(data)
 		},
 		
@@ -291,7 +302,9 @@
 		computed: {
 			...mapGetters([
 				'titleText',
-				'userInfo'
+				'userInfo',
+				'isSkipDetails',
+				'cacheIndex'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -319,7 +332,9 @@
 		
 		methods: {
 			...mapMutations([
-				'changeMainTaskId'
+				'changeMainTaskId',
+				'changeCacheIndex',
+				'changeIsSkipDetails'
 			]),
 			// 返回上一页
 			backTo() {
@@ -352,6 +367,30 @@
 					case 6 :
 					return '已完成'
 			    break;
+			  }
+			},
+			
+			// 下拉框状态转换
+			statusOtherTransfer (index) {
+			  switch(index) {
+					case 0 :
+					return '全部'
+					break;
+			    case 1 :
+			    return '检查中'
+			    break;
+			    case 2 :
+			    return '确认结果中'
+			    break;
+			    case 3 :
+			    return '复核质疑中'
+			    break;
+			    case 4 :
+			    return '整改中'
+					break;
+					case 5 :
+					return '复查中'
+					break
 			  }
 			},
 			
@@ -534,7 +573,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err}`,
+						title: `${err.msg}`,
 						type: 'error'
 					});
 					this.showLoadingHint = false;
@@ -565,7 +604,8 @@
 					data.state = 6
 				};
 				if (index == 1) {
-					data.state = -1
+					data.state = -1;
+					this.initValue = '全部'
 				};
 				this.getAllMainTasks(data)
 			},
@@ -594,6 +634,20 @@
 				// if (item.status === 0) {
 				// 	return
 				// };
+				let temporaryIndex = {};
+				if (this.current == 0) {
+					temporaryIndex.current = this.current;
+					temporaryIndex.isGoingTask = false
+				} else if (this.current == 1) {
+					temporaryIndex.current = this.current;
+					temporaryIndex.isGoingTask = true;
+					temporaryIndex.selectIndex = this.goingState
+				} else {
+					temporaryIndex.current = this.current;
+					temporaryIndex.isGoingTask = false
+				};
+				this.changeIsSkipDetails(true);
+				this.changeCacheIndex(temporaryIndex);
 				this.changeMainTaskId(item.id);
 				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'

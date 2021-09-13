@@ -136,7 +136,7 @@
 				  .catch((err) => {
 					   this.showLoadingHint = false;
 					   this.modalShow = true;
-					   this.modalContent = `${err.message}`
+					   this.modalContent = `${err.msg}`
 				  })
 			},
       

@@ -18,10 +18,10 @@ export function logIn(data) {
 }
 
 // 用户退出登录
-export function userSignOut(proId,workerId) {
+export function userSignOut() {
   return request({
-    url: `auth/logOut/${proId}/${workerId}`,
-    method: 'get'
+    url: 'auth/logout',
+    method: 'post'
   })
 };
 

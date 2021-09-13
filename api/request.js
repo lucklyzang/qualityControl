@@ -26,21 +26,20 @@ instance.interceptors.request.use(function (config) {
 	 return config;
 }, function (error) {
   //处理请求错误
-  return Promise.reject(error);
+  return Promise.reject(error.response);
 });
 
 // 添加响应拦截器
 instance.interceptors.response.use(function (response) {
-	 if (response.headers['token']) {
-		 store.commit('changeToken', response.headers['token']);
-		 setCache('questToken', response.headers['token'])
-	 };
-	 if (response['status'] == '401') {
-		 if (response.data.msg == `当前用户[${getCache('userName')}]已登陆,不可重复登陆` || response.data.msg == `当前登陆用户[${getCache('userName')}]不存在`) {
-			return response
-		 };
-		 removeAllLocalStorage();
-		 if (!store.getters.overDueWay) {
+	if (response.headers['token']) {
+		store.commit('changeToken', response.headers['token']);
+		setCache('questToken', response.headers['token'])
+	};
+	return response
+}, function (error) {
+	if (error.response.status === 401) {
+		removeAllLocalStorage();
+		if (!store.getters.overDueWay) {
 			uni.showToast({
 				title: 'token已过期,请重新登录',
 				duration: 1000
@@ -56,10 +55,8 @@ instance.interceptors.response.use(function (response) {
 			})
 		}
 	};
-	return response;
-}, function (error) {
   // 处理响应错误
-  return Promise.reject(error);
+  return Promise.reject(error.response.data)
 });
 
 export default instance
