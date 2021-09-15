@@ -6,7 +6,7 @@
 		</view>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="加载中···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#2c9af1" fontColor="#FFF" title="任务列表" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="任务列表" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="tabs-title">
@@ -30,54 +30,66 @@
 		<view class="status-content-wrapper">
 			<view class="not-start" v-if="current === 0" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
-					<view class="status-info">
-						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
-					</view>
 					<view class="status-content-top">
-						<view class="specific-status">
-							<text>状态 : {{statusTransfer(item.status)}}</text>
-						</view>
-					</view>
-					<view class="status-content-middle">
 						<view class="content-number">
 							<text>编号 : </text>
 							<text>{{item.serialNumber}}</text>
 						</view>
-						<view class="content-examination-item">
-							<text>考核项目 : </text>
-							<text>{{item.examinationItem}}</text>
+						<view class="specific-status">
+							<text>{{statusTransfer(item.status)}}</text>
 						</view>
-						<view class="content-examination-time">
-							<text>考核时间 : </text>
-							<text>{{item.examinationTime}}</text>
+					</view>
+					<view class="status-content-middle">
+						<view class="status-content-middle-first-line">
+							<view class="content-examination-item">
+								<text>考核项目 : </text>
+								<text>{{item.examinationItem}}</text>
+							</view>
+							<view class="content-examination-time">
+								<text>考核时间 : </text>
+								<text>{{item.examinationTime}}</text>
+							</view>
 						</view>
-						<view class="content-examination-type">
-							<text>检查类型 : </text>
-							<text>{{item.examinationType}}</text>
+						<view class="status-content-middle-two-line">
+							<view class="content-examination-type">
+								<text>检查类型 : </text>
+								<text>{{item.examinationType}}</text>
+							</view>
+							<view class="content-examination-principal">
+								<text>检查负责人 : </text>
+								<text>{{item.examinationPrincipal}}</text>
+							</view>
 						</view>
-						<view class="content-examination-principal">
-							<text>检查负责人 : </text>
-							<text>{{item.examinationPrincipal}}</text>
+						<view class="status-content-middle-three-line">
+							<view class="content-assessment-format">
+								<text>评价方式 : </text>
+								<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
+							</view>
+							<view class="content-isQuery">
+								<text>质 疑 : </text>
+								<text>{{queryTransfer(item.isQuery)}}</text>
+							</view>
 						</view>
-						<view class="content-examination-startTime">
-							<text>开始时间 : </text>
-							<text>{{item.examinationStartTime}}</text>
+						<view class="status-content-middle-four-line">
+							<view class="content-fullMark">
+								<text>满 分 : </text>
+								<text>{{item.fullMark}}</text>
+							</view>
+							<view class="status-info">
+								<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
+							</view>
 						</view>
-						<view class="content-assessment-format">
-							<text>评价方式 : </text>
-							<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
+						<view class="status-content-middle-five-line">
+							<view class="content-remark">
+								<text>备 注 : </text>
+								<text>{{item.remark}}</text>
+							</view>
 						</view>
-						<view class="content-isQuery">
-							<text>质疑 : </text>
-							<text>{{queryTransfer(item.isQuery)}}</text>
-						</view>
-						<view class="content-fullMark">
-							<text>满分 : </text>
-							<text>{{item.fullMark}}</text>
-						</view>
-						<view class="content-remark">
-							<text>备注 : </text>
-							<text>{{item.remark}}</text>
+						<view class="status-content-middle-six-line">
+							<view class="start-time">
+								<text>开始时间 :</text>
+								<text>{{item.examinationStartTime}}</text>
+							</view>
 						</view>
 					</view>
 					<view class="status-content-bottom">
@@ -88,54 +100,66 @@
 			</view>
 			<view class="is-going" v-if="current === 1">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
-					<view class="status-info">
-						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
-					</view>
 					<view class="status-content-top">
-						<view class="specific-status">
-							<text>状态 : {{statusTransfer(item.status)}}</text>
-						</view>
-					</view>
-					<view class="status-content-middle">
 						<view class="content-number">
 							<text>编号 : </text>
 							<text>{{item.serialNumber}}</text>
 						</view>
-						<view class="content-examination-item">
-							<text>考核项目 : </text>
-							<text>{{item.examinationItem}}</text>
+						<view class="specific-status">
+							<text>{{statusTransfer(item.status)}}</text>
 						</view>
-						<view class="content-examination-time">
-							<text>考核时间 : </text>
-							<text>{{item.examinationTime}}</text>
+					</view>
+					<view class="status-content-middle">
+						<view class="status-content-middle-first-line">
+							<view class="content-examination-item">
+								<text>考核项目 : </text>
+								<text>{{item.examinationItem}}</text>
+							</view>
+							<view class="content-examination-time">
+								<text>考核时间 : </text>
+								<text>{{item.examinationTime}}</text>
+							</view>
 						</view>
-						<view class="content-examination-type">
-							<text>检查类型 : </text>
-							<text>{{item.examinationType}}</text>
+						<view class="status-content-middle-two-line">
+							<view class="content-examination-type">
+								<text>检查类型 : </text>
+								<text>{{item.examinationType}}</text>
+							</view>
+							<view class="content-examination-principal">
+								<text>检查负责人 : </text>
+								<text>{{item.examinationPrincipal}}</text>
+							</view>
 						</view>
-						<view class="content-examination-principal">
-							<text>检查负责人 : </text>
-							<text>{{item.examinationPrincipal}}</text>
+						<view class="status-content-middle-three-line">
+							<view class="content-assessment-format">
+								<text>评价方式 : </text>
+								<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
+							</view>
+							<view class="content-isQuery">
+								<text>质 疑 : </text>
+								<text>{{queryTransfer(item.isQuery)}}</text>
+							</view>
 						</view>
-						<view class="content-examination-startTime">
-							<text>开始时间 : </text>
-							<text>{{item.examinationStartTime}}</text>
+						<view class="status-content-middle-four-line">
+							<view class="content-fullMark">
+								<text>满 分 : </text>
+								<text>{{item.fullMark}}</text>
+							</view>
+							<view class="status-info">
+								<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
+							</view>
 						</view>
-						<view class="content-assessment-format">
-							<text>评价方式 : </text>
-							<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
+						<view class="status-content-middle-five-line">
+							<view class="content-remark">
+								<text>备 注 : </text>
+								<text>{{item.remark}}</text>
+							</view>
 						</view>
-						<view class="content-isQuery">
-							<text>质疑 : </text>
-							<text>{{queryTransfer(item.isQuery)}}</text>
-						</view>
-						<view class="content-fullMark">
-							<text>满分 : </text>
-							<text>{{item.fullMark}}</text>
-						</view>
-						<view class="content-remark">
-							<text>备注 : </text>
-							<text>{{item.remark}}</text>
+						<view class="status-content-middle-six-line">
+							<view class="start-time">
+								<text>开始时间 :</text>
+								<text>{{item.examinationStartTime}}</text>
+							</view>
 						</view>
 					</view>
 					<view class="status-content-bottom">
@@ -146,54 +170,66 @@
 			</view>
 			<view class="is-completed" v-if="current === 2" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
-					<view class="status-info">
-						<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
-					</view>
 					<view class="status-content-top">
-						<view class="specific-status">
-							<text>状态 : {{statusTransfer(item.status)}}</text>
-						</view>
-					</view>
-					<view class="status-content-middle">
 						<view class="content-number">
 							<text>编号 : </text>
 							<text>{{item.serialNumber}}</text>
 						</view>
-						<view class="content-examination-item">
-							<text>考核项目 : </text>
-							<text>{{item.examinationItem}}</text>
+						<view class="specific-status">
+							<text>{{statusTransfer(item.status)}}</text>
 						</view>
-						<view class="content-examination-time">
-							<text>考核时间 : </text>
-							<text>{{item.examinationTime}}</text>
+					</view>
+					<view class="status-content-middle">
+						<view class="status-content-middle-first-line">
+							<view class="content-examination-item">
+								<text>考核项目 : </text>
+								<text>{{item.examinationItem}}</text>
+							</view>
+							<view class="content-examination-time">
+								<text>考核时间 : </text>
+								<text>{{item.examinationTime}}</text>
+							</view>
 						</view>
-						<view class="content-examination-type">
-							<text>检查类型 : </text>
-							<text>{{item.examinationType}}</text>
+						<view class="status-content-middle-two-line">
+							<view class="content-examination-type">
+								<text>检查类型 : </text>
+								<text>{{item.examinationType}}</text>
+							</view>
+							<view class="content-examination-principal">
+								<text>检查负责人 : </text>
+								<text>{{item.examinationPrincipal}}</text>
+							</view>
 						</view>
-						<view class="content-examination-principal">
-							<text>检查负责人 : </text>
-							<text>{{item.examinationPrincipal}}</text>
+						<view class="status-content-middle-three-line">
+							<view class="content-assessment-format">
+								<text>评价方式 : </text>
+								<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
+							</view>
+							<view class="content-isQuery">
+								<text>质 疑 : </text>
+								<text>{{queryTransfer(item.isQuery)}}</text>
+							</view>
 						</view>
-						<view class="content-examination-startTime">
-							<text>开始时间 : </text>
-							<text>{{item.examinationStartTime}}</text>
+						<view class="status-content-middle-four-line">
+							<view class="content-fullMark">
+								<text>满 分 : </text>
+								<text>{{item.fullMark}}</text>
+							</view>
+							<view class="status-info">
+								<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
+							</view>
 						</view>
-						<view class="content-assessment-format">
-							<text>评价方式 : </text>
-							<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
+						<view class="status-content-middle-five-line">
+							<view class="content-remark">
+								<text>备 注 : </text>
+								<text>{{item.remark}}</text>
+							</view>
 						</view>
-						<view class="content-isQuery">
-							<text>质疑 : </text>
-							<text>{{queryTransfer(item.isQuery)}}</text>
-						</view>
-						<view class="content-fullMark">
-							<text>满分 : </text>
-							<text>{{item.fullMark}}</text>
-						</view>
-						<view class="content-remark">
-							<text>备注 : </text>
-							<text>{{item.remark}}</text>
+						<view class="status-content-middle-six-line">
+							<view class="start-time">
+								<text>开始时间 :</text>
+								<text>{{item.examinationStartTime}}</text>
+							</view>
 						</view>
 					</view>
 					<view class="status-content-bottom">
@@ -669,7 +705,7 @@
 	};
 	.container {
 		@include content-wrapper;
-		background: #f5f5f5;
+		background: #fff;
 		padding-bottom: 0;
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
@@ -689,12 +725,21 @@
 		.nav {
 			width: 100%
 		}
-		.tabs-title {
-		}
+		/deep/ .tabs-title {
+			.u-tabs {
+				.u-scroll-view {
+					.u-tab-item {
+						color: black !important;
+						font-weight: bold
+					}
+				}
+			}
+		};
 		.status-select-wrapper {
-			width: 90%;
-			padding: 8px 0;
+			width: 100%;
+			padding: 14px 10px;
 			margin: 0 auto;
+			font-size: 16px;
 			display: flex;
 			flex-flow: row;
 			justify-content: center;
@@ -702,20 +747,28 @@
 				height: 40px;
 				&:first-child {
 					width: 20%;
-					text-align: center;
+					text-align: left;
 					line-height: 40px;
-					font-weight: bold
+					font-weight: bold;
+					color: #666666
 				};
 				&:last-child {
 					width: 80%;
 					.show-box {
-						height: 40px
+						height: 40px;
+						border: none;
+						color: black;
+						font-weight: bold;
+						background: #f9f9f9;
+						/deep/ .iconfont {
+							color: black !important
+						}
 					}
 				}
 			}
 		}
 		.status-content-wrapper {
-			width: 96%;
+			width: 100%;
 			margin: 0 auto;
 			flex: 1;
 			overflow: auto;
@@ -723,86 +776,142 @@
 				margin-top: 6px
 			}
 			.status-content-list {
-				padding: 8px;
 				margin-bottom: 10px;
 				background: #fff;
 				position: relative;
-				&:last-child {
-					margin-bottom: 0
-				};
-				.status-info {
-					width: 50%;
-					padding-left: 4px;
-					box-sizing: border-box;
-					border-left: 1px solid #ddd;
-					border-bottom: 1px solid #ddd;
-					text-align: center;
-					height: 30px;
-					line-height: 30px;
-					position: absolute;
-					top: 0;
-					right: 0;
-					color: #2c9af1;
-					font-size: 13px;
-					overflow: hidden;
-					> text {
-						width: 100%;
-						display: inline-block
-					}
-					.animate-center {
-						white-space: nowrap;
-						animation: 4s wordsLoop linear infinite normal
-					}
-					@keyframes wordsLoop {
-						0% {
-							transform: translateX(100%)
-						}
-						100% {
-							transform: translateX(-100%)
-						}
-					}
-				}
 				.status-content-top {
+					height: 52px;
+					line-height: 52px;
+					padding: 0 10px;
+					background: #f6f6f6;
 					color: #2c9af1;
 					font-size: 15px;
+					display: flex;
+					flex-flow: row nowrap;
+					justify-content: space-between;
+					.content-number {
+						color: #666;
+						font-size: 15px;
+						line-height: 52px;
+						max-width: 200px;
+						overflow-x: auto;
+						white-space: nowrap;
+						> text {
+							&:first-child {
+								margin-right: 4px
+							}
+						}
+					}
 					.specific-status {
-						
+						max-width: 150px;
+						font-size: 16px;
+						text-align: center;
+						height: 30px;
+						line-height: 30px;
+						margin-top: 11px;
+						padding: 0 4px;
+						box-sizing: border-box;
+						background: #fff;
+						border-radius: 10px;
+						overflow-x: auto;
+						white-space: nowrap
 					}
 				};
 				.status-content-middle {
-					margin: 5px 0 10px 0;
+					padding: 10px;
+					font-size: 16px;
 					> view {
-						height: 25px;
-						line-height: 25px;
-						overflow: auto;
-						text {
-							&:first-child {
-								margin-right: 6px
-							};
-							&:last-child {
-								font-weight: bold
+						> view {
+							> text {
+								&:first-child {
+									color: #666666
+								}
+							}
+						};
+						display: flex;
+						flex-flow: row nowrap;
+						justify-content: space-between;
+						padding: 3px 0;
+						> view {
+							width: 50%;
+							height: 25px;
+							line-height: 25px;
+							overflow: auto;
+							text {
+								&:first-child {
+									margin-right: 6px
+								};
+								&:last-child {
+									font-weight: bold
+								}
 							}
 						}
-					}
-					.content-remark {
-						height: auto;
-						text {
-							display: inline-block;
+					};
+					.status-content-middle-four-line {
+						> view {
 							&:first-child {
-								width: 12%;
-								vertical-align: top
+								width: 40%
 							};
 							&:last-child {
-								width: 85%;
-								margin-right: 0;
-								vertical-align: top
+								width: 60%;
+								padding-left: 4px;
+								box-sizing: border-box;
+								text-align: center;
+								height: 30px;
+								line-height: 30px;
+								font-size: 13px;
+								overflow: hidden;
+								> text {
+									width: 100%;
+									display: inline-block;
+									color: #2c9af1;
+								}
+								.animate-center {
+									white-space: nowrap;
+									animation: 4s wordsLoop linear infinite normal
+								}
+								@keyframes wordsLoop {
+									0% {
+										transform: translateX(100%)
+									}
+									100% {
+										transform: translateX(-100%)
+									}
+								}
 							}
 						}
+					};
+					.status-content-middle-five-line {
+						height: 80px;
+						background: #f6f6f6;
+						.content-remark {
+							width: 100%;
+							height: 80px;
+							overflow: auto;
+							padding: 8px;
+							box-sizing: border-box;
+							text {
+								display: inline-block;
+								&:first-child {
+									width: 15%;
+									vertical-align: top
+								};
+								&:last-child {
+									width: 82%;
+									margin-right: 0;
+									vertical-align: top
+								}
+							}
+						}
+					};
+					.status-content-middle-six-line {
+						font-size: 15px;
+						color: #666666 !important
 					}
 				};
 				.status-content-bottom {
 					height: 40px;
-					width: 70%;
+					width: 65%;
 					margin: 0 auto;
 					display: flex;
 					justify-content: space-between;
@@ -812,13 +921,16 @@
 						color: #666
 					};
 					text {
-						width: 90px;
+						font-size: 16px;
+						width: 100px;
 						height: 40px;
 						border-radius: 4px;
 						text-align: center;
 						line-height: 40px;
 						color: #fff;
-						background: #5ab3ff;
+						&:first-child {
+							background-image: linear-gradient(to right, #37d5fc , #439bff);
+						};
 						&:last-child {
 							color: #666;
 							background: #e8e8e8

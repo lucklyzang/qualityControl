@@ -3,48 +3,85 @@
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#2c9af1" fontColor="#FFF" title="检查项详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查项详情" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="score-box">
-			<text>得分: </text>
+			<text>得分 </text>
 			<text v-if="subtaskInfo.state == 0">未评价</text>
 			<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState != 3">不参评</text>
 			<text v-if="(subtaskInfo.itemMode != 2 && subtaskInfo.state != 0) || subtaskInfo.majorState == 3">{{`${subtaskInfo.score}/${subtaskInfo.fullScore}`}}</text>
 		</view>
 		<view class="operite-btn-box" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
-			<view @click="gradeEvent(1)" v-if="fullScoreShow">满分</view>
-			<view @click="gradeEvent(2)" v-if="deductMarkShow">扣分</view>
-			<view @click="gradeEvent(0)" v-if="notMarkShow">不参评</view>
+			<view @click="gradeEvent(1)" v-if="fullScoreShow">
+				<view class="image">
+					<image src="/static/img/default-person.jpg"></image>
+				</view>
+				<view class="text">满分</view>
+			</view>
+			<view @click="gradeEvent(2)" v-if="deductMarkShow">
+				<view class="image">
+					<image src="/static/img/default-person.jpg"></image>
+				</view>
+				<view class="text">扣分</view>
+			</view>
+			<view @click="gradeEvent(0)" v-if="notMarkShow">
+				<view class="image">
+					<image src="/static/img/default-person.jpg"></image>
+				</view>
+				<view class="text">不参评</view>
+			</view>
 		</view>
 		<view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 3">
-			<view @click="gradeEvent(-1)">重新评价</view>
-			<view @click="gradeEvent(5)">驳回</view>
+			<view @click="gradeEvent(-1)">
+				<view class="image">
+					<image src="/static/img/default-person.jpg"></image>
+				</view>
+				<view class="text">重新评价</view>
+			</view>
+			<view @click="gradeEvent(5)">
+				<view class="image">
+					<image src="/static/img/default-person.jpg"></image>
+				</view>
+				<view class="text">驳回</view>
+			</view>
 		</view>
 		<view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 5">
-			<view @click="gradeEvent(8)">通过</view>
-			<view @click="gradeEvent(7)">不通过</view>
+			<view @click="gradeEvent(8)">
+				<view class="image">
+					<image src="/static/img/default-person.jpg"></image>
+				</view>
+				<view class="text">通过</view>
+			</view>
+			<view @click="gradeEvent(7)">
+				<view class="image">
+					<image src="/static/img/default-person.jpg"></image>
+				</view>
+				<view class="text">不通过</view>
+			</view>
 		</view>
 		<view class="examine-content-box">
-			<view class="examine-items-number">
-				<text>检查项编号: </text>
-				<text>{{subtaskInfo.number}}</text>
-			</view>
-			<view class="score">
-				<text>分数: </text>
-				<text>{{subtaskInfo.score}}</text>
-			</view>
-			<view class="examine-describe">
-				<text>检查描述: </text>
-				<text>{{subtaskInfo.describe}}</text>
-			</view>
-			<view class="examine-describe">
-				<text>标准参考: </text>
-				<text>{{subtaskInfo.standard}}</text>
-			</view>
-			<view class="examine-describe">
-				<text>考核内容: </text>
-				<text>{{subtaskInfo.content}}</text>
+			<view class="examine-content-box-top">
+				<view class="examine-items-number">
+					<text>检查项编号 : </text>
+					<text>{{subtaskInfo.number}}</text>
+				</view>
+				<view class="score">
+					<text>分 数 : </text>
+					<text>{{subtaskInfo.score}}</text>
+				</view>
+				<view class="examine-describe">
+					<text>检查描述 : </text>
+					<text>{{subtaskInfo.describe}}</text>
+				</view>
+				<view class="examine-describe">
+					<text>标准参考 : </text>
+					<text>{{subtaskInfo.standard}}</text>
+				</view>
+				<view class="examine-describe">
+					<text>考核内容 : </text>
+					<text>{{subtaskInfo.content}}</text>
+				</view>
 			</view>
 		</view>
 		<view class="btn-box">
@@ -237,41 +274,55 @@
 		}
 
 		.score-box {
-			width: 98%;
+			width: 100%;
 			margin: 0 auto;
-			height: 100px;
-			margin-top: 8px;
-			font-size: 20px;
+			height: 150px;
+			font-size: 30px;
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			background: #fff;
-			border-radius: 4px;
-
+			color: #fff;
+			border-bottom-right-radius: 20px;
+			border-bottom-left-radius: 20px;
+			background: #f6f6f6 url(/static/img/default-person.jpg) no-repeat;
+			background-size: 100% 100%;
 			text {
 				&:first-child {
-					margin-right: 10px
+					margin-right: 10px;
+					font-size: 20px
 				}
 			}
 		}
 
 		.operite-btn-box {
-			height: 70px;
+			height: 80px;
 			display: flex;
 			font-size: 16px;
 			justify-content: center;
 			align-items: center;
-
 			>view {
-				display: inline-block;
+				display: flex;
+				flex-direction: column;
 				width: 100px;
-				height: 40px;
-				border-radius: 4px;
-				text-align: center;
-				line-height: 40px;
-				background: #fff;
+				height: 80px;
+				transform: translateY(-35%);
+				justify-content: center;
+				align-items: center;
 				margin-right: 8px;
-
+				> view {
+					&:first-child {
+						width: 70px;
+						height: 70px;
+						image {
+							width: 100%;
+							height: 100%
+						}
+					};
+					&:last-child {
+						margin-top: 6px;
+						color: #666
+					}
+				};
 				&:last-child {
 					margin-right: 0
 				}
@@ -308,25 +359,26 @@
 
 		.examine-content-box {
 			flex: 1;
-			width: 98%;
+			width: 100%;
 			margin: 0 auto;
 			height: 100px;
-			background: #fff;
+			background: #f5f5f5;
 			border-radius: 4px;
-			padding: 6px;
-
-			>view {
-				line-height: 30px;
-				height: 30px;
-				overflow: auto;
-
-				>text {
-					&:first-child {
-						margin-right: 4px
-					}
-
-					&:last-child {
-						font-weight: bold
+			.examine-content-box-top {
+				padding: 8px;
+				background: #fff;
+				>view {
+					height: auto;
+					line-height: 30px;
+					>text {
+						&:first-child {
+							margin-right: 6px;
+							color: #9a9a9a
+						}
+				
+						&:last-child {
+							font-weight: bold
+						}
 					}
 				}
 			}
@@ -334,7 +386,7 @@
 
 		.btn-box {
 			height: 60px;
-			width: 70%;
+			width: 80%;
 			margin: 0 auto;
 			display: flex;
 			justify-content: space-between;
@@ -344,14 +396,13 @@
 				color: #989898
 			};
 			text {
-				width: 110px;
+				width: 140px;
 				height: 40px;
 				border-radius: 4px;
 				text-align: center;
 				line-height: 40px;
 				color: #fff;
-				background: #5ab3ff;
-
+				background-image: linear-gradient(to right, #37d5fc , #439bff);
 				&:last-child {
 					color: #666;
 					background: #e8e8e8

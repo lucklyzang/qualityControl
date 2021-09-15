@@ -2,11 +2,16 @@
 	<view class="timelineItem">
 		<view class="timeItem">
 			<view class="leftTime">
-				<view class="scrutator">
-					{{scrutator}}
-				</view>
 				<view class="time">
 					{{leftTime}}
+				</view>
+				<view class="scrutator">
+					<text>
+						<u-icon name="man-add-fill"></u-icon>
+					</text> 
+					<text>
+						{{scrutator}}
+					</text>
 				</view>
 			</view>
 			<view class="line">
@@ -58,7 +63,13 @@
 				text-overflow: ellipsis;
 				white-space: nowrap;
 				.scrutator {
-					text-align: center
+					text-align: center;
+					color: #9a9a9a;
+					text {
+						&:first-child {
+							margin-right: 6px
+						}
+					}
 				}
 			}
 			.line {

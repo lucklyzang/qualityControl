@@ -9,7 +9,7 @@
 			</view>
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#2c9af1" fontColor="#FFF" title="检查记录" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查记录" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="back-btn-box">
@@ -18,7 +18,7 @@
 		<view class="time-shaft">
 			<timeline>
 				<timelineItem :leftTime="item.startTime" 
-				:scrutator="item.scrutator" color="#2c9af1"
+				:scrutator="item.scrutator" color="#43c3f4"
 				:key="index"
 				v-for="(item,index) in recordList"
 				>
@@ -170,7 +170,7 @@
 	};
 	.container {
 		@include content-wrapper;
-		background: #f5f5f5;
+		background: #fff;
 		padding-bottom: 0;
 		font-size: 14px;
 		padding-bottom: constant(safe-area-inset-bottom);
@@ -214,13 +214,13 @@
 			font-szie: 16px;
 			margin: 0 auto;
 			> view {
-				width: 80px;
+				width: 120px;
 				height: 40px;
 				border-radius: 4px;
 				text-align: center;
 				line-height: 40px;
-				color: #666;
-				background: #e8e8e8
+				color: #fff;
+				background-image: linear-gradient(to right, #37d5fc, #439bff);
 			}
 		}
 		.time-shaft {
@@ -229,19 +229,43 @@
 			overflow: auto;
 			flex: 1;
 			/deep/ .timeline {
-				height: 100%
+				height: 100%;
+				.timelineItem {
+					.timeItem {
+						.leftTime {
+							padding: 0 !important;
+							.time {
+								background: #43c3f4;
+								padding: 0 4px;
+								color: #fff;
+								border-radius: 10px
+							}
+						};
+						.line {
+							margin: 0 10px;
+							.out {
+								width: 10px;
+								height: 10px;
+								.inner {
+									width: 8px;
+									height: 8px
+								}
+							}
+						}
+					}
+				}
 			};
 			.tripItem {
 					padding: 10px;
 					box-sizing: border-box;
-					background:rgba(255,255,255,1);
+					background: #f6f6f6;
 					box-shadow:0px 0px 20px 0px rgba(0,0,0,0.08);
 					border-radius:10px;
 					margin-bottom: 30px;
 					.title {
-							font-size:14px;
-							font-weight:500;
-							color:rgba(51,51,51,1);
+						font-size: 15px;
+						font-weight: bold;
+						color: block
 					}
 					.record-img {
 						display: flex;

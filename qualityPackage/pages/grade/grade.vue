@@ -6,23 +6,23 @@
 		 @cancel="cancelSure">
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#2c9af1" fontColor="#FFF" title="评分" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="评分" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content">
 			<view class="score">
 				<view class="left">
-					<text>{{`得分 (满分${subtaskInfo.fullScore}) :`}}</text>
+					<text>{{`得分 (满分${subtaskInfo.fullScore})`}}</text>
 				</view>
 				<view class="right">
-					<u-input v-model="gradeValue" placeholder="" type="number" :border="true"  :disabled="isDisabled"/>
+					<u-input v-model="gradeValue" placeholder="请输入分数" type="number" :border="true"  :disabled="isDisabled"/>
 				</view>
 			</view>
-			<view class="problem-describe">
+			<view class="problem-describe" :class="{'problemDescribeStyle': subtaskInfo.operation == 2}">
 				<view class="top">
-					<text>问题描述: </text>
+					<text>问题描述 </text>
 				</view>
-				<view>
+				<view class="bottom">
 					<u-input v-model="problemDescribeValue" placeholder="请输入问题描述" type="textarea" :border="true"  />
 				</view>
 			</view>
@@ -42,9 +42,9 @@
 			</view>
 			<view class="remark-describe">
 				<view class="top">
-					<text>备注: </text>
+					<text>备注 </text>
 				</view>
-				<view>
+				<view class="bottom">
 					<u-input v-model="remark" placeholder="请输入备注" type="textarea" :border="true"  />
 				</view>
 			</view>
@@ -448,55 +448,91 @@
 		}
 		.content {
 			flex: 1;
-			padding: 6px 6px 0 6px;
+			padding: 6px 0 0 0;
 			box-sizing: border-box;
 			overflow: auto;
 			.score {
-				padding: 8px 4px;
+				padding: 12px 4px;
 				background: #fff;
+				@include bottom-border-1px(#9b9b9b);
 				>view {
 					display: inline-block
 				};
 				.left {
 					vertical-align: middle;
-					margin-right: 4px
+					width: 26%;
+					color: #5d5d5d;
+					padding-left: 4px;
+					box-sizing: border-box
 				};
 				.right {
-					vertical-align: middle
+					width: 74%;
+					vertical-align: middle;
+					/deep/ .u-input--border {
+						border: none;
+						background: #f9f9f9
+					}
 				}
 			};
+			.problemDescribeStyle {
+				@include bottom-border-1px(#9b9b9b);
+			};
 			.problem-describe {
+				>view {
+					display: inline-block
+				};
 				padding: 8px 4px;
-				margin: 6px 0;
 				background: #fff;
 				.top {
-					margin-bottom: 4px
+					width: 26%;
+					padding-left: 4px;
+					vertical-align: top;
+					color: #5d5d5d
+				};
+				.bottom {
+					width: 74%;
+					/deep/ .u-input--border {
+						border: none;
+						background: #f9f9f9
+					}
 				}
 			};
 			.remark-describe {
 				padding: 8px 4px;
 				background: #fff;
 				margin-top: 6px;
+				>view {
+					display: inline-block
+				};
 				.top {
-					margin-bottom: 4px
+					width: 26%;
+					padding-left: 4px;
+					vertical-align: top;
+					color: #5d5d5d
+				};
+				.bottom {
+					width:  74%;
+					/deep/ .u-input--border {
+						border: none;
+						background: #f9f9f9
+					}
 				}
 			};
 			.problem-photo {
 				background: #fff;
 				box-sizing: border-box;
 				padding: 8px 0;
-				border-bottom: 12px solid #f6f6f6;
 				>view {
 					display: inline-block;
 					&:first-child {
-						width: 80px;
+						width: 26%;
 						vertical-align: top;
 						height: 100px;
-						padding-left: 4px;
-						line-height: 100px;
+						color: #5d5d5d;
+						padding:4px 0 0 4px
 					};
 					&:nth-child(2) {
-						width: calc(100% - 80px);
+						width: 74%;
 						font-size: 34px;
 						>view {
 							width: 32%;
@@ -534,19 +570,19 @@
 		}
 		.btn-box {
 			height: 60px;
-			width: 70%;
+			width: 80%;
 			margin: 0 auto;
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
 			text {
-				width: 110px;
+				width: 140px;
 				height: 40px;
 				border-radius: 4px;
 				text-align: center;
 				line-height: 40px;
 				color: #fff;
-				background: #5ab3ff;
+				background-image: linear-gradient(to right, #37d5fc , #439bff);
 				&:last-child {
 					color: #666;
 					background: #e8e8e8

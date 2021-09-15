@@ -3,39 +3,62 @@
 		<u-toast ref="uToast" />
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#2c9af1" fontColor="#FFF" title="检查详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查详情" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="flow-wrapper">
-			<u-steps :list="flowList" mode="number" :current="flowState-1" active-color="#fa3534"></u-steps>
+			<u-steps :list="flowList" mode="number" :current="flowState-1" active-color="#43c3f4"></u-steps>
 		</view>
 		<view class="examine-items-table-wrapper">
-			<t-table border="1" border-color="#cecece">
-				<t-tr font-size="12" color="#333" align="left">
-					<t-th align="left">开始时间</t-th>
-					<t-th align="left">质疑截止时间</t-th>
-					<t-th align="left">检查截止时间</t-th>
-					<t-th align="left">总分值</t-th>
-					<t-th align="left">当前得分</t-th>
-				</t-tr>
-				<t-tr font-size="12" color="#333" align="left" v-for="item in tableList" :key="item.id">
-					<t-td align="left">{{ item.startTime }}</t-td>
-					<t-td align="left">{{ item.questionTime }}</t-td>
-					<t-td align="left">{{ item.finishTime }}</t-td>
-					<t-td align="left">{{ item.score }}</t-td>
-					<t-td align="left">{{ item.resultScore }}</t-td>
-				</t-tr>
-			</t-table>
+			<view class="examine-items-table-top">
+				<view class="image-wrapper">
+					<view class="examine-items-table-top-content">
+						<view class="left">
+							<text>总分值</text>
+							<text>{{ tableList.length > 0 ? tableList[0]['score'] : ''}}</text>
+						</view>
+						<view class="right">
+							<text>当前得分</text>
+							<text>{{tableList.length > 0 ? tableList[0]['resultScore'] : ''}}</text>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="examine-items-table-bottom">
+				<view class="examine-items-table-bottom-content">
+					<view class="start-time">
+						<view class="top">
+							<text></text>
+							<text>开始时间</text>
+						</view>
+						<view class="bottom">
+							{{tableList.length > 0 ? tableList[0]['startTime'] : ''}}
+						</view>
+					</view>
+					<view class="query-end-time">
+						<view class="top">
+							<text></text>
+							<text>质疑截止时间</text>
+						</view>
+						<view class="bottom">
+							{{tableList.length > 0 ? tableList[0]['questionTime'] : ''}}
+						</view>
+					</view>
+					<view class="examine-end-time">
+						<view class="top">
+							<text></text>
+							<text>检查截止时间</text>
+						</view>
+						<view class="bottom">
+							{{tableList.length > 0 ? tableList[0]['finishTime'] : ''}}
+						</view>
+					</view>
+				</view>
+			</view>
 		</view>
 		<view class="subtask-wrapper">
 			<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index">
 				<view class="subtask-list-title" @click="subtaskEvent(item,index)">
-					<view class="subtask-list-left">
-						<view class="subtask-icon">
-							<u-icon name="play-right-fill" v-if="!item.unfold"></u-icon>
-							<u-icon name="arrow-down-fill" v-if="item.unfold"></u-icon>
-						</view>
-					</view>
 					<view class="subtask-list-center-wrapper">
 						<view class="subtask-list-center" :class="{'animate-center':item.isScroll}">
 							<view class="subtask-name">
@@ -45,7 +68,7 @@
 								({{`${item.subtaskFullMark}分`}})
 							</view>
 							<view class="subtask-principal">
-								<text>负责人: </text>
+								<text>负责人/</text>
 								<text>{{item.subtaskPrincipal}}</text>
 							</view>
 						</view>
@@ -53,11 +76,17 @@
 					<view class="subtask-list-right">
 						<view class="subtask-score">
 							<text>
-								得分: 
+								得分/
 							</text>
 							<text>
 								{{item.subtaskScore}}
 							</text>
+						</view>
+					</view>
+					<view class="subtask-list-left">
+						<view class="subtask-icon">
+							<u-icon name="play-right-fill" v-if="!item.unfold"></u-icon>
+							<u-icon name="arrow-down-fill" v-if="item.unfold"></u-icon>
 						</view>
 					</view>
 				</view>
@@ -93,8 +122,8 @@
 			</view>
 		</view>
 		<view class="subtask-btn-wrapper">
-			<text class="btn-left" :class="{'btnRightStyle': flowState == 2 || flowState == 4 || flowState == 6}" @click="submitResult">提交</text>
-			<text class="btn-right" @click="backTo">返回</text>
+			<text class="btn-left" :class="{'btnRightStyle': flowState == 2 || flowState == 4 || flowState == 6}" @click="submitResult">提 交</text>
+			<text class="btn-right" @click="backTo">返 回</text>
 		</view>
 	</view>
 </template>
@@ -875,33 +904,107 @@
 			width: 100%
 		}
 		.flow-wrapper {
-			padding: 4px 0;
-			margin-top: 6px;
+			padding: 8px 0;
 			background: #fff
 		}
 		.examine-items-table-wrapper {
 			padding: 8px 0;
-			margin: 6px 0;
-			background: #fff
+			position: relative;
+			.examine-items-table-top {
+				height: 60px;
+				background: #f6f6f6;
+				.image-wrapper {
+					height: 70px;
+					width: 90%;
+					position: absolute;
+					top: 10px;
+					left: 5%;
+					margin: 0 auto;
+					background: #f6f6f6 url(/static/img/default-person.jpg) no-repeat;
+					background-size: 100% 100%;
+					z-index: 400;
+					.examine-items-table-top-content {
+						height: 70px;
+						display: flex;
+						flex-flow: row nowrap;
+						justify-content: space-around;
+						align-items: center;
+						> view {
+							text {
+								&:first-child {
+									color: #bfbfbf;
+									font-size: 14px;
+									margin-right: 8px
+								};
+								&:last-child {
+									color: #fff;
+									font-size: 22px;
+									font-weight: bold
+								}
+							}
+						}
+					}
+				}
+			};
+			.examine-items-table-bottom {
+				height: 100px;
+				position: relative;
+				background: #fff;
+				.examine-items-table-bottom-content {
+					position: absolute;
+					width: 100%;
+					height: 60px;
+					top: 50%;
+					left: 0;
+					transform: translateY(-50%);
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					flex-flow: row nowrap;
+					> view {
+						.top {
+							font-size: 14px;
+							color: black;
+							text-align: center;
+							> text {
+								&:first-child {
+									display: inline-block;
+									width: 4px;
+									height: 4px;
+									background: black;
+									border-radius: 50%;
+									margin-right: 6px;
+									vertical-align: middle;
+								}
+							}
+						};
+						.bottom {
+							font-size: 15px;
+							color: #9a9a9a;
+							text-align: center
+						}
+					}
+				}
+			}
 		}
 		.subtask-wrapper {
 			flex: 1;
-			padding: 4px;
 			overflow: auto;
+			margin-top: 8px;
 			.subtask-list {
 				background: #fff;
-				margin-bottom: 4px;
+				margin-bottom: 8px;
 				&:last-child {
 					margin-bottom: 0
 				};
 				.subtask-list-title {
 					width: 100%;
-					height: 30px;
-					padding: 4px;
+					padding: 10px 6px;
 					box-sizing: border-box;
 					display: flex;
 					flex-direction: row;
 					justify-content: space-between;
+					@include bottom-border-1px(#9b9b9b);
 					.subtask-list-left {
 						width: 4%
 					}
@@ -918,17 +1021,28 @@
 						}
 					}
 					.subtask-list-center-wrapper {
-						width: 75%;
+						width: 70%;
 						overflow: hidden;
 						.subtask-list-center {
 							width: 100%;
-							padding-left: 10px;
 							>view {
 								display: inline-block;
 								margin-right: 6px;
-								vertical-align: middle
+								vertical-align: middle;
+								font-size: 16px;
+								color: #666
+							}
+							.subtask-name {
+								color: black;
+								font-weight: bold
+							};
+							.subtask-full-mark {
+								color: black;
+								font-weight: bold
 							}
 							.subtask-principal {
+								font-size: 15px;
+								color: #9a9a9a;
 								text {
 									&:first-child {
 										margin-right: 4px
@@ -938,7 +1052,8 @@
 						}
 					}	
 					.subtask-list-right {
-						width: 18%;
+						font-size: 15px;
+						color: #9a9a9a;
 						text-align: right;
 						.subtask-score {
 							text {
@@ -953,11 +1068,12 @@
 					box-sizing: border-box;
 					.subtask-item-wrapper {
 						.subtask-item {
+							@include bottom-border-1px(#d5d5d6);
 							.subtask-item-title {
-								padding-left: 8px;
+								padding-left: 6px;
 								line-height: 30px;
 								font-weight: bold;
-								background: #efefef;
+								background: #fff;
 								text {
 									&:first-child {
 										margin-right: 4px
@@ -970,19 +1086,22 @@
 								justify-content: space-between;
 								align-items: center;
 								padding: 12px 4px;
-								@include bottom-border-1px(#d5d5d6);
 								&:last-child:after {
 									display: none
 								}
 								.subtask-item-list-left {
-									width: 70%
+									width: 70%;
+									color: #666;
+									padding-left: 20px
 								}
 								.subtask-item-list-right {
 									width: 20%;
+									color: #43c3f4;
 									text-align: right
 								}
 								.icon {
 									width: 10%;
+									color: #43c3f4;
 									text-align: right
 								}
 							}
@@ -993,19 +1112,19 @@
 		}
 		.subtask-btn-wrapper {
 			height: 60px;
-			width: 70%;
+			width: 80%;
 			margin: 0 auto;
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
 			text {
-				width: 100px;
+				width: 130px;
 				height: 40px;
 				border-radius: 4px;
 				text-align: center;
 				line-height: 40px;
 				color: #fff;
-				background: #5ab3ff
+				background-image: linear-gradient(to right, #37d5fc , #439bff)
 			}
 			.btnRightStyle {
 				background: #e8e8e8;
