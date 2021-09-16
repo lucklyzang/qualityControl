@@ -304,6 +304,9 @@
 				} else {
 					data.state = this.cacheIndex['current'] == 2 ? 6 : this.cacheIndex['current']
 				}
+			} else {
+				this.current = 1;
+				data.state = -1
 			};
 			this.changeIsSkipDetails(false);
 			this.getAllMainTasks(data)
@@ -579,6 +582,8 @@
 							this.noDataShow = false;
 							if (this.goingState != 0 ) {
 								this.goingState = res.data.data.list[0]['state']
+							} else {
+								this.goingState = 0
 							};
 							for (let item of res.data.data.list) {
 								this.statusContentList.push({
