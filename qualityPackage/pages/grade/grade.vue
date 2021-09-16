@@ -129,7 +129,9 @@
 		
 		methods: {
 			...mapMutations([
-				'changeSubtaskInfo'
+				'changeSubtaskInfo',
+				'changeIsSkipDetails',
+				'changeCacheIndex'
 			]),
 			// 弹框确定按钮
 			sureCancel() {
@@ -292,6 +294,12 @@
 				submitTotalTaskDetails(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						let temporaryIndex = {};
+						temporaryIndex.current = 1;
+						temporaryIndex.isGoingTask = true;
+						temporaryIndex.selectIndex = 1;
+						this.changeIsSkipDetails(true);
+						this.changeCacheIndex(temporaryIndex);
 						this.backToExaminePage()
 					} else {
 						this.$refs.uToast.show({

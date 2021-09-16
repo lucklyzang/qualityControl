@@ -14,48 +14,48 @@
 		</view>
 		<view class="operite-btn-box" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
 			<view @click="gradeEvent(1)" v-if="fullScoreShow">
-				<view class="image">
-					<image src="/static/img/default-person.jpg"></image>
+				<view class="image-box">
+					<image src="/static/img/full-mark.png"></image>
 				</view>
 				<view class="text">满分</view>
 			</view>
 			<view @click="gradeEvent(2)" v-if="deductMarkShow">
-				<view class="image">
-					<image src="/static/img/default-person.jpg"></image>
+				<view class="image-box">
+					<image src="/static/img/deduct-mark.png"></image>
 				</view>
 				<view class="text">扣分</view>
 			</view>
 			<view @click="gradeEvent(0)" v-if="notMarkShow">
-				<view class="image">
-					<image src="/static/img/default-person.jpg"></image>
+				<view class="image-box">
+					<image src="/static/img/no-evaluate.png"></image>
 				</view>
 				<view class="text">不参评</view>
 			</view>
 		</view>
 		<view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 3">
 			<view @click="gradeEvent(-1)">
-				<view class="image">
-					<image src="/static/img/default-person.jpg"></image>
+				<view class="image-box">
+					<image src="/static/img/again-evaluate.png"></image>
 				</view>
 				<view class="text">重新评价</view>
 			</view>
 			<view @click="gradeEvent(5)">
-				<view class="image">
-					<image src="/static/img/default-person.jpg"></image>
+				<view class="image-box">
+					<image src="/static/img/reject.png"></image>
 				</view>
 				<view class="text">驳回</view>
 			</view>
 		</view>
 		<view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 5">
 			<view @click="gradeEvent(8)">
-				<view class="image">
-					<image src="/static/img/default-person.jpg"></image>
+				<view class="image-box">
+					<image src="/static/img/pass.png"></image>
 				</view>
 				<view class="text">通过</view>
 			</view>
 			<view @click="gradeEvent(7)">
-				<view class="image">
-					<image src="/static/img/default-person.jpg"></image>
+				<view class="image-box">
+					<image src="/static/img/no-pass.png"></image>
 				</view>
 				<view class="text">不通过</view>
 			</view>
@@ -276,7 +276,8 @@
 		.score-box {
 			width: 100%;
 			margin: 0 auto;
-			height: 150px;
+			margin-top: -3px;
+			height: 160px;
 			font-size: 30px;
 			display: flex;
 			justify-content: center;
@@ -284,7 +285,7 @@
 			color: #fff;
 			border-bottom-right-radius: 20px;
 			border-bottom-left-radius: 20px;
-			background: #f6f6f6 url(/static/img/default-person.jpg) no-repeat;
+			background: #f6f6f6 url(/static/img/examine-item-background.png) no-repeat;
 			background-size: 100% 100%;
 			text {
 				&:first-child {
@@ -295,6 +296,40 @@
 		}
 
 		.operite-btn-box {
+			height: 75px;
+			display: flex;
+			font-size: 16px;
+			justify-content: center;
+			align-items: center;
+			>view {
+				display: flex;
+				flex-direction: column;
+				width: 100px;
+				height: 80px;
+				transform: translateY(-45%);
+				justify-content: center;
+				align-items: center;
+				margin-right: 8px;
+				> view {
+					&:first-child {
+						width: 80px;
+						height: 80px;
+						image {
+							width: 100%;
+							height: 100%
+						}
+					};
+					&:last-child {
+						color: #666
+					}
+				};
+				&:last-child {
+					margin-right: 0
+				}
+			}
+		}
+
+		.operite-query-btn-box {
 			height: 80px;
 			display: flex;
 			font-size: 16px;
@@ -311,8 +346,8 @@
 				margin-right: 8px;
 				> view {
 					&:first-child {
-						width: 70px;
-						height: 70px;
+						width: 80px;
+						height: 80px;
 						image {
 							width: 100%;
 							height: 100%
@@ -325,34 +360,6 @@
 				};
 				&:last-child {
 					margin-right: 0
-				}
-			}
-		}
-
-		.operite-query-btn-box {
-			height: 70px;
-			display: flex;
-			font-size: 16px;
-			justify-content: space-around;
-			align-items: center;
-
-			>view {
-				display: inline-block;
-				width: 140px;
-				height: 40px;
-				border-radius: 4px;
-				text-align: center;
-				line-height: 40px;
-				color: #fff;
-				margin-right: 8px;
-
-				&:first-child {
-					background: #2c9af1;
-				}
-
-				&:last-child {
-					margin-right: 0;
-					background: red
 				}
 			}
 		}

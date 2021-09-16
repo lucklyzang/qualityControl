@@ -297,6 +297,7 @@
 			};
 			if (this.isSkipDetails) {
 				this.current = this.cacheIndex['current'];
+				this.goingState = this.cacheIndex['selectIndex'];
 				if (this.cacheIndex['isGoingTask']) {
 					data.state = this.cacheIndex['selectIndex'] == 0 ? -1 : this.cacheIndex['selectIndex'];
 					this.initValue = this.statusOtherTransfer(this.cacheIndex['selectIndex'])
@@ -576,6 +577,9 @@
 					if (res && res.data.code == 200) {
 						if (res.data.data.list.length > 0) {
 							this.noDataShow = false;
+							if (this.goingState != 0 ) {
+								this.goingState = res.data.data.list[0]['state']
+							};
 							for (let item of res.data.data.list) {
 								this.statusContentList.push({
 									status: item.state,
@@ -677,7 +681,7 @@
 				} else if (this.current == 1) {
 					temporaryIndex.current = this.current;
 					temporaryIndex.isGoingTask = true;
-					temporaryIndex.selectIndex = this.goingState
+					temporaryIndex.selectIndex = this.goingState;
 				} else {
 					temporaryIndex.current = this.current;
 					temporaryIndex.isGoingTask = false
@@ -784,7 +788,7 @@
 					line-height: 52px;
 					padding: 0 10px;
 					background: #f6f6f6;
-					color: #2c9af1;
+					color: #43c3f4;
 					font-size: 15px;
 					display: flex;
 					flex-flow: row nowrap;
@@ -864,7 +868,7 @@
 								> text {
 									width: 100%;
 									display: inline-block;
-									color: #2c9af1;
+									color: #43c3f4;
 								}
 								.animate-center {
 									white-space: nowrap;

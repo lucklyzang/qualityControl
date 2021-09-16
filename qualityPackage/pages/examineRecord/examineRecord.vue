@@ -258,7 +258,7 @@
 			.tripItem {
 					padding: 10px;
 					box-sizing: border-box;
-					background: #f6f6f6;
+					background: #ededed;
 					box-shadow:0px 0px 20px 0px rgba(0,0,0,0.08);
 					border-radius:10px;
 					margin-bottom: 30px;

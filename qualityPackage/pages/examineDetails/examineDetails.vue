@@ -95,7 +95,7 @@
 						<view class="subtask-item" v-for="(itemInner,indexInner) in item.checkItem" :key="indexInner">
 							<view class="subtask-item-title" v-if="itemInner.checkItemList.length > 0">
 								<text>
-									<u-icon name="list"></u-icon>
+									<u-icon name="file-text"></u-icon>
 								</text>
 								<text>
 									{{itemInner.checkItemName.length == 0 ? '无标签' : itemInner.checkItemName}}
@@ -109,10 +109,19 @@
 										{{checkItem.itemName}}
 									</text>
 								</view>
-								<view class="subtask-item-list-right">
+								<view class="subtask-item-list-right" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
+										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},
+										{'willChangeStyle': checkItem.checkState == 4},{'changedStyle': checkItem.checkState == 5},
+										{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
+										{'passStyle': checkItem.checkState == 8}]"
+								>
 									<text>{{taskItemStatusTransfer(checkItem.checkState)}}</text>
 								</view>
-								<view class="icon">
+								<view class="icon" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
+										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},
+										{'willChangeStyle': checkItem.checkState == 4},{'changedStyle': checkItem.checkState == 5},
+										{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
+										{'passStyle': checkItem.checkState == 8}]">
 									<u-icon name="arrow-right"></u-icon>
 								</view>
 							</view>
@@ -219,7 +228,9 @@
 		methods: {
 			...mapMutations([
 				'changeSubtaskInfo',
-				'changeDisposeSubTaskData'
+				'changeDisposeSubTaskData',
+				'changeIsSkipDetails',
+				'changeCacheIndex'
 			]),
 			
 			// 返回上一页
@@ -228,6 +239,7 @@
 					url: '/qualityPackage/pages/qualityManagement/index/index'
 				})
 			},
+			
 			
 			// 检查项状态转换
 			taskItemStatusTransfer (index) {
@@ -743,7 +755,7 @@
 									}	
 								};
 								console.log('子任务详情',this.subtaskList);
-							}	
+							}
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -826,6 +838,24 @@
 				submitTotalTaskDetails(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						let temporaryIndex = {};
+						if (this.flowState != 5) {
+							if (this.judgeSubTaskItemState(this.subtaskList,7)) {}
+							temporaryIndex.current = 1;
+							temporaryIndex.isGoingTask = true;
+							temporaryIndex.selectIndex = this.flowState + 1
+						} else {
+							if (this.judgeSubTaskItemState(this.subtaskList,7)) {
+								temporaryIndex.current = 1;
+								temporaryIndex.isGoingTask = true;
+								temporaryIndex.selectIndex = this.flowState - 1
+							} else {
+								temporaryIndex.current = 2;
+								temporaryIndex.isGoingTask = false
+							}
+						};
+						this.changeIsSkipDetails(true);
+						this.changeCacheIndex(temporaryIndex);
 						this.backTo()
 					} else {
 						this.$refs.uToast.show({
@@ -911,29 +941,28 @@
 			padding: 8px 0;
 			position: relative;
 			.examine-items-table-top {
-				height: 60px;
+				height: 70px;
 				background: #f6f6f6;
 				.image-wrapper {
 					height: 70px;
-					width: 90%;
-					position: absolute;
-					top: 10px;
-					left: 5%;
+					width: 100%;
 					margin: 0 auto;
-					background: #f6f6f6 url(/static/img/default-person.jpg) no-repeat;
+					background: #f6f6f6 url(/static/img/examine-background.png) no-repeat;
 					background-size: 100% 100%;
 					z-index: 400;
 					.examine-items-table-top-content {
 						height: 70px;
 						display: flex;
 						flex-flow: row nowrap;
-						justify-content: space-around;
+						justify-content: center;
 						align-items: center;
 						> view {
+							width: 35%;
+							text-align: center;
 							text {
 								&:first-child {
 									color: #bfbfbf;
-									font-size: 14px;
+									font-size: 12px;
 									margin-right: 8px
 								};
 								&:last-child {
@@ -947,7 +976,7 @@
 				}
 			};
 			.examine-items-table-bottom {
-				height: 100px;
+				height: 75px;
 				position: relative;
 				background: #fff;
 				.examine-items-table-bottom-content {
@@ -962,6 +991,10 @@
 					align-items: center;
 					flex-flow: row nowrap;
 					> view {
+						margin-right: 10px;
+						&:last-child {
+							margin-right: 0
+						};
 						.top {
 							font-size: 14px;
 							color: black;
@@ -1096,13 +1129,40 @@
 								}
 								.subtask-item-list-right {
 									width: 20%;
-									color: #43c3f4;
+									color: #666;
 									text-align: right
 								}
 								.icon {
 									width: 10%;
-									color: #43c3f4;
+									color: #666;
 									text-align: right
+								}
+								.willEvaluateStyle {
+									color: #FF5722
+								}
+								.evaluateDStyle {
+									color: #FFB800
+								}
+								.willSureStyle {
+									color: #FFB800
+								}
+								.suredStyle {
+									color: #009688
+								}
+								.queryedStyle {
+									color: #666
+								}
+								.willChangeStyle {
+									color: #1e9fff
+								}
+								.changedStyle {
+									color: #009688
+								}
+								.noPassStyle {
+									color: #009688
+								}
+								.passStyle {
+									color: #009688
 								}
 							}
 						}
