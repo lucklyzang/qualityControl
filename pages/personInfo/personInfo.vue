@@ -73,7 +73,7 @@
 		data() {
 			return {
 				content: '',
-				versionNumber: '0.1',
+				versionNumber: '0.2',
 				sureCancelShow: false,
 				showLoadingHint: false
 			}
@@ -81,13 +81,14 @@
 		onReady() {},
 		computed: {
 			...mapGetters([
-				'userInfo'
+				'userInfo',
+				'selectHospitalList'
 			]),
 			userName() {
 				return this.userInfo.name
 			},
 			proId() {
-				return this.userInfo.proIds[0]
+				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
@@ -148,7 +149,7 @@
 				}).
 				catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.msg}`,
+						title: `${err}`,
 						type: 'warning'
 					});
 					this.changeOverDueWay(false);

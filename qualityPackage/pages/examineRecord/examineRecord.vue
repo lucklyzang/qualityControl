@@ -74,13 +74,14 @@
 			...mapGetters([
 				'titleText',
 				'userInfo',
-				'subtaskInfo'
+				'subtaskInfo',
+				'selectHospitalList'
 			]),
 			userName() {
 				return this.userInfo.name
 			},
 			proId() {
-				return this.userInfo.proIds[0]
+				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
@@ -134,7 +135,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.msg}`,
+						title: `${err}`,
 						type: 'warning'
 					});
 					this.showLoadingHint = false
@@ -154,7 +155,7 @@
 			
 			// 返回上一页
 			backTo() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/qualityPackage/pages/examineItemDetails/examineItemDetails'
 				})
 			}

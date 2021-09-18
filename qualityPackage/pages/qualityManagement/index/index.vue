@@ -292,8 +292,6 @@
 				startTime: "",//检查时间
 				createTime : "", //创建时间
 				state : 0, //主任务状态
-				page : 1, //页码
-				limit : 20 //条数
 			};
 			if (this.isSkipDetails) {
 				this.current = this.cacheIndex['current'];
@@ -322,9 +320,7 @@
 				subPersons : "", //子任务负责人
 				startTime: "",//检查时间
 				createTime : "", //创建时间
-				state : this.goingState, //主任务状态
-				page : 1, //页码
-				limit : 20 //条数
+				state : this.goingState //主任务状态
 			};
 			this.isFresh = true;
 			if (this.current === 1) {
@@ -344,13 +340,14 @@
 				'titleText',
 				'userInfo',
 				'isSkipDetails',
-				'cacheIndex'
+				'cacheIndex',
+				'selectHospitalList'
 			]),
 			userName() {
 				return this.userInfo.name
 			},
 			proId() {
-				return this.userInfo.proIds[0]
+				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
@@ -618,7 +615,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.msg}`,
+						title: `${err}`,
 						type: 'error'
 					});
 					this.showLoadingHint = false;
@@ -641,9 +638,7 @@
 					subPersons : "", //子任务负责人
 					startTime: "",//检查时间
 					createTime : "", //创建时间
-					state : this.current, //主任务状态
-					page : 1, //页码
-					limit : 20 //条数
+					state : this.current //主任务状态
 				};
 				if (index == 2) {
 					data.state = 6
@@ -665,9 +660,7 @@
 					subPersons : "", //子任务负责人
 					startTime: "",//检查时间
 					createTime : "", //创建时间
-					state : this.goingState, //主任务状态
-					page : 1, //页码
-					limit : 20 //条数
+					state : this.goingState //主任务状态
 				};
 				if (val.index == 0) {
 					data.state = -1
@@ -938,6 +931,7 @@
 						line-height: 40px;
 						color: #fff;
 						&:first-child {
+							color: #fff;
 							background-image: linear-gradient(to right, #37d5fc , #439bff);
 						};
 						&:last-child {

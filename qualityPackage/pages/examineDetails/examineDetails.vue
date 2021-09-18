@@ -12,6 +12,7 @@
 		<view class="examine-items-table-wrapper">
 			<view class="examine-items-table-top">
 				<view class="image-wrapper">
+					<image src="/static/img/examine-background.png"></image>
 					<view class="examine-items-table-top-content">
 						<view class="left">
 							<text>总分值</text>
@@ -195,13 +196,14 @@
 			...mapGetters([
 				'titleText',
 				'userInfo',
-				'mainTaskId'
+				'mainTaskId',
+				'selectHospitalList'
 			]),
 			userName() {
 				return this.userInfo.name
 			},
 			proId() {
-				return this.userInfo.proIds[0]
+				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
@@ -235,7 +237,7 @@
 			
 			// 返回上一页
 			backTo() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/qualityPackage/pages/qualityManagement/index/index'
 				})
 			},
@@ -766,7 +768,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.msg}`,
+						title: `${err}`,
 						type: 'warning'
 					});
 					this.showLoadingHint = false
@@ -866,7 +868,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.msg}`,
+						title: `${err}`,
 						type: 'warning'
 					});
 					this.showLoadingHint = false
@@ -942,15 +944,23 @@
 			position: relative;
 			.examine-items-table-top {
 				height: 70px;
-				background: #f6f6f6;
 				.image-wrapper {
+					position: relative;
 					height: 70px;
 					width: 100%;
 					margin: 0 auto;
-					background: #f6f6f6 url(/static/img/examine-background.png) no-repeat;
-					background-size: 100% 100%;
-					z-index: 400;
+					> image {
+						position: absolute;
+						top: 0;
+						left: 0;
+						width: 100%;
+						height: 100%
+					};
 					.examine-items-table-top-content {
+						position: absolute;
+						top: 0;
+						left: 0;
+						width: 100%;
 						height: 70px;
 						display: flex;
 						flex-flow: row nowrap;

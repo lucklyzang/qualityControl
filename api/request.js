@@ -37,26 +37,42 @@ instance.interceptors.response.use(function (response) {
 	};
 	return response
 }, function (error) {
-	if (error.response.status === 401) {
-		removeAllLocalStorage();
-		if (!store.getters.overDueWay) {
-			uni.showToast({
-				title: 'token已过期,请重新登录',
-				duration: 1000
-			});
-			setTimeout(() => {
-				uni.redirectTo({
-				 url: '/pages/login/login'
-				})
-			},2000);
-		 } else {
-			uni.redirectTo({
-				url: '/pages/login/login'
-			})
+	if (Object.prototype.toString.call(error.response) === '[object Object]') {
+		if (error.response.hasOwnProperty('status')) {
+			if (error.response.status === 401) {
+				removeAllLocalStorage();
+				if (!store.getters.overDueWay) { 
+					uni.showToast({
+						title: 'token已过期,请重新登录',
+						duration: 1000
+					});
+					setTimeout(() => {
+						uni.redirectTo({
+						 url: '/pages/login/login'
+						})
+					},2000);
+				 } else {
+					uni.redirectTo({
+						url: '/pages/login/login'
+					})
+				}
+			}
 		}
-	};
+	};		
   // 处理响应错误
-  return Promise.reject(error.response.data)
+	if (Object.prototype.toString.call(error.response) === '[object Object]') {
+		if (error.response.hasOwnProperty('data')) {
+			if (error.response.data.hasOwnProperty('msg')) {
+				return Promise.reject(error.response.data.msg)
+			} else {
+				return Promise.reject(error.response.data)
+			}
+		} else {
+			return Promise.reject(error.response)
+		}
+	}	else {
+		return Promise.reject(error)
+	}
 });
 
 export default instance

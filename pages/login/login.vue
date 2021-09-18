@@ -1,5 +1,23 @@
 <template>
 	<view class="container">
+		<u-toast ref="uToast" />
+		<u-modal v-model="chooseHospitalShow" width="90%" :zoom="false" :show-title="false" 
+		:mask-close-able="true" @confirm="chooseHospitalEvent"
+		>
+			<view class="slot-content">
+				<view>
+					<xfl-select 
+						:list="hospitalList"
+						:showItemNum="8"
+						 @change="hosipitalChange"
+						 @clear="hosipitalClear"
+						placeholder = "请选择医院"
+						:selectHideType="'hideAll'"
+					>
+					</xfl-select>
+				</view>
+			</view>
+		</u-modal>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="登录中,请稍候···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-modal v-model="modalShow" :content="modalContent"
 		 :show-cancel-button="true" @confirm="sureCancel" @cancel="cancelSure">
@@ -51,12 +69,17 @@
 <script>
 	import { mapGetters, mapMutations } from 'vuex'
 	import {logIn} from '@/api/login.js'
+	import xflSelect from '@/components/xfl-select/xfl-select.vue';
 	import { setCache, getCache, removeCache } from '@/common/js/utils'
 	export default {
 	components: {
+		xflSelect
 	 },
 		data() {
 			return {
+				chooseHospitalShow: false,
+				selectHospitalList: [],
+				hospitalList: [],
 				form: {
 					username: '',
 					password: ''
@@ -77,16 +100,18 @@
 		},
 		computed: {
 			...mapGetters([
+				'userInfo'
 			])
 		},
 		mounted () {
-			 this.form.username = getCache('userName') ? getCache('userName') : '';
-			 this.form.password = getCache('userPassword') ? getCache('userPassword') : '';
+			this.form.username = getCache('userName') ? getCache('userName') : '';
+			this.form.password = getCache('userPassword') ? getCache('userPassword') : '';
 		},
 		methods: {
 			...mapMutations([
 				'storeUserInfo',
-				'changeOverDueWay'
+				'changeOverDueWay',
+				'changeSelectHospitalList'
 			]),
       
       // 选中某个复选框时，由checkbox时触发
@@ -98,7 +123,34 @@
       checkboxGroupChange(e) {
         // console.log(e);
       },
-          
+			
+			// 医院下拉框下拉选择确定事件
+			hosipitalChange (val) {
+				this.selectHospitalList = [];
+				this.selectHospitalList.push(val.orignItem);
+				this.changeSelectHospitalList(this.selectHospitalList)
+			},
+			
+			// 医院下拉框下拉清除事件
+			hosipitalClear () {
+				this.selectHospitalList = []
+			},
+			
+			// 医院下拉框下拉确定事件
+      chooseHospitalEvent () {
+				if (this.selectHospitalList.length == 0) {
+					this.chooseHospitalShow = true
+					this.$refs.uToast.show({
+						title: '请选择医院',
+						type: 'warning'
+					})
+				} else {
+					uni.switchTab({
+						url: '/pages/index/index'
+					})
+				}
+			},
+				 
 			// 账号密码事件
 			sure () {
 				let loginMessage = {
@@ -123,9 +175,21 @@
 							setCache('userInfo', res.data.data.worker);
 							setCache('isLogin', true);
 							this.storeUserInfo(res.data.data.worker);
-							uni.switchTab({
-								url: '/pages/index/index'
-							})
+							if (this.userInfo.proIds.length > 1) {
+								this.hospitalList = [];
+								this.selectHospitalList = [];
+								for (let item of this.userInfo.hospitalList) {
+									this.hospitalList.push({
+										value: item.name,
+										id: item.id
+									})
+								};
+								this.chooseHospitalShow = true
+							} else {
+								uni.switchTab({
+									url: '/pages/index/index'
+								})
+							}
 					  } else {
 						 this.modalShow = true;
 						 this.modalContent = `${res.msg}`
@@ -136,7 +200,7 @@
 				  .catch((err) => {
 					   this.showLoadingHint = false;
 					   this.modalShow = true;
-					   this.modalContent = `${err.msg}`
+					   this.modalContent = `${err}`
 				  })
 			},
       
@@ -161,6 +225,19 @@
 	.container {
 		@include content-wrapper;
 		font-size: 14px;
+		/deep/ .u-model {
+			position: relative;
+			box-sizing: border-box;
+			.u-model__content {
+				.slot-content {
+					height: 300px;
+					overflow: auto
+				}
+			};
+			.u-model__footer__button {
+				color: #43c3f4 !important
+			}
+		};
 		.container-content {
 			flex: 1;
 			background: #fff;

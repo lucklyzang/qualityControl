@@ -7,10 +7,13 @@
 			</nav-bar>
 		</view>
 		<view class="score-box">
-			<text>得分 </text>
-			<text v-if="subtaskInfo.state == 0">未评价</text>
-			<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState != 3">不参评</text>
-			<text v-if="(subtaskInfo.itemMode != 2 && subtaskInfo.state != 0) || subtaskInfo.majorState == 3">{{`${subtaskInfo.score}/${subtaskInfo.fullScore}`}}</text>
+			<image src="/static/img/examine-item-background.png"></image>
+			<view>
+				<text>得分 </text>
+				<text v-if="subtaskInfo.state == 0">未评价</text>
+				<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState != 3">不参评</text>
+				<text v-if="(subtaskInfo.itemMode != 2 && subtaskInfo.state != 0) || subtaskInfo.majorState == 3">{{`${subtaskInfo.score}/${subtaskInfo.fullScore}`}}</text>
+			</view>
 		</view>
 		<view class="operite-btn-box" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
 			<view @click="gradeEvent(1)" v-if="fullScoreShow">
@@ -122,13 +125,14 @@
 			...mapGetters([
 				'titleText',
 				'userInfo',
-				'subtaskInfo'
+				'subtaskInfo',
+				'selectHospitalList'
 			]),
 			userName() {
 				return this.userInfo.name
 			},
 			proId() {
-				return this.userInfo.proIds[0]
+				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
@@ -158,7 +162,7 @@
 			// 进入检查记录页
 			enterRecord() {
 				if (!this.subtaskInfo['taskItemId']) { return};
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/qualityPackage/pages/examineRecord/examineRecord'
 				})
 			},
@@ -205,7 +209,7 @@
 						operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
 					})
 				} else {
-					uni.navigateTo({
+					uni.redirectTo({
 						url: '/qualityPackage/pages/grade/grade'
 					})
 				}
@@ -228,7 +232,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.msg}`,
+						title: `${err}`,
 						type: 'warning'
 					});
 					this.showLoadingHint = false
@@ -237,7 +241,7 @@
 			
 			// 返回上一页
 			backTo() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'
 				})
 			}
@@ -279,18 +283,31 @@
 			margin-top: -3px;
 			height: 160px;
 			font-size: 30px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
 			color: #fff;
 			border-bottom-right-radius: 20px;
 			border-bottom-left-radius: 20px;
-			background: #f6f6f6 url(/static/img/examine-item-background.png) no-repeat;
-			background-size: 100% 100%;
-			text {
-				&:first-child {
-					margin-right: 10px;
-					font-size: 20px
+			position: relative;
+			> image {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%
+			};
+			> view {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 160px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				text {
+					&:first-child {
+						margin-right: 10px;
+						font-size: 20px
+					}
 				}
 			}
 		}

@@ -100,13 +100,14 @@
 				'userInfo',
 				'subtaskInfo',
 				'disposeSubTaskData',
-				'mainTaskId'
+				'mainTaskId',
+				'selectHospitalList'
 			]),
 			userName() {
 				return this.userInfo.name
 			},
 			proId() {
-				return this.userInfo.proIds[0]
+				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
@@ -303,7 +304,7 @@
 						this.backToExaminePage()
 					} else {
 						this.$refs.uToast.show({
-							title: `${err}`,
+							title: `${res.data.data.msg}`,
 							type: 'warning'
 						})
 					}
@@ -425,7 +426,7 @@
 			
 			// 返回任务详情页
 			backToExaminePage() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'
 				})
 			}	
