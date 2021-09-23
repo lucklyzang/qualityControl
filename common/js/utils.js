@@ -126,5 +126,6 @@ export const removeAllLocalStorage = () => {
   removeCache('userInfo');
   removeCache('isLogin');
   removeCache('questToken');
+	removeCache('permissionInfo');
   removeCache('storeOverDueWay')
 }

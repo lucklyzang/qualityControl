@@ -80,6 +80,10 @@
 				if (getCache('questToken')) {
 					this.$store.commit('changeToken', getCache('questToken'));
 				};
+				// 页面刷新时重新存入用户权限信息
+				if (getCache('permissionInfo')) {
+				  this.$store.commit('changePermissionInfo',JSON.parse(getCache('permissionInfo')));
+				};
 			}
 		}
 	}

@@ -3,13 +3,15 @@ export default {
 		userInfo: null,
 		token: null, //请求token,
 		overDueWay: false,
-		selectHospitalList: []
+		selectHospitalList: [],
+		permissionInfo: []
 	},
 	getters: {
 		userInfo: state => state.userInfo,
 		token: state => state.token,
 		overDueWay: state => state.overDueWay,
-		selectHospitalList: state => state.selectHospitalList
+		selectHospitalList: state => state.selectHospitalList,
+		permissionInfo: state => state.permissionInfo
 	},
 	mutations: {
 		storeUserInfo(state, playLoad) {
@@ -25,10 +27,14 @@ export default {
 		changeOverDueWay(state, playLoad) {
 			state.overDueWay = playLoad
 		},
-		// // 修改过期方式
+		// 修改项目列表
 		changeSelectHospitalList(state, playLoad) {
 			state.selectHospitalList = playLoad
 		},
+		// 修改权限列表
+		changePermissionInfo(state, playLoad) {
+			state.permissionInfo = playLoad
+		}
 	},
 	actions: {}
 }

@@ -7,7 +7,7 @@
 				</view>
 				<view class="scrutator">
 					<text>
-						<u-icon name="man-add-fill"></u-icon>
+						<u-icon name="info"></u-icon>
 					</text> 
 					<text>
 						{{scrutator}}
@@ -66,6 +66,7 @@
 					text-align: center;
 					color: #9a9a9a;
 					text {
+						display: inline-block;
 						&:first-child {
 							margin-right: 6px
 						}

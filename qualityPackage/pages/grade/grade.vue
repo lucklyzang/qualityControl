@@ -18,7 +18,7 @@
 					<u-input v-model="gradeValue" placeholder="请输入分数" type="number" :border="true"  :disabled="isDisabled"/>
 				</view>
 			</view>
-			<view class="problem-describe" :class="{'problemDescribeStyle': subtaskInfo.operation == 2}">
+			<view class="problem-describe" v-show="subtaskInfo.operation == 2" :class="{'problemDescribeStyle': subtaskInfo.operation == 2}">
 				<view class="top">
 					<text>问题描述 </text>
 				</view>
@@ -140,18 +140,18 @@
 			},
 			// 判断打分方式
 			judgeScoreWay () {
-				 this.subtaskInfo['recordDesc'] ? this.problemDescribeValue = this.subtaskInfo['recordDesc'].replace('描述:','') : this.problemDescribeValue = '';
 				 this.subtaskInfo['recordRemarks'] ? this.remark = this.subtaskInfo['recordRemarks'].replace('备注:','') : this.remark = '';
 				 // 判断打分方式(1满分2扣分0不参评-1重新评价7不通过8通过);
 				if (this.subtaskInfo['operation'] == 1) {
 					this.isDisabled = true;
-					this.gradeValue = this.subtaskInfo['fullScore'].toString()
+					this.gradeValue = this.subtaskInfo['fullScore'].toString();
 				} else if (this.subtaskInfo['operation'] === 0) {
 					this.isDisabled = true;
 					this.gradeValue = '0'
 				} else if (this.subtaskInfo['operation'] == 2 || this.subtaskInfo['operation'] == -1) {
 					this.isDisabled = false;
-					this.gradeValue = this.subtaskInfo['score'].toString()
+					this.gradeValue = this.subtaskInfo['score'].toString();
+					this.subtaskInfo['recordDesc'] ? this.problemDescribeValue = this.subtaskInfo['recordDesc'].replace('描述:','') : this.problemDescribeValue = ''
 				} else if (this.subtaskInfo['operation'] == 7 || this.subtaskInfo['operation'] == 8) {
 					this.isDisabled = true;
 					this.gradeValue = this.subtaskInfo['score'].toString();
@@ -369,6 +369,9 @@
 						mode: this.subtaskInfo.operation == 2 ? 3 : this.subtaskInfo.operation == 1 ? this.subtaskInfo.operation : 2, // 操作方式（1满分3扣分2不参评）
 						operation: this.subtaskInfo.operation, //操作方式（1满分2扣分0不参评）
 						imageList: this.imgArr //上传图片集合
+					};
+					if (this.subtaskInfo.operation != 2) {
+						temporaryData.describe = ''
 					};
 					// 判断检查项状态
 					if (this.subtaskInfo.state === 0) {

@@ -111,7 +111,8 @@
 			...mapMutations([
 				'storeUserInfo',
 				'changeOverDueWay',
-				'changeSelectHospitalList'
+				'changeSelectHospitalList',
+				'changePermissionInfo'
 			]),
       
       // 选中某个复选框时，由checkbox时触发
@@ -173,8 +174,10 @@
                 removeCache('userPassword', this.form.password);
               };
 							setCache('userInfo', res.data.data.worker);
+							setCache('permissionInfo', res.data.data.authorities);
 							setCache('isLogin', true);
 							this.storeUserInfo(res.data.data.worker);
+							this.changePermissionInfo(res.data.data.authorities);
 							if (this.userInfo.proIds.length > 1) {
 								this.hospitalList = [];
 								this.selectHospitalList = [];

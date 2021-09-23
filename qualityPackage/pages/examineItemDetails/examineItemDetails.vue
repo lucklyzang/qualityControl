@@ -11,7 +11,8 @@
 			<view>
 				<text>得分 </text>
 				<text v-if="subtaskInfo.state == 0">未评价</text>
-				<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState != 3">不参评</text>
+				<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState != 3 && subtaskInfo.majorState != 6">不参评</text>
+				<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState == 6">已确认 不参评</text>
 				<text v-if="(subtaskInfo.itemMode != 2 && subtaskInfo.state != 0) || subtaskInfo.majorState == 3">{{`${subtaskInfo.score}/${subtaskInfo.fullScore}`}}</text>
 			</view>
 		</view>
@@ -88,7 +89,7 @@
 			</view>
 		</view>
 		<view class="btn-box">
-			<text @click="enterRecord" :class="{'btnRightStyle': !this.subtaskInfo['taskItemId']}">检查记录</text>
+			<text @click="enterRecord" :class="{'btnRightStyle': !subtaskInfo['taskItemId']}">检查记录</text>
 			<text @click="backTo">返回</text>
 		</view>
 	</view>
@@ -117,6 +118,7 @@
 				fullScoreShow: true,
 				deductMarkShow: true,
 				notMarkShow: true,
+				rejectShow: true,
 				infoText: '',
 				showLoadingHint: false
 			}
@@ -149,9 +151,9 @@
 		},
 
 		onLoad(options) {
-			console.log('属啥',this.subtaskInfo);
 			this.judgeScoreWay();
-			this.taskTypeText = this.titleText
+			this.taskTypeText = this.titleText;
+			console.log('撒',this.subtaskInfo);
 		},
 
 		methods: {
@@ -169,19 +171,22 @@
 			
 			// 判断打分方式 
 			judgeScoreWay () {
-				if (this.subtaskInfo['itemMode'] == 1) {
-					this.fullScoreShow = false;
-					this.deductMarkShow = true;
-					this.notMarkShow = true
-				} else if (this.subtaskInfo['itemMode'] == 2) {
-					this.fullScoreShow = true;
-					this.deductMarkShow = true;
-					this.notMarkShow = false
-				} else if (this.subtaskInfo['itemMode'] == 3) {
-					this.fullScoreShow = true;
-					this.deductMarkShow = false;
-					this.notMarkShow = true
-				}
+				if (this.subtaskInfo.majorState == 1 || this.subtaskInfo.majorState == 0) {
+					if (this.subtaskInfo['itemMode'] == 1) {
+						this.fullScoreShow = false;
+						this.deductMarkShow = true;
+						this.notMarkShow = true
+					} else if (this.subtaskInfo['itemMode'] == 2) {
+						this.fullScoreShow = true;
+						this.deductMarkShow = true;
+						this.notMarkShow = false
+					} else if (this.subtaskInfo['itemMode'] == 3) {
+						this.fullScoreShow = true;
+						this.deductMarkShow = false;
+						this.notMarkShow = true
+					}
+				} else if (this.subtaskInfo.majorState == 3) {
+				}	
 			},
 			
 			// 进入评分页
@@ -321,9 +326,8 @@
 			>view {
 				display: flex;
 				flex-direction: column;
-				width: 100px;
-				height: 80px;
-				transform: translateY(-45%);
+				width: 80px;
+				transform: translateY(-40%);
 				justify-content: center;
 				align-items: center;
 				margin-right: 8px;
@@ -331,9 +335,11 @@
 					&:first-child {
 						width: 80px;
 						height: 80px;
+						border-radius: 50%;
 						image {
 							width: 100%;
-							height: 100%
+							height: 100%;
+							border-radius: 50%
 						}
 					};
 					&:last-child {
@@ -355,9 +361,8 @@
 			>view {
 				display: flex;
 				flex-direction: column;
-				width: 100px;
-				height: 80px;
-				transform: translateY(-35%);
+				width: 80px;
+				transform: translateY(-40%);
 				justify-content: center;
 				align-items: center;
 				margin-right: 8px;
@@ -365,9 +370,11 @@
 					&:first-child {
 						width: 80px;
 						height: 80px;
+						border-radius: 50%;
 						image {
 							width: 100%;
-							height: 100%
+							height: 100%;
+							border-radius: 50%
 						}
 					};
 					&:last-child {

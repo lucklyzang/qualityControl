@@ -111,16 +111,16 @@
 									</text>
 								</view>
 								<view class="subtask-item-list-right" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
-										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},
-										{'willChangeStyle': checkItem.checkState == 4},{'changedStyle': checkItem.checkState == 5},
+										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
+										{'willChangeStyle': checkItem.checkState == 4 && flowState == 4},{'changedStyle': checkItem.checkState == 5},
 										{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
 										{'passStyle': checkItem.checkState == 8}]"
 								>
 									<text>{{taskItemStatusTransfer(checkItem.checkState)}}</text>
 								</view>
 								<view class="icon" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
-										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},
-										{'willChangeStyle': checkItem.checkState == 4},{'changedStyle': checkItem.checkState == 5},
+										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
+										{'willChangeStyle': checkItem.checkState == 4 && flowState == 4},{'changedStyle': checkItem.checkState == 5},
 										{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
 										{'passStyle': checkItem.checkState == 8}]">
 									<u-icon name="arrow-right"></u-icon>
@@ -197,7 +197,8 @@
 				'titleText',
 				'userInfo',
 				'mainTaskId',
-				'selectHospitalList'
+				'selectHospitalList',
+				'permissionInfo'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -220,7 +221,7 @@
 		},
 		
 		onLoad(options) {
-			console.log('长度',getStringLength('飒飒'));
+			console.log('权限信息',this.permissionInfo);
 			this.taskTypeText = this.titleText
 		},
 		mounted () {
@@ -242,6 +243,17 @@
 				})
 			},
 			
+			// 判断权限
+			judgePermission (arrayInfo) {
+				let flag;
+				if (arrayInfo.some((item) => { return item['authority'] == 'ROLE_primary'}) 
+						&& arrayInfo.some((item) => { return item['authority'] == 'ROLE_sub'})) {
+					flag = true
+				} else {
+					flag = false
+				};
+				return flag
+			},
 			
 			// 检查项状态转换
 			taskItemStatusTransfer (index) {
@@ -263,7 +275,11 @@
 				}  else if (index == 3) {
 					transferStr = '已复核'
 				} else if (index == 4) {
-					transferStr = '待整改'
+					if (this.flowState == 3) {
+						transferStr = '已复核'
+					} else {
+						transferStr = '待整改'
+					}
 				} else if (index == 5) {
 					transferStr = '已整改'
 				} else if (index == 6) {
@@ -321,7 +337,7 @@
 										subtaskPrincipal: this.extractPrincipal(res.data.data.subTaskList[i]['persons']),
 										persons: res.data.data.subTaskList[i]['persons'],
 										unfold: res.data.data.subTaskList[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
-										isScroll: getStringLength(res.data.data.subTaskList[i].name + res.data.data.subTaskList[i].score + res.data.data.subTaskList[i].persons[0]['name']) >= 20 ? true : false,
+										isScroll: getStringLength(res.data.data.subTaskList[i].name + res.data.data.subTaskList[i].score + this.extractPrincipal(res.data.data.subTaskList[i].persons)) >= 20 ? true : false,
 										checkItem: []
 									});
 									if (res.data.data.subTaskList[i].checkItems.length > 0) {
@@ -334,7 +350,7 @@
 													// “复核质疑”和“复查”状态下，任务详情场景只展示“待复核”、“已复核”、“已整改”、“整改未通过”四个状态的检查项
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 8) {
+															if (innerItem['state'] != 6 && innerItem['state'] != 8) {
 																this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -418,7 +434,7 @@
 													});
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 8) {
+															if (innerItem['state'] != 6 && innerItem['state'] != 8) {
 																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -505,7 +521,7 @@
 													});
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 8) {
+															if (innerItem['state'] != 6 && innerItem['state'] != 8) {
 																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -588,7 +604,7 @@
 													if (tagsIndex != -1) {
 														if (this.flowState == 3 || this.flowState == 5) {
 															if (this.flowState == 3) {
-																if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 8) {
+																if (innerItem['state'] != 6 && innerItem['state'] != 8) {
 																	this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																		confirm : innerItem['confirm'], //是否确认地点
 																		standard : innerItem['standard'], //评价标准
@@ -672,7 +688,7 @@
 														});
 														if (this.flowState == 3 || this.flowState == 5) {
 															if (this.flowState == 3) {
-																if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 8) {
+																if (innerItem['state'] != 6 && innerItem['state'] != 8) {
 																	this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																		confirm : innerItem['confirm'], //是否确认地点
 																		standard : innerItem['standard'], //评价标准
@@ -787,13 +803,11 @@
 					for (let j = 0, len = data[i]['checkItem'].length; j < len; j++) {
 						for (let k = 0, len = data[i]['checkItem'][j]['checkItemList'].length; k < len; k++) {
 							let temporaryData = data[i]['checkItem'][j]['checkItemList'];
-							if (this.flowState == 0 || this.flowState == 1 || this.flowState == 2 || this.flowState == 5 || state == 7) {
+							if (this.flowState == 0 || this.flowState == 1 || this.flowState == 2 || this.flowState == 3 || this.flowState == 5 || state == 7) {
 								temporaryFlag = temporaryData.some((item) => { return item['checkState'] == state})
 							} else {
 								if (this.flowState == 4) {
 									temporaryFlag = temporaryData.some((item) => { return item['checkState'] == state || item['checkState'] == 7 })
-								} else {
-									temporaryFlag = temporaryData.some((item) => { return item['checkState'] != state})
 								}
 							};
 							if (temporaryFlag) {
@@ -887,7 +901,7 @@
 				} else if (this.flowState == 2) {
 					flag = this.judgeSubTaskItemState(this.subtaskList,1)
 				} else if (this.flowState == 3) {
-					flag = this.judgeSubTaskItemState(this.subtaskList,3)
+					flag = this.judgeSubTaskItemState(this.subtaskList,2)
 				} else if (this.flowState == 4) {
 					flag = this.judgeSubTaskItemState(this.subtaskList,4)
 				} else if (this.flowState == 5) {
@@ -1047,6 +1061,7 @@
 					display: flex;
 					flex-direction: row;
 					justify-content: space-between;
+					align-items: center;
 					@include bottom-border-1px(#9b9b9b);
 					.subtask-list-left {
 						width: 4%

@@ -13,9 +13,13 @@ const app = new Vue({
 	...App,
 	store,
 	created () {
-		// 页面刷新时重新存入用户信息
+		// 页面刷新时重新存入用户信息 changePermissionInfo
 		if (getCache('userInfo')) {
 		  store.commit('storeUserInfo',getCache('userInfo'));
+		};
+		// 页面刷新时重新存入用户权限信息
+		if (getCache('permissionInfo')) {
+		  store.commit('changePermissionInfo',JSON.parse(getCache('permissionInfo')));
 		};
 		// 页面刷新重新存入请求token
 		if (getCache('questToken')) {

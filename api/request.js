@@ -4,6 +4,9 @@ import Qs from 'qs'
 import { setCache, getCache, removeAllLocalStorage } from '@/common/js/utils'
 const instance = axios.create({
   baseURL: 'https://blink.blinktech.cn/nblink',
+	retry: 3, // 网络请求异常后，重试次数
+	retryDelay: 1000, // 每次重试间隔时间,
+	timeout: 20000,
   headers: {
     // common: {
     //   'Accept': 'application/json, test/plain,'
@@ -60,19 +63,84 @@ instance.interceptors.response.use(function (response) {
 		}
 	};		
   // 处理响应错误
-	if (Object.prototype.toString.call(error.response) === '[object Object]') {
-		if (error.response.hasOwnProperty('data')) {
-			if (error.response.data.hasOwnProperty('msg')) {
-				return Promise.reject(error.response.data.msg)
+	var config = error.config;
+	// 判断是否配置了重试
+	if(!config || !config.retry) {
+		if (Object.prototype.toString.call(error.response) === '[object Object]') {
+			if (error.response.hasOwnProperty('data')) {
+				if (error.response.data.hasOwnProperty('msg')) {
+					return Promise.reject(error.response.data.msg)
+				} else {
+					return Promise.reject(error.response.data)
+				}
 			} else {
-				return Promise.reject(error.response.data)
+				return Promise.reject(error.response)
 			}
-		} else {
-			return Promise.reject(error.response)
+		}	else {
+			return Promise.reject(error)
 		}
-	}	else {
-		return Promise.reject(error)
-	}
+	};
+	if(!config.shouldRetry || typeof config.shouldRetry != 'function') {
+		if (Object.prototype.toString.call(error.response) === '[object Object]') {
+			if (error.response.hasOwnProperty('data')) {
+				if (error.response.data.hasOwnProperty('msg')) {
+					return Promise.reject(error.response.data.msg)
+				} else {
+					return Promise.reject(error.response.data)
+				}
+			} else {
+				return Promise.reject(error.response)
+			}
+		}	else {
+			return Promise.reject(error)
+		}
+	};
+	//判断是否满足重试条件
+	if(!config.shouldRetry(error)) {
+		if (Object.prototype.toString.call(error.response) === '[object Object]') {
+			if (error.response.hasOwnProperty('data')) {
+				if (error.response.data.hasOwnProperty('msg')) {
+					return Promise.reject(error.response.data.msg)
+				} else {
+					return Promise.reject(error.response.data)
+				}
+			} else {
+				return Promise.reject(error.response)
+			}
+		}	else {
+			return Promise.reject(error)
+		}
+	};
+	// 设置重置次数，默认为0
+	config.__retryCount = config.__retryCount || 0;
+	// 判断是否超过了重试次数
+	 if(config.__retryCount > config.retry) {
+		 if (Object.prototype.toString.call(error.response) === '[object Object]') {
+		 	if (error.response.hasOwnProperty('data')) {
+		 		if (error.response.data.hasOwnProperty('msg')) {
+		 			return Promise.reject(error.response.data.msg)
+		 		} else {
+		 			return Promise.reject(error.response.data)
+		 		}
+		 	} else {
+		 		return Promise.reject(error.response)
+		 	}
+		 }	else {
+		 	return Promise.reject(error)
+		 }
+	 };
+	//重试次数自增
+	config.__retryCount += 1;
+	//延时处理
+	var backoff = new Promise(function(resolve) {
+		setTimeout(function() {
+			resolve();
+		}, config.retryDelay || 1);
+	});
+	//重新发起axios请求
+	return backoff.then(function() {
+		return service(config);
+	})
 });
 
 export default instance

@@ -32,6 +32,11 @@
 							</text>
 						</view>
 						<view class="tips" v-if="item.remark">{{item.remark}}</view>
+						<view class="file-down" v-if="item.files.length > 0">
+							<view @click="downFileEvent(innerItem)" v-for="(innerItem,innerIndex) in item.files" :key="innerIndex">
+								{{`${cutStr(innerItem)} 点击下载`}}
+							</view>
+						</view>
 					</view>
 				</timelineItem>
 			</timeline>
@@ -107,6 +112,15 @@
 			...mapMutations([
 			]),
 			
+			// 截取字符串
+			cutStr (str) {
+				let strIndex = str.indexOf('_');
+				if (strIndex != -1) {
+					return str.substr(strIndex + 1)
+				};
+				return str
+			},
+			
 			// 查询检查项详情
 			getItemDetails (checkId) {
 				this.recordList = [];
@@ -122,7 +136,8 @@
 									startTime: item['operationTime'],
 									problemDescription: item['describe'],
 									remark: item['remarks'],
-									images: item['images']
+									images: item['images'],
+									files: item.hasOwnProperty('files') ? item['files'] : []
 								})
 							}
 						}
@@ -151,6 +166,40 @@
 			// 图片关闭事件
 			closeImageEvent () {
 				this.enlargePhotoShow = false
+			},
+			
+			// 文件下载事件
+			downFileEvent (file) {
+				this.infoText = '下载中···';
+				this.showLoadingHint = true;
+				uni.downloadFile({
+				  url: encodeURI(`https://blink.blinktech.cn/image/${file}`), // 文件下载地址
+				  success: response => {
+				    if (response.statusCode === 200) {
+				      uni.saveFile({
+				        tempFilePath: response.tempFilePath,
+				        success: (resData) => {
+									this.showLoadingHint = false;
+									this.$refs.uToast.show({
+										title: '下载成功',
+										type: 'success'
+									});
+									//保存成功并打开文件
+									 uni.openDocument({
+										filePath:resData.savedFilePath
+									})
+				        },
+				        fail: error => {
+									this.showLoadingHint = false;
+				          this.$refs.uToast.show({
+				          	title: `${error}`,
+				          	type: 'warning'
+				          })
+				        }
+				      })
+				    }
+				  }
+				})
 			},
 			
 			// 返回上一页
@@ -285,10 +334,20 @@
 						}
 					}
 					.tips {
-							font-size:14px;
-							font-weight:400;
-							color:rgba(153,153,153,1);
-							margin-top: 10px
+						font-size:14px;
+						font-weight:400;
+						color:rgba(153,153,153,1);
+						margin-top: 10px
+					}
+					.file-down {
+						> view {
+							margin-bottom: 8px;
+							font-size: 18px;
+							color: blue;
+							&:last-child {
+								margin-bottom: 0
+							}
+						}
 					}
 			}
 		}
