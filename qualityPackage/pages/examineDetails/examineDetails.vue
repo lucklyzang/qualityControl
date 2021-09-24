@@ -65,9 +65,6 @@
 							<view class="subtask-name">
 								{{item.subtaskName}}
 							</view>
-							<view class="subtask-full-mark">
-								({{`${item.subtaskFullMark}分`}})
-							</view>
 							<view class="subtask-principal">
 								<text>负责人/</text>
 								<text>{{item.subtaskPrincipal}}</text>
@@ -77,10 +74,13 @@
 					<view class="subtask-list-right">
 						<view class="subtask-score">
 							<text>
-								得分/
+								得分:
 							</text>
 							<text>
 								{{item.subtaskScore}}
+							</text>
+							<text>
+								{{`/${item.subtaskFullMark}`}}
 							</text>
 						</view>
 					</view>
@@ -119,7 +119,7 @@
 									<text>{{taskItemStatusTransfer(checkItem.checkState)}}</text>
 								</view>
 								<view class="icon" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
-										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
+										{'willReviewdStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
 										{'willChangeStyle': checkItem.checkState == 4 && flowState == 4},{'changedStyle': checkItem.checkState == 5},
 										{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
 										{'passStyle': checkItem.checkState == 8}]">
@@ -275,11 +275,7 @@
 				}  else if (index == 3) {
 					transferStr = '已复核'
 				} else if (index == 4) {
-					if (this.flowState == 3) {
-						transferStr = '已复核'
-					} else {
-						transferStr = '待整改'
-					}
+					transferStr = '待整改'
 				} else if (index == 5) {
 					transferStr = '已整改'
 				} else if (index == 6) {
@@ -337,7 +333,7 @@
 										subtaskPrincipal: this.extractPrincipal(res.data.data.subTaskList[i]['persons']),
 										persons: res.data.data.subTaskList[i]['persons'],
 										unfold: res.data.data.subTaskList[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
-										isScroll: getStringLength(res.data.data.subTaskList[i].name + res.data.data.subTaskList[i].score + this.extractPrincipal(res.data.data.subTaskList[i].persons)) >= 20 ? true : false,
+										isScroll: getStringLength(res.data.data.subTaskList[i].name + this.extractPrincipal(res.data.data.subTaskList[i].persons)) >= 20 ? true : false,
 										checkItem: []
 									});
 									if (res.data.data.subTaskList[i].checkItems.length > 0) {
@@ -347,10 +343,10 @@
 												// 判断之前的数组里是否存在无的标签名
 												let tagsIndex = this.subtaskList[i]['checkItem'].indexOf(this.subtaskList[i]['checkItem'].filter((tagName) => {  return tagName['checkItemName'].length == 0 })[0]);
 												if (tagsIndex != -1) {
-													// “复核质疑”和“复查”状态下，任务详情场景只展示“待复核”、“已复核”、“已整改”、“整改未通过”四个状态的检查项
+													// “复核质疑”和“复查”状态下，任务详情场景只展示“待复核”、“已整改”、“整改未通过”四个状态的检查项
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 6 && innerItem['state'] != 8) {
+															if (innerItem['state'] != 8) {
 																this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -434,7 +430,7 @@
 													});
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 6 && innerItem['state'] != 8) {
+															if (innerItem['state'] != 8) {
 																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -521,7 +517,7 @@
 													});
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 6 && innerItem['state'] != 8) {
+															if (innerItem['state'] != 8) {
 																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -604,7 +600,7 @@
 													if (tagsIndex != -1) {
 														if (this.flowState == 3 || this.flowState == 5) {
 															if (this.flowState == 3) {
-																if (innerItem['state'] != 6 && innerItem['state'] != 8) {
+																if (innerItem['state'] != 8) {
 																	this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																		confirm : innerItem['confirm'], //是否确认地点
 																		standard : innerItem['standard'], //评价标准
@@ -688,7 +684,7 @@
 														});
 														if (this.flowState == 3 || this.flowState == 5) {
 															if (this.flowState == 3) {
-																if (innerItem['state'] != 6 && innerItem['state'] != 8) {
+																if (innerItem['state'] != 8) {
 																	this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																		confirm : innerItem['confirm'], //是否确认地点
 																		standard : innerItem['standard'], //评价标准
@@ -821,6 +817,14 @@
 			
 			// 检查项点击事件
 			checkItemEvent (item,checkItem,index) {
+				// 判断是否为检查者
+				if (!this.judgePermission(this.permissionInfo)) {
+					this.$refs.uToast.show({
+						title: '你没有此操作权限!',
+						type: 'warning'
+					});
+					return
+				};
 				let temporaryInfo = {
 				 	majorSubId: item['majorSubId'],  //主任务子任务关联id
 				 	state: checkItem['checkState'],	 //检查项状态
@@ -856,7 +860,7 @@
 					if (res && res.data.code == 200) {
 						let temporaryIndex = {};
 						if (this.flowState != 5) {
-							if (this.judgeSubTaskItemState(this.subtaskList,7)) {}
+							if (this.judgeSubTaskItemState(this.subtaskList,7)) {};
 							temporaryIndex.current = 1;
 							temporaryIndex.isGoingTask = true;
 							temporaryIndex.selectIndex = this.flowState + 1
@@ -891,6 +895,14 @@
 		
 			// 检查结果提交
 			submitResult () {
+				// 判断是否为检查者
+				if (!this.judgePermission(this.permissionInfo)) {
+					this.$refs.uToast.show({
+						title: '你没有此操作权限!',
+						type: 'warning'
+					});
+					return
+				};
 				if (this.flowState == 2 || this.flowState == 4 || this.flowState == 6) {
 					return 
 				};
@@ -1079,7 +1091,7 @@
 						}
 					}
 					.subtask-list-center-wrapper {
-						width: 70%;
+						width: 60%;
 						overflow: hidden;
 						.subtask-list-center {
 							width: 100%;
@@ -1094,10 +1106,6 @@
 								color: black;
 								font-weight: bold
 							};
-							.subtask-full-mark {
-								color: black;
-								font-weight: bold
-							}
 							.subtask-principal {
 								font-size: 15px;
 								color: #9a9a9a;
@@ -1174,8 +1182,11 @@
 								.suredStyle {
 									color: #009688
 								}
+								.willReviewdStyle {
+									color: #ff0000
+								}
 								.queryedStyle {
-									color: #666
+									color: #ff00ff
 								}
 								.willChangeStyle {
 									color: #1e9fff
@@ -1184,7 +1195,7 @@
 									color: #009688
 								}
 								.noPassStyle {
-									color: #009688
+									color: #ff5500
 								}
 								.passStyle {
 									color: #009688

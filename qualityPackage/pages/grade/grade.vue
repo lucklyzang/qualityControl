@@ -403,7 +403,7 @@
 					if (this.subtaskInfo.majorState == 3) {
 						// 重新评价满分的情况
 						if (this.gradeValue == this.subtaskInfo['fullScore']) {
-							temporaryData['state'] = 3;
+							temporaryData['state'] = 6;
 							temporaryData['operation'] = 7
 						} else {
 							temporaryData['state'] = 4;

@@ -435,7 +435,6 @@
 			statusInfoTransfer (item,itemSubTask,state) {
 				let ownSubTaskList = itemSubTask.filter((innerItem) => { return innerItem['persons'].indexOf(innerItem['persons'].filter((k) => {return k.id == this.workerId})[0]) != -1});
 				let otherSubTaskList = itemSubTask.filter((innerItem) => { return innerItem['persons'].indexOf(innerItem['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1});
-				console.log('自己',ownSubTaskList,'他人',otherSubTaskList);
 				let markedWords = '';
 				if (state == 0) {
 					markedWords = "还未到达开始时间"
@@ -563,6 +562,15 @@
 				return temporaryFlag
 			},
 			
+			//提取负责人
+			extractPrincipal (data) {
+				let temporaryData = [];
+				for (let item of data) {
+					temporaryData.push(item.name)
+				};
+				return temporaryData.join("、")
+			},
+			
 			// 查询所有主任务
 			getAllMainTasks(dataParams) {
 				this.noDataShow = false;
@@ -589,7 +597,7 @@
 									examinationItem: item.hospatils[0]['name'],
 									examinationTime: item.assess,
 									examinationType: item.type,
-									examinationPrincipal: item.persons[0]['name'],
+									examinationPrincipal: this.extractPrincipal(item.persons),
 									examinationStartTime: item.startTime,
 									assessmentFormat: item.mode,
 									isQuery: item.question,
@@ -908,7 +916,10 @@
 					};
 					.status-content-middle-six-line {
 						font-size: 15px;
-						color: #666666 !important
+						color: #666666 !important;
+						.start-time {
+							width: 100%
+						}
 					}
 				};
 				.status-content-bottom {

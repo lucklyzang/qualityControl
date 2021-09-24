@@ -58,7 +58,7 @@
 				<view class="text">通过</view>
 			</view>
 			<view @click="gradeEvent(7)">
-				<view class="image-box">
+				<view class="image-box-two">
 					<image src="/static/img/no-pass.png"></image>
 				</view>
 				<view class="text">不通过</view>
@@ -383,7 +383,10 @@
 					}
 				};
 				&:last-child {
-					margin-right: 0
+					margin-right: 0;
+					.image-box-two {
+						width: 76px
+					}
 				}
 			}
 		}

@@ -7,7 +7,7 @@
 				</view>
 				<view class="scrutator">
 					<text>
-						<u-icon name="info"></u-icon>
+						<u-icon name="man-add-fill"></u-icon>
 					</text> 
 					<text>
 						{{scrutator}}
