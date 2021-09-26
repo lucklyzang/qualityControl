@@ -82,8 +82,12 @@
 				};
 				// 页面刷新时重新存入用户权限信息
 				if (getCache('permissionInfo')) {
-				  this.$store.commit('changePermissionInfo',JSON.parse(getCache('permissionInfo')));
+				  this.$store.commit('changePermissionInfo',getCache('permissionInfo'));
 				};
+				// 页面刷新重新存入选择的医院列表信息
+				if (getCache('selectHospitalList')) {
+				  this.$store.commit('changeSelectHospitalList', getCache('selectHospitalList'));
+				}
 			}
 		}
 	}

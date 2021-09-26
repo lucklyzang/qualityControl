@@ -129,7 +129,8 @@
 			hosipitalChange (val) {
 				this.selectHospitalList = [];
 				this.selectHospitalList.push(val.orignItem);
-				this.changeSelectHospitalList(this.selectHospitalList)
+				this.changeSelectHospitalList(this.selectHospitalList);
+				setCache('selectHospitalList',this.selectHospitalList)
 			},
 			
 			// 医院下拉框下拉清除事件
