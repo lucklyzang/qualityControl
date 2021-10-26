@@ -232,10 +232,10 @@
 		/deep/ .u-model {
 			position: relative;
 			box-sizing: border-box;
+			overflow: auto !important;
 			.u-model__content {
 				.slot-content {
-					height: 300px;
-					overflow: auto
+					height: 300px
 				}
 			};
 			.u-model__footer__button {

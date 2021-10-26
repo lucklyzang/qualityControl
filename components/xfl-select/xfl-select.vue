@@ -27,14 +27,14 @@
 		
 		<!-- 列表框 -->
 		<div class="list-container" 
-		@click.stop="onListClick"
-		:style="'top:' + listTop__ + 'px;'" v-show="isShowList">
+		@click.stop.prevent="onListClick"
+		@touchmove.stop.prevent="function(){}"
+		:style="'transform:' + 'translateY('+ listTop__ + 'px);'" v-show="isShowList">
 			<span class="popper__arrow"></span> <!-- 列表框左上角的空心小三角 -->
 			<scroll-view 
 				class="list" style="background-color: #fff;"  
-				:style="'max-height: ' + listBoxHeight__ +'em;'"
-			    scroll-y=true scroll-x=true
-			>
+				:style="'height: ' + listBoxHeight__ +'em;'"
+			    scroll-y >
 				<div 
 					class="item" @click="onClickItem(index, item.value)"
 					v-for="(item, index) in innerList" :key="index" 
@@ -313,7 +313,6 @@
 
 			// 整个列表框上的点击事件
 			onListClick(){
-
 			},
 			onClickItem(index, value){  // 列表项上的点击事件
 				if( this.itemIsDisabled(index) ){
@@ -807,6 +806,7 @@
 		.input{
 			width: 100%; height: 100%; 
 			display: flex; align-items: center; justify-content: flex-start;
+			z-index: 1000
 		}
 		.placeholder{
 			color: #bbb;
@@ -830,7 +830,7 @@
 		
 		/****** 列表框部分样式 *****/
 		.list-container{
-			position: absolute; width: 100%; left: 0; top: 50px;
+			position: absolute; width: 100%; left: 0;
 			box-sizing: border-box; z-index: 100;
 			
 			//***************************  弹出框上面的小三角  ***************************
@@ -858,7 +858,7 @@
 					height: 0;
 					border-color: transparent;
 					border-style: solid;
-					 top: 1px;
+					top: 1px;
 					margin-left: -6px;
 					border-top-width: 0;
 					border-bottom-color: #fff;
@@ -867,8 +867,10 @@
 			.list{
 				border-radius: 4px;
 				border: 1px solid #dcdfe6; 
-				width: 100%; 
-				max-height: 10em;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				// max-height: 10em;
 				background-color: #fff;
 				box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
 				padding: 5px 0;

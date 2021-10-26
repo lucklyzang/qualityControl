@@ -4,13 +4,13 @@
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="nav">
 			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查详情" @backClick="backTo">
-			</nav-bar>
+			</nav-bar> 
 		</view>
 		<view class="flow-wrapper">
 			<u-steps :list="flowList" mode="number" :current="flowState-1" active-color="#43c3f4"></u-steps>
 		</view>
 		<view class="examine-items-table-wrapper">
-			<view class="examine-items-table-top">
+			<view class="examine-items-table-top">  
 				<view class="image-wrapper">
 					<image src="/static/img/examine-background.png"></image>
 					<view class="examine-items-table-top-content">

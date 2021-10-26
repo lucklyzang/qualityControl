@@ -73,7 +73,7 @@
 		data() {
 			return {
 				content: '',
-				versionNumber: '0.5',
+				versionNumber: '0.6',
 				sureCancelShow: false,
 				showLoadingHint: false
 			}
@@ -92,7 +92,7 @@
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
-			},
+			},  
 			workerId() {
 				return this.userInfo.id
 			},
