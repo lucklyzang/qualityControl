@@ -287,7 +287,7 @@
 				hospitals : this.proId, //检查项目(指的是医院)
 				mode : 1, //评价方式
 				type : "", //任务类型
-				persons : this.workerId, //任务负责人
+				person : this.workerId, //任务负责人
 				subPersons : "", //子任务负责人
 				startTime: "",//检查时间
 				createTime : "", //创建时间
@@ -316,7 +316,7 @@
 				hospitals : this.proId, //检查项目(指的是医院)
 				mode : 1, //评价方式
 				type : "", //任务类型
-				persons : this.workerId, //任务负责人
+				person : this.workerId, //任务负责人
 				subPersons : "", //子任务负责人
 				startTime: "",//检查时间
 				createTime : "", //创建时间
@@ -642,7 +642,7 @@
 					hospitals : this.proId, //检查项目(指的是医院)
 					mode : 1, //评价方式
 					type : "", //任务类型
-					persons : this.workerId, //任务负责人
+					person : this.workerId, //任务负责人
 					subPersons : "", //子任务负责人
 					startTime: "",//检查时间
 					createTime : "", //创建时间
@@ -664,7 +664,7 @@
 					hospitals : this.proId, //检查项目(指的是医院)
 					mode : 1, //评价方式
 					type : "", //任务类型
-					persons : this.workerId, //任务负责人
+					person : this.workerId, //任务负责人
 					subPersons : "", //子任务负责人
 					startTime: "",//检查时间
 					createTime : "", //创建时间
