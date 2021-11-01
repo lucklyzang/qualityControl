@@ -6,7 +6,7 @@ const instance = axios.create({
   baseURL: 'https://blink.blinktech.cn/nblink',
 	retry: 3, // 网络请求异常后，重试次数
 	retryDelay: 1000, // 每次重试间隔时间,
-	timeout: 20000,
+	timeout: 30000,
   headers: {
     // common: {   
     //   'Accept': 'application/json, test/plain,'
@@ -70,6 +70,8 @@ instance.interceptors.response.use(function (response) {
 			if (error.response.hasOwnProperty('data')) {
 				if (error.response.data.hasOwnProperty('msg')) {
 					return Promise.reject(error.response.data.msg)
+				} else if (error.response.data.hasOwnProperty('message')) {
+					return Promise.reject(error.response.data.message)
 				} else {
 					return Promise.reject(error.response.data)
 				}
@@ -85,6 +87,8 @@ instance.interceptors.response.use(function (response) {
 			if (error.response.hasOwnProperty('data')) {
 				if (error.response.data.hasOwnProperty('msg')) {
 					return Promise.reject(error.response.data.msg)
+				} else if (error.response.data.hasOwnProperty('message')) {
+					return Promise.reject(error.response.data.message)
 				} else {
 					return Promise.reject(error.response.data)
 				}
@@ -101,6 +105,8 @@ instance.interceptors.response.use(function (response) {
 			if (error.response.hasOwnProperty('data')) {
 				if (error.response.data.hasOwnProperty('msg')) {
 					return Promise.reject(error.response.data.msg)
+				} else if (error.response.data.hasOwnProperty('message')) {
+					return Promise.reject(error.response.data.message)
 				} else {
 					return Promise.reject(error.response.data)
 				}
@@ -119,7 +125,9 @@ instance.interceptors.response.use(function (response) {
 		 	if (error.response.hasOwnProperty('data')) {
 		 		if (error.response.data.hasOwnProperty('msg')) {
 		 			return Promise.reject(error.response.data.msg)
-		 		} else {
+		 		} else if (error.response.data.hasOwnProperty('message')) {
+					return Promise.reject(error.response.data.message)
+				} else {
 		 			return Promise.reject(error.response.data)
 		 		}
 		 	} else {

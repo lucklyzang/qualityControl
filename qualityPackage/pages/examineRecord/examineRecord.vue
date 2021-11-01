@@ -25,11 +25,11 @@
 					<view class="tripItem">
 						<view class="title" v-if="item.problemDescription">{{item.problemDescription}}</view>
 						<view class="record-img" v-if="item.images">
-							<text v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
+							<view v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
 							 @click="imageEvent(innerItem,innerIndex)"
 							>
-								<image :src="`http://blink.blinktech.cn/image/${innerItem}`">
-							</text>
+								<image :src="`http://blink.blinktech.cn/image/${innerItem}`"  mode="aspectFill"></image>
+							</view>
 						</view>
 						<view class="tips" v-if="item.remark">{{item.remark}}</view>
 						<view class="file-down" v-if="item.files.length > 0">
@@ -321,7 +321,7 @@
 						display: flex;
 						flex-flow: row wrap;
 						margin-top: 10px;
-						text {
+						 >view {
 							display: inline-block;
 							width: 50px;
 							height: 50px;

@@ -171,7 +171,7 @@
 			getImg() {
 				var that = this
 				uni.chooseImage({
-					count: 3,
+					count: 4,
 					sizeType: ['original', 'compressed'],
 					sourceType: ['album', 'camera'],
 					success: function(res) {
@@ -222,7 +222,7 @@
 				})
 				.catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.msg}`,
+						title: `${err}`,
 						type: 'warning'
 					});
 					this.showLoadingHint = false
