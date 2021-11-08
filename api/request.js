@@ -3,9 +3,11 @@ import store from '@/store'
 import Qs from 'qs'
 import { setCache, getCache, removeAllLocalStorage } from '@/common/js/utils'
 const instance = axios.create({
-  baseURL: 'https://blink.blinktech.cn/nblink',
+	// 生产域名 https://blinktech.cn/nblink
+	// 测试域名 https://blink.blinktech.cn/nblink
+  baseURL: 'https://blinktech.cn/nblink',
 	retry: 3, // 网络请求异常后，重试次数
-	retryDelay: 1000, // 每次重试间隔时间,
+	retryDelay: 1000, // 每次重试间隔时间
 	timeout: 30000,
   headers: {
     // common: {   
