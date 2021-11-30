@@ -33,6 +33,7 @@
 	"subPackages": [
 		{
 			"root": "qualityPackage",
+			"name": "rootQuality",
 			"pages": [
 				{
 					"path": "pages/examineDetails/examineDetails",
