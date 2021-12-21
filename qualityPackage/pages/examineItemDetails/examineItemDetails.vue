@@ -72,7 +72,7 @@
 				</view>
 				<view class="score">
 					<text>分 数 : </text>
-					<text>{{subtaskInfo.score}}</text>
+					<text>{{subtaskInfo.fullScore}}</text>
 				</view>
 				<view class="examine-describe">
 					<text>检查描述 : </text>

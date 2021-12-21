@@ -260,7 +260,7 @@
 					}
 				}  else if (index == 2) {
 					if (this.flowState == 2) {
-						transferStr = '已质疑'
+						transferStr = '请复核'
 					} else {
 						transferStr = '待复核'
 					}
