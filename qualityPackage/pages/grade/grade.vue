@@ -366,6 +366,7 @@
 						taskItemId: this.subtaskInfo.taskItemId, //检查项id
 						majorState: this.subtaskInfo.majorState,		//主任务当前状态
 						worker: this.userName,
+						additional: this.subtaskInfo.additional, //检查项类型
 						mode: this.subtaskInfo.operation == 2 ? 3 : this.subtaskInfo.operation == 1 ? this.subtaskInfo.operation : 2, // 操作方式（1满分3扣分2不参评）
 						operation: this.subtaskInfo.operation, //操作方式（1满分2扣分0不参评）
 						imageList: this.imgArr //上传图片集合
@@ -397,7 +398,8 @@
 						itemId: this.subtaskInfo.checkId,			//检查项id
 						taskItemId: this.subtaskInfo.taskItemId, //检查项id
 						majorState: this.subtaskInfo.majorState,		//主任务当前状态
-						worker: this.userName,	
+						worker: this.userName,
+						additional: this.subtaskInfo.additional, //检查项类型	
 						operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
 					};
 					if (this.subtaskInfo.majorState == 3) {

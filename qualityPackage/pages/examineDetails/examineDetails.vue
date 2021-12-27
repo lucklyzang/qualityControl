@@ -344,6 +344,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -363,6 +364,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -384,6 +386,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -402,6 +405,7 @@
 																standard : innerItem['standard'], //评价标准
 																itemName : innerItem['describe'], //检查描述
 																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
 																mode : innerItem['mode'], //评价方式
 																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -428,6 +432,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -447,6 +452,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -468,6 +474,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -486,6 +493,7 @@
 																standard : innerItem['standard'], //评价标准
 																itemName : innerItem['describe'], //检查描述
 																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
 																mode : innerItem['mode'], //评价方式
 																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -515,6 +523,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -534,6 +543,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -555,6 +565,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -573,6 +584,7 @@
 																standard : innerItem['standard'], //评价标准
 																itemName : innerItem['describe'], //检查描述
 																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
 																mode : innerItem['mode'], //评价方式
 																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -598,6 +610,7 @@
 																		standard : innerItem['standard'], //评价标准
 																		itemName : innerItem['describe'], //检查描述
 																		number : innerItem['number'], //检查项编号
+																		additional : innerItem['additional'], //检查项类型
 																		mode : innerItem['mode'], //评价方式
 																		itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																		checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -617,6 +630,7 @@
 																		standard : innerItem['standard'], //评价标准
 																		itemName : innerItem['describe'], //检查描述
 																		number : innerItem['number'], //检查项编号
+																		additional : innerItem['additional'], //检查项类型
 																		mode : innerItem['mode'], //评价方式
 																		itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																		checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -638,6 +652,7 @@
 																		standard : innerItem['standard'], //评价标准
 																		itemName : innerItem['describe'], //检查描述
 																		number : innerItem['number'], //检查项编号
+																		additional : innerItem['additional'], //检查项类型
 																		mode : innerItem['mode'], //评价方式
 																		itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																		checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -656,6 +671,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -682,6 +698,7 @@
 																		standard : innerItem['standard'], //评价标准
 																		itemName : innerItem['describe'], //检查描述
 																		number : innerItem['number'], //检查项编号
+																		additional : innerItem['additional'], //检查项类型
 																		mode : innerItem['mode'], //评价方式
 																		itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																		checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -701,6 +718,7 @@
 																		standard : innerItem['standard'], //评价标准
 																		itemName : innerItem['describe'], //检查描述
 																		number : innerItem['number'], //检查项编号
+																		additional : innerItem['additional'], //检查项类型
 																		mode : innerItem['mode'], //评价方式
 																		itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																		checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -722,6 +740,7 @@
 																		standard : innerItem['standard'], //评价标准
 																		itemName : innerItem['describe'], //检查描述
 																		number : innerItem['number'], //检查项编号
+																		additional : innerItem['additional'], //检查项类型
 																		mode : innerItem['mode'], //评价方式
 																		itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																		checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -740,6 +759,7 @@
 																	standard : innerItem['standard'], //评价标准
 																	itemName : innerItem['describe'], //检查描述
 																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
 																	mode : innerItem['mode'], //评价方式
 																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
 																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
@@ -835,7 +855,8 @@
 					itemMode: checkItem['itemMode'], //打分方式
 					recordDesc: checkItem['recordDesc'], //记录描述
 					recordRemarks: checkItem['recordRemarks'], //记录备注
-					persons: item['persons'] // 子任务负责人
+					persons: item['persons'], // 子任务负责人
+					additional: checkItem['additional'] // 检查项类型
 				};
 				this.changeSubtaskInfo(temporaryInfo);
 				uni.redirectTo({

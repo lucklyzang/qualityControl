@@ -86,6 +86,10 @@
 					<text>考核内容 : </text>
 					<text>{{subtaskInfo.content}}</text>
 				</view>
+				<view class="examine-describe">
+					<text>类型 : </text>
+					<text>{{subtaskInfo.additional === 0 ? '普通' : '附加'}}</text>
+				</view>
 			</view>
 		</view>
 		<view class="btn-box">
