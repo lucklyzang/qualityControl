@@ -179,7 +179,7 @@
 							setCache('isLogin', true);
 							this.storeUserInfo(res.data.data.worker);
 							this.changePermissionInfo(res.data.data.authorities);
-							if (this.userInfo.proIds.length > 1) {
+							if (this.userInfo.hospitalList.length > 1) {
 								this.hospitalList = [];
 								this.selectHospitalList = [];
 								for (let item of this.userInfo.hospitalList) {
