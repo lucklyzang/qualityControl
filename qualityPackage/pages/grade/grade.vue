@@ -66,7 +66,8 @@
 		addCheckRecord,
 		updateCheckRecord,
 		updateTaskItem,
-		submitTotalTaskDetails
+		submitTotalTaskDetails,
+		getAliyunSign
 	} from '@/api/task.js'
 	import {
 		setCache,
@@ -91,7 +92,9 @@
 				showLoadingHint: false,
 				sureCancelShow: false,
 				imgIndex: '',
-				imgArr: []
+				imgArr: [],
+				temporaryImgPathArr: [],
+				imgOnlinePathArr: []
 			}
 		},
 		computed: {
@@ -101,7 +104,9 @@
 				'subtaskInfo',
 				'disposeSubTaskData',
 				'mainTaskId',
-				'selectHospitalList'
+				'selectHospitalList',
+				'timeMessage',
+				'ossMessage'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -132,12 +137,88 @@
 			...mapMutations([
 				'changeSubtaskInfo',
 				'changeIsSkipDetails',
-				'changeCacheIndex'
+				'changeCacheIndex',
+				'changeTimeMessage',
+				'changeOssMessage'
 			]),
+			
+			// 获取阿里云签名接口
+			getSign () {
+				return new Promise((resolve, reject) => {
+					getAliyunSign().then((res) => {
+						if (res && res.data.code == 200) {
+							// 获取初请求的开始时间
+							let startTime = new Date().getTime();
+							// 存储签名信息
+							this.changeOssMessage(res.data.data);
+							let temporaryTimeInfo = {};
+							temporaryTimeInfo['startGetOssTime'] = startTime;
+							temporaryTimeInfo['expire'] = Number(res.data.data.expire);
+							// 存储过期时间信息
+							this.changeTimeMessage(temporaryTimeInfo);
+							resolve()
+						} else {
+							this.$refs.uToast.show({
+								title: `${res.data.data.msg}`,
+								type: 'warning'
+							});
+							reject()
+						}
+					})
+					.catch((err) => {
+						this.$refs.uToast.show({
+							title: `${err}`,
+							type: 'warning'
+						});
+						reject()
+					})
+				})	
+			},
+			
+			// 上传图片到阿里云服务器
+			uploadImageToOss (filePath) {
+				 return new Promise((resolve, reject) => {
+					 // OSS地址
+					 const aliyunServerURL = this.ossMessage.host;
+					 // 存储路径(后台固定位置+随即数+文件格式)
+					 const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + filePath.substring(filePath.lastIndexOf('.'),filePath.length);
+					 // 临时AccessKeyID0
+					 const OSSAccessKeyId = this.ossMessage.accessid;
+					 // 加密策略
+					 const policy = this.ossMessage.policy;
+					 // 签名
+					 const signature = this.ossMessage.signature;
+					 console.log('测试',filePath,aliyunServerURL,aliyunFileKey,this.ossMessage);
+					 uni.uploadFile({
+					 	url: aliyunServerURL,
+					 	filePath: filePath,//要上传文件资源的路径
+					 	name: 'file',//必须填file
+					 	formData: {
+					 		'key': aliyunFileKey,
+					 		'policy': policy,
+					 		'OSSAccessKeyId': OSSAccessKeyId,
+					 		'signature': signature,
+					 		'success_action_status': '200',
+					 	},
+					 	success: (res) => {
+							resolve();
+							this.imgOnlinePathArr.push(`${aliyunServerURL}/${aliyunFileKey}`);
+					 		console.log('成功路径',res)
+					 	},
+					 	fail: (err) => {
+					 		console.log(err);
+							reject()
+					 	}
+					})
+				})
+			},
+			
 			// 弹框确定按钮
 			sureCancel() {
-				this.imgArr.splice(this.imgIndex, 1)
+				this.imgArr.splice(this.imgIndex, 1);
+				this.temporaryImgPathArr.splice(this.imgIndex, 1)
 			},
+			
 			// 判断打分方式
 			judgeScoreWay () {
 				 this.subtaskInfo['recordRemarks'] ? this.remark = this.subtaskInfo['recordRemarks'].replace('备注:','') : this.remark = '';
@@ -178,6 +259,7 @@
 						uni.previewImage({
 							urls: res.tempFilePaths
 						});
+						that.temporaryImgPathArr = that.temporaryImgPathArr.concat(res.tempFilePaths);
 						for (let imgI = 0, len = res.tempFilePaths.length; imgI < len; imgI++) {
 							that.srcImage = res.tempFilePaths[imgI];
 							uni.getFileSystemManager().readFile({
@@ -317,7 +399,7 @@
 				})
 			},
 			// 确认事件
-			sure () {
+			async sure () {
 				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
 					this.$refs.uToast.show({
 						title: '该子任务为其它人负责，你无操作权限',
@@ -364,12 +446,30 @@
 						operator: "检查者",		//检查者（固定）
 						itemId: this.subtaskInfo.checkId,			//检查项id
 						taskItemId: this.subtaskInfo.taskItemId, //检查项id
-						majorState: this.subtaskInfo.majorState,		//主任务当前状态
+						majorState: this.subtaskInfo.majorState, //主任务当前状态
 						worker: this.userName,
 						additional: this.subtaskInfo.additional, //检查项类型
 						mode: this.subtaskInfo.operation == 2 ? 3 : this.subtaskInfo.operation == 1 ? this.subtaskInfo.operation : 2, // 操作方式（1满分3扣分2不参评）
 						operation: this.subtaskInfo.operation, //操作方式（1满分2扣分0不参评）
-						imageList: this.imgArr //上传图片集合
+						imagePaths: [] //上传图片集合 imageList this.imgArr
+					};
+					// 上传图片到阿里云服务器
+					if (this.temporaryImgPathArr.length > 0) {
+						for (let imgI of this.temporaryImgPathArr) {
+							if (Object.keys(this.timeMessage).length > 0) {
+								// 判断签名信息是否过期
+								if (new Date().getTime() - this.timeMessage['startGetOssTime'] >= this.timeMessage['expire']) {
+									await this.getSign();
+									await this.uploadImageToOss(imgI)
+								} else {
+									await this.uploadImageToOss(imgI)
+								}
+							} else {
+								await this.getSign();
+								await this.uploadImageToOss(imgI)
+							}
+						};
+						temporaryData['imagePaths'] = this.imgOnlinePathArr
 					};
 					if (this.subtaskInfo.operation != 2) {
 						temporaryData.describe = ''

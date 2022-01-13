@@ -6,7 +6,9 @@ export default {
 		subtaskInfo: {},
 		disposeSubTaskData: [],
 		cacheIndex: {},
-		isSkipDetails: false
+		isSkipDetails: false,
+		timeMessage: {},
+		ossMessage: {}
   },
   getters:{
     titleText: state => state.titleText,
@@ -15,7 +17,9 @@ export default {
 		subtaskInfo: state => state.subtaskInfo,
 		disposeSubTaskData: state => state.disposeSubTaskData,
 		cacheIndex: state => state.cacheIndex,
-		isSkipDetails: state => state.isSkipDetails
+		isSkipDetails: state => state.isSkipDetails,
+		timeMessage: state => state.timeMessage,
+		ossMessage: state => state.ossMessage
   },
   mutations:{
     changeTitleText (state, playLoad) {
@@ -38,6 +42,12 @@ export default {
 		},
 		changeIsSkipDetails (state, playLoad) {
 			state.isSkipDetails = playLoad
+		},
+		changeTimeMessage (state, playLoad) {
+			state.timeMessage = playLoad
+		},
+		changeOssMessage (state, playLoad) {
+			state.ossMessage = playLoad
 		}
   },
   actions:{}
