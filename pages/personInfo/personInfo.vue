@@ -73,7 +73,7 @@
 		data() {
 			return {
 				content: '',
-				versionNumber: '1.5',
+				versionNumber: '1.6',
 				sureCancelShow: false,
 				showLoadingHint: false
 			}
@@ -88,7 +88,7 @@
 				return this.userInfo.name
 			},
 			proId() {
-				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
+				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].id : this.userInfo.hospitalList[0].id
 			},
 			proName() {
 				return this.userInfo.hospitalList[0].name
