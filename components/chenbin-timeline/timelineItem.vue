@@ -100,6 +100,7 @@
 			.rightContent {
 				flex: 1;
 				padding: 0 5px;
+				overflow: auto;
 				margin-left: 10px;
 				min-height: 50px;
 			}

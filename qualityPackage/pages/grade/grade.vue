@@ -92,6 +92,7 @@
 				showLoadingHint: false,
 				sureCancelShow: false,
 				imgIndex: '',
+				isExpire: false,
 				imgArr: [],
 				temporaryImgPathArr: [],
 				imgOnlinePathArr: []
@@ -115,7 +116,7 @@
 				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
-				return this.userInfo.hospitalList[0].name
+				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].value : this.userInfo.hospitalList[0].name
 			},
 			workerId() {
 				return this.userInfo.id
@@ -143,19 +144,20 @@
 			]),
 			
 			// 获取阿里云签名接口
-			getSign () {
+			getSign (filePath = '') {
 				return new Promise((resolve, reject) => {
 					getAliyunSign().then((res) => {
 						if (res && res.data.code == 200) {
-							// 获取初请求的开始时间
-							let startTime = new Date().getTime();
 							// 存储签名信息
 							this.changeOssMessage(res.data.data);
 							let temporaryTimeInfo = {};
-							temporaryTimeInfo['startGetOssTime'] = startTime;
 							temporaryTimeInfo['expire'] = Number(res.data.data.expire);
 							// 存储过期时间信息
 							this.changeTimeMessage(temporaryTimeInfo);
+							if (this.isExpire) {
+								this.uploadImageToOss(filePath)
+							};
+							this.isExpire = false;
 							resolve()
 						} else {
 							this.$refs.uToast.show({
@@ -188,7 +190,6 @@
 					 const policy = this.ossMessage.policy;
 					 // 签名
 					 const signature = this.ossMessage.signature;
-					 console.log('测试',filePath,aliyunServerURL,aliyunFileKey,this.ossMessage);
 					 uni.uploadFile({
 					 	url: aliyunServerURL,
 					 	filePath: filePath,//要上传文件资源的路径
@@ -201,12 +202,26 @@
 					 		'success_action_status': '200',
 					 	},
 					 	success: (res) => {
-							resolve();
-							this.imgOnlinePathArr.push(`${aliyunServerURL}/${aliyunFileKey}`);
-					 		console.log('成功路径',res)
+							if (res.statusCode == 200) {
+								this.imgOnlinePathArr.push(`${aliyunServerURL}/${aliyunFileKey}`);
+								resolve()
+							} else if (res.statusCode == 403) { 
+								// 后端签名过期后重新请求获取新的签名信息
+								this.isExpire = true;
+								this.getSign(filePath)
+							} else {
+								this.$refs.uToast.show({
+									title: '上传图片失败',
+									type: 'warning'
+								});
+								reject()
+							}
 					 	},
 					 	fail: (err) => {
-					 		console.log(err);
+							this.$refs.uToast.show({
+								title: `${err}`,
+								type: 'warning'
+							});
 							reject()
 					 	}
 					})
@@ -276,8 +291,6 @@
 			},
 			// 任务详情检查项操作（满分，扣分，不参评）
 			addCheckRecordMethod (data) {
-				this.infoText = '提交中···';
-				this.showLoadingHint = true;
 				addCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
@@ -312,8 +325,6 @@
 			},
 			// 任务详情检查项操作（满分，扣分，不参评）
 			updateCheckRecordMethod (data) {
-				this.infoText = '提交中···';
-				this.showLoadingHint = true;
 				updateCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
@@ -335,8 +346,6 @@
 			},
 			//任务详情检查项操作（质疑，确认，复核质疑，上传整改记录，通过，不通过）
 			updateTaskItemRecordMethod (data) {
-				this.infoText = '提交中···';
-				this.showLoadingHint = true;
 				updateTaskItem(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
@@ -430,6 +439,8 @@
 						return
 					}
 				};
+				this.infoText = '提交中···';
+				this.showLoadingHint = true;
 				// 判断操作方式
 				if (this.subtaskInfo.operation === 0 || this.subtaskInfo.operation === 1 || this.subtaskInfo.operation === 2 ) {
 					let temporaryData = {
@@ -458,7 +469,7 @@
 						for (let imgI of this.temporaryImgPathArr) {
 							if (Object.keys(this.timeMessage).length > 0) {
 								// 判断签名信息是否过期
-								if (new Date().getTime() - this.timeMessage['startGetOssTime'] >= this.timeMessage['expire']) {
+								if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
 									await this.getSign();
 									await this.uploadImageToOss(imgI)
 								} else {

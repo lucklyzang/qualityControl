@@ -22,6 +22,10 @@
 							<text>当前得分</text>
 							<text>{{tableList.length > 0 ? tableList[0]['resultScore'] : ''}}</text>
 						</view>
+						<view class="bottom">
+							<text>考核内容</text>
+							<text>{{tableList[0]['checkName']}}</text>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -199,7 +203,7 @@
 				return this.userInfo.proIds.length > 1 ? this.selectHospitalList[0].id : this.userInfo.proIds[0]
 			},
 			proName() {
-				return this.userInfo.hospitalList[0].name
+				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].value : this.userInfo.hospitalList[0].name
 			},
 			workerId() {
 				return this.userInfo.id
@@ -303,6 +307,7 @@
 							this.tableList.push({
 								id: res.data.data.id,
 								startTime: res.data.data.startTime,
+								checkName: res.data.data.checkName,
 								questionTime: res.data.data.questionTime,
 								finishTime: res.data.data.finishTime,
 								score: res.data.data.score,
@@ -982,10 +987,10 @@
 			padding: 8px 0;
 			position: relative;
 			.examine-items-table-top {
-				height: 70px;
+				height: 100px;
 				.image-wrapper {
 					position: relative;
-					height: 70px;
+					height: 100px;
 					width: 100%;
 					margin: 0 auto;
 					> image {
@@ -1000,13 +1005,13 @@
 						top: 0;
 						left: 0;
 						width: 100%;
-						height: 70px;
+						height: 100px;
 						display: flex;
-						flex-flow: row nowrap;
+						flex-flow: row wrap;
 						justify-content: center;
 						align-items: center;
 						> view {
-							width: 35%;
+							width: 45%;
 							text-align: center;
 							text {
 								&:first-child {
@@ -1018,6 +1023,16 @@
 									color: #fff;
 									font-size: 22px;
 									font-weight: bold
+								}
+							}
+						};
+						.bottom {
+							width: 60%;
+							overflow: auto;
+							max-height: 60px;
+							> text {
+								&:last-child {
+									font-size: 15px
 								}
 							}
 						}
