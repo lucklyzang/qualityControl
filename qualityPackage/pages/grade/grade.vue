@@ -66,7 +66,8 @@
 		addCheckRecord,
 		updateCheckRecord,
 		updateTaskItem,
-		submitTotalTaskDetails
+		submitTotalTaskDetails,
+		getAliyunSign
 	} from '@/api/task.js'
 	import {
 		setCache,
@@ -91,7 +92,10 @@
 				showLoadingHint: false,
 				sureCancelShow: false,
 				imgIndex: '',
-				imgArr: []
+				isExpire: false,
+				imgArr: [],
+				temporaryImgPathArr: [],
+				imgOnlinePathArr: []
 			}
 		},
 		computed: {
@@ -101,7 +105,9 @@
 				'subtaskInfo',
 				'disposeSubTaskData',
 				'mainTaskId',
-				'selectHospitalList'
+				'selectHospitalList',
+				'timeMessage',
+				'ossMessage'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -110,7 +116,7 @@
 				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].id : this.userInfo.hospitalList[0].id
 			},
 			proName() {
-				return this.userInfo.hospitalList[0].name
+				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].value : this.userInfo.hospitalList[0].name
 			},
 			workerId() {
 				return this.userInfo.id
@@ -132,12 +138,102 @@
 			...mapMutations([
 				'changeSubtaskInfo',
 				'changeIsSkipDetails',
-				'changeCacheIndex'
+				'changeCacheIndex',
+				'changeTimeMessage',
+				'changeOssMessage'
 			]),
+			
+			// 获取阿里云签名接口
+			getSign (filePath = '') {
+				return new Promise((resolve, reject) => {
+					getAliyunSign().then((res) => {
+						if (res && res.data.code == 200) {
+							// 存储签名信息
+							this.changeOssMessage(res.data.data);
+							let temporaryTimeInfo = {};
+							temporaryTimeInfo['expire'] = Number(res.data.data.expire);
+							// 存储过期时间信息
+							this.changeTimeMessage(temporaryTimeInfo);
+							if (this.isExpire) {
+								this.uploadImageToOss(filePath)
+							};
+							this.isExpire = false;
+							resolve()
+						} else {
+							this.$refs.uToast.show({
+								title: `${res.data.data.msg}`,
+								type: 'warning'
+							});
+							reject()
+						}
+					})
+					.catch((err) => {
+						this.$refs.uToast.show({
+							title: `${err}`,
+							type: 'warning'
+						});
+						reject()
+					})
+				})	
+			},
+			
+			// 上传图片到阿里云服务器
+			uploadImageToOss (filePath) {
+				 return new Promise((resolve, reject) => {
+					 // OSS地址
+					 const aliyunServerURL = this.ossMessage.host;
+					 // 存储路径(后台固定位置+随即数+文件格式)
+					 const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + filePath.substring(filePath.lastIndexOf('.'),filePath.length);
+					 // 临时AccessKeyID0
+					 const OSSAccessKeyId = this.ossMessage.accessid;
+					 // 加密策略
+					 const policy = this.ossMessage.policy;
+					 // 签名
+					 const signature = this.ossMessage.signature;
+					 uni.uploadFile({
+					 	url: aliyunServerURL,
+					 	filePath: filePath,//要上传文件资源的路径
+					 	name: 'file',//必须填file
+					 	formData: {
+					 		'key': aliyunFileKey,
+					 		'policy': policy,
+					 		'OSSAccessKeyId': OSSAccessKeyId,
+					 		'signature': signature,
+					 		'success_action_status': '200',
+					 	},
+					 	success: (res) => {
+							if (res.statusCode == 200) {
+								this.imgOnlinePathArr.push(`${aliyunServerURL}/${aliyunFileKey}`);
+								resolve()
+							} else if (res.statusCode == 403) { 
+								// 后端签名过期后重新请求获取新的签名信息
+								this.isExpire = true;
+								this.getSign(filePath)
+							} else {
+								this.$refs.uToast.show({
+									title: '上传图片失败',
+									type: 'warning'
+								});
+								reject()
+							}
+					 	},
+					 	fail: (err) => {
+							this.$refs.uToast.show({
+								title: `${err}`,
+								type: 'warning'
+							});
+							reject()
+					 	}
+					})
+				})
+			},
+			
 			// 弹框确定按钮
 			sureCancel() {
-				this.imgArr.splice(this.imgIndex, 1)
+				this.imgArr.splice(this.imgIndex, 1);
+				this.temporaryImgPathArr.splice(this.imgIndex, 1)
 			},
+			
 			// 判断打分方式
 			judgeScoreWay () {
 				 this.subtaskInfo['recordRemarks'] ? this.remark = this.subtaskInfo['recordRemarks'].replace('备注:','') : this.remark = '';
@@ -178,6 +274,7 @@
 						uni.previewImage({
 							urls: res.tempFilePaths
 						});
+						that.temporaryImgPathArr = that.temporaryImgPathArr.concat(res.tempFilePaths);
 						for (let imgI = 0, len = res.tempFilePaths.length; imgI < len; imgI++) {
 							that.srcImage = res.tempFilePaths[imgI];
 							uni.getFileSystemManager().readFile({
@@ -194,8 +291,6 @@
 			},
 			// 任务详情检查项操作（满分，扣分，不参评）
 			addCheckRecordMethod (data) {
-				this.infoText = '提交中···';
-				this.showLoadingHint = true;
 				addCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
@@ -230,8 +325,6 @@
 			},
 			// 任务详情检查项操作（满分，扣分，不参评）
 			updateCheckRecordMethod (data) {
-				this.infoText = '提交中···';
-				this.showLoadingHint = true;
 				updateCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
@@ -253,8 +346,6 @@
 			},
 			//任务详情检查项操作（质疑，确认，复核质疑，上传整改记录，通过，不通过）
 			updateTaskItemRecordMethod (data) {
-				this.infoText = '提交中···';
-				this.showLoadingHint = true;
 				updateTaskItem(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
@@ -317,7 +408,7 @@
 				})
 			},
 			// 确认事件
-			sure () {
+			async sure () {
 				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
 					this.$refs.uToast.show({
 						title: '该子任务为其它人负责，你无操作权限',
@@ -348,6 +439,8 @@
 						return
 					}
 				};
+				this.infoText = '提交中···';
+				this.showLoadingHint = true;
 				// 判断操作方式
 				if (this.subtaskInfo.operation === 0 || this.subtaskInfo.operation === 1 || this.subtaskInfo.operation === 2 ) {
 					let temporaryData = {
@@ -364,12 +457,30 @@
 						operator: "检查者",		//检查者（固定）
 						itemId: this.subtaskInfo.checkId,			//检查项id
 						taskItemId: this.subtaskInfo.taskItemId, //检查项id
-						majorState: this.subtaskInfo.majorState,		//主任务当前状态
+						majorState: this.subtaskInfo.majorState, //主任务当前状态
 						worker: this.userName,
 						additional: this.subtaskInfo.additional, //检查项类型
 						mode: this.subtaskInfo.operation == 2 ? 3 : this.subtaskInfo.operation == 1 ? this.subtaskInfo.operation : 2, // 操作方式（1满分3扣分2不参评）
 						operation: this.subtaskInfo.operation, //操作方式（1满分2扣分0不参评）
-						imageList: this.imgArr //上传图片集合
+						imagePaths: [] //上传图片集合 imageList this.imgArr
+					};
+					// 上传图片到阿里云服务器
+					if (this.temporaryImgPathArr.length > 0) {
+						for (let imgI of this.temporaryImgPathArr) {
+							if (Object.keys(this.timeMessage).length > 0) {
+								// 判断签名信息是否过期
+								if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+									await this.getSign();
+									await this.uploadImageToOss(imgI)
+								} else {
+									await this.uploadImageToOss(imgI)
+								}
+							} else {
+								await this.getSign();
+								await this.uploadImageToOss(imgI)
+							}
+						};
+						temporaryData['imagePaths'] = this.imgOnlinePathArr
 					};
 					if (this.subtaskInfo.operation != 2) {
 						temporaryData.describe = ''

@@ -141,7 +141,7 @@
 				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].id : this.userInfo.hospitalList[0].id
 			},
 			proName() {
-				return this.userInfo.hospitalList[0].name
+				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].value : this.userInfo.hospitalList[0].name
 			},
 			workerId() {
 				return this.userInfo.id

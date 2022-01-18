@@ -15,19 +15,19 @@ export function querySingleMainTask(majorId) {
 	    method: 'get'
 	  })
 }
-//任务详情检查项操作（满分，扣分，不参评）
+//任务详情检查项操作（满分，扣分，不参评）newCheckRecord
 export function addCheckRecord(data) {
 	return request({
-		url: 'quality/checkRecord/newCheckRecord',
+		url: 'quality/checkRecord/addCheckRecord',
 		method: 'post',
 		data
 	})
 }
-//任务详情检查项操作（满分，扣分，不参评）
+//任务详情检查项操作（满分，扣分，不参评）modifyCheckRecord
 export function updateCheckRecord(data) {
 	return request({
-	    url: 'quality/checkRecord/modifyCheckRecord',
-	    method: 'put',
+	    url: 'quality/checkRecord/updateCheckRecord',
+	    method: 'post',
 			data
 	  })
 }
@@ -53,4 +53,11 @@ export function queryItemDetails(checkId) {
 	    url: `quality/checkRecord/queryByCheckId/${checkId}`,
 	    method: 'get'
 	  })
+}
+// 获取阿里云签名接口
+export function getAliyunSign() {
+	return request({
+	    url: 'quality/oss/getSign',
+	    method: 'get'
+	})
 }

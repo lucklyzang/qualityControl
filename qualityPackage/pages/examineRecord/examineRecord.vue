@@ -28,7 +28,7 @@
 							<view v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
 							 @click="imageEvent(innerItem,innerIndex)"
 							>
-								<image :src="`http://blink.blinktech.cn/image/${innerItem}`"  mode="aspectFill"></image>
+								<image :src="`${innerItem}`"  mode="aspectFill"></image>
 							</view>
 						</view>
 						<view class="tips" v-if="item.remark">{{item.remark}}</view>
@@ -89,7 +89,7 @@
 				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].id : this.userInfo.hospitalList[0].id
 			},
 			proName() {
-				return this.userInfo.hospitalList[0].name
+				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].value : this.userInfo.hospitalList[0].name
 			},
 			workerId() {
 				return this.userInfo.id
@@ -160,7 +160,7 @@
 			// 图片放大事件
 			imageEvent (item,index) {
 				this.enlargePhotoShow = true;
-				this.enlargeImg = `http://blink.blinktech.cn/image/${item}`
+				this.enlargeImg = `${item}`
 			},
 			
 			// 图片关闭事件
@@ -173,7 +173,7 @@
 				this.infoText = '下载中···';
 				this.showLoadingHint = true;
 				uni.downloadFile({
-				  url: encodeURI(`https://blink.blinktech.cn/image/${file}`), // 文件下载地址
+				  url: encodeURI(`${file}`), // 文件下载地址
 				  success: response => {
 				    if (response.statusCode === 200) {
 				      uni.saveFile({
@@ -233,7 +233,7 @@
 			.u-model__content {
 				.slot-content {
 					height: 580px;
-					.u-icon {
+					u-icon {
 						position: absolute;
 						top: 0;
 						right: 0;
@@ -318,8 +318,6 @@
 						color: block
 					}
 					.record-img {
-						display: flex;
-						flex-flow: row wrap;
 						margin-top: 10px;
 						 >view {
 							display: inline-block;
@@ -342,8 +340,9 @@
 					.file-down {
 						> view {
 							margin-bottom: 8px;
-							font-size: 18px;
+							font-size: 16px;
 							color: blue;
+							word-wrap:break-word;
 							&:last-child {
 								margin-bottom: 0
 							}

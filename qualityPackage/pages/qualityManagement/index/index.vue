@@ -70,6 +70,12 @@
 								<text>{{queryTransfer(item.isQuery)}}</text>
 							</view>
 						</view>
+						<view class="status-content-middle-exam-line">
+							<view class="content-exam">
+								<text>考核内容 : </text>
+								<text>{{item.checkName}}</text>
+							</view>
+						</view>
 						<view class="status-content-middle-four-line">
 							<view class="content-fullMark">
 								<text>满 分 : </text>
@@ -140,6 +146,12 @@
 								<text>{{queryTransfer(item.isQuery)}}</text>
 							</view>
 						</view>
+						<view class="status-content-middle-exam-line">
+							<view class="content-exam">
+								<text>考核内容 : </text>
+								<text>{{item.checkName}}</text>
+							</view>
+						</view>
 						<view class="status-content-middle-four-line">
 							<view class="content-fullMark">
 								<text>满 分 : </text>
@@ -208,6 +220,12 @@
 							<view class="content-isQuery">
 								<text>质 疑 : </text>
 								<text>{{queryTransfer(item.isQuery)}}</text>
+							</view>
+						</view>
+						<view class="status-content-middle-exam-line">
+							<view class="content-exam">
+								<text>考核内容 : </text>
+								<text>{{item.checkName}}</text>
 							</view>
 						</view>
 						<view class="status-content-middle-four-line">
@@ -350,7 +368,7 @@
 				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].id : this.userInfo.hospitalList[0].id
 			},
 			proName() {
-				return this.userInfo.hospitalList[0].name
+				return this.userInfo.hospitalList.length > 1 ? this.selectHospitalList[0].value : this.userInfo.hospitalList[0].name
 			},
 			workerId() {
 				return this.userInfo.id
@@ -600,6 +618,7 @@
 									examinationPrincipal: this.extractPrincipal(item.persons),
 									examinationStartTime: item.startTime,
 									assessmentFormat: item.mode,
+									checkName: item.checkName,
 									isQuery: item.question,
 									fullMark: item.score,
 									id: item.id,
@@ -855,6 +874,9 @@
 									font-weight: bold
 								}
 							}
+						};
+						.content-exam {
+							width: 100%;
 						}
 					};
 					.status-content-middle-four-line {
