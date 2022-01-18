@@ -343,7 +343,7 @@
 													// “复核质疑”和“复查”状态下，任务详情场景只展示“待复核”、“已整改”、“整改未通过”四个状态的检查项
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 8) {
+															if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
 																this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -431,7 +431,7 @@
 													});
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 8) {
+															if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
 																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -522,7 +522,7 @@
 													});
 													if (this.flowState == 3 || this.flowState == 5) {
 														if (this.flowState == 3) {
-															if (innerItem['state'] != 8) {
+															if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
 																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
 																	standard : innerItem['standard'], //评价标准
@@ -609,7 +609,7 @@
 													if (tagsIndex != -1) {
 														if (this.flowState == 3 || this.flowState == 5) {
 															if (this.flowState == 3) {
-																if (innerItem['state'] != 8) {
+																if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
 																	this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																		confirm : innerItem['confirm'], //是否确认地点
 																		standard : innerItem['standard'], //评价标准
@@ -697,7 +697,7 @@
 														});
 														if (this.flowState == 3 || this.flowState == 5) {
 															if (this.flowState == 3) {
-																if (innerItem['state'] != 8) {
+																if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
 																	this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
 																		confirm : innerItem['confirm'], //是否确认地点
 																		standard : innerItem['standard'], //评价标准
