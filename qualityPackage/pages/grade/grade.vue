@@ -19,12 +19,29 @@
 				</view>
 			</view>
 			<view class="problem-describe" v-show="subtaskInfo.operation == 2" :class="{'problemDescribeStyle': subtaskInfo.operation == 2}">
-				<view class="top">
-					<text>问题描述 </text>
-				</view>
-				<view class="bottom">
-					<u-input v-model="problemDescribeValue" placeholder="请输入问题描述" type="textarea" :border="true"  />
-				</view>
+				<view class="problem-describe-top">
+					<view class="problem-describe-top-left">
+						<text>问题描述</text>
+					</view>
+					<view class="problem-describe-top-center">
+						<text>扣分</text>
+					</view>	
+					<view class="problem-describe-top-right">
+						<text>操作</text>
+					</view>
+				</view>	
+				<view class="problem-describe-list" v-for="(item,index) in problemDescribeList" :key="index">
+					<view class="problem-describe-left">
+						<u-input v-model="item.problemDescribeValue" placeholder="请输入问题描述" type="textarea" :border="true"  />
+					</view>
+					<view class="problem-describe-center">
+						<u-input v-model="item.deductMarksvalue" @input="(value) => buckleScoreChange(value,index)" placeholder="分数" type="number" :border="true"  />
+					</view>	
+					<view class="problem-describe-right">
+						<fa-icon type="plus-square" size="26" color="#43c3f4" @click="operateHandle('plus',item,index)"></fa-icon>
+						<fa-icon v-show="index != 0" type="minus-square" size="26" color="#43c3f4"  @click="operateHandle('minus',item,index)"></fa-icon>
+					</view>
+				</view>	
 			</view>
 			<view class="problem-photo" v-show="subtaskInfo.operation == 2">
 				<view> 
@@ -85,6 +102,12 @@
 				gradeValue: '0',
 				infoText: '',
 				problemDescribeValue: '',
+				problemDescribeList: [
+					{
+						problemDescribeValue: '',
+						deductMarksvalue: ''
+					}
+				],
 				taskTypeText: '',
 				content: '',
 				remark: '',
@@ -142,6 +165,56 @@
 				'changeTimeMessage',
 				'changeOssMessage'
 			]),
+			
+			// 操作按钮事件
+			operateHandle (operate,item,index) {
+				if (operate === 'plus') {
+					if (this.problemDescribeList.length == 5) {return};
+					this.problemDescribeList.push(
+						{
+							problemDescribeValue: '',
+							deductMarksvalue: ''
+						}
+					)
+				} else {
+					if (this.problemDescribeList[index]['deductMarksvalue'] != '') {
+						this.gradeValue = this.gradeValue + Number(this.problemDescribeList[index]['deductMarksvalue'])
+					};
+					this.problemDescribeList.splice(index,1);
+				}
+			},
+			
+			// 扣分项的值改变事件
+			buckleScoreChange (value,index) {
+				if(!(/(^[1-9]\d*$)/.test(value)) && value != '') {
+					this.$refs.uToast.show({
+						title: '扣分应为正整数',
+						type: 'warning'
+					});
+					this.$set(this.problemDescribeList[index], "deductMarksvalue" ,"");
+					this.$forceUpdate();
+					this.gradeValue = this.subtaskInfo.fullScore - this.totalBuckleScore(this.problemDescribeList)
+					return
+				};
+				if (this.totalBuckleScore(this.problemDescribeList) > this.subtaskInfo.fullScore) {
+					this.$refs.uToast.show({
+						title: '扣分总和不能大于该检查项分值',
+						type: 'warning'
+					});
+					this.$set(this.problemDescribeList[index], "deductMarksvalue" ,"");
+					this.$forceUpdate();
+					this.gradeValue = this.subtaskInfo.fullScore - this.totalBuckleScore(this.problemDescribeList)
+					return
+				};
+				this.gradeValue = this.subtaskInfo.fullScore - this.totalBuckleScore(this.problemDescribeList)
+			},
+			
+			// 计算总扣分之和
+			totalBuckleScore (targerArr) {
+				return targerArr.reduce((total, currentValue, currentIndex, arr) => {
+				        return total + Number(currentValue.deductMarksvalue);
+				    }, 0);
+			},
 			
 			// 获取阿里云签名接口
 			getSign (filePath = '') {
@@ -244,7 +317,11 @@
 				} else if (this.subtaskInfo['operation'] === 0) {
 					this.isDisabled = true;
 					this.gradeValue = '0'
-				} else if (this.subtaskInfo['operation'] == 2 || this.subtaskInfo['operation'] == -1) {
+				} else if (this.subtaskInfo['operation'] == 2 ) {
+					this.isDisabled = true;
+					this.gradeValue = this.subtaskInfo['score'].toString();
+					this.subtaskInfo['recordDesc'] ? this.problemDescribeValue = this.subtaskInfo['recordDesc'].replace('描述:','') : this.problemDescribeValue = ''
+				} else if (this.subtaskInfo['operation'] == -1) {
 					this.isDisabled = false;
 					this.gradeValue = this.subtaskInfo['score'].toString();
 					this.subtaskInfo['recordDesc'] ? this.problemDescribeValue = this.subtaskInfo['recordDesc'].replace('描述:','') : this.problemDescribeValue = ''
@@ -431,9 +508,9 @@
 					return
 				};
 				if (this.subtaskInfo.operation == 2) {
-					if (this.gradeValue == this.subtaskInfo.fullScore) {
+					if (this.problemDescribeList.some((item,index) => {return item.deductMarksvalue == ''})) {
 						this.$refs.uToast.show({
-							title: '扣分分数必须小于满分',
+							title: '扣分不能为空',
 							type: 'warning'
 						});
 						return
@@ -443,9 +520,18 @@
 				this.showLoadingHint = true;
 				// 判断操作方式
 				if (this.subtaskInfo.operation === 0 || this.subtaskInfo.operation === 1 || this.subtaskInfo.operation === 2 ) {
+					let temporaryProblemDescribeList = [];
+					if (this.subtaskInfo.operation === 2) {
+						for (let item of this.problemDescribeList) {
+							temporaryProblemDescribeList.push({
+								desc: item['problemDescribeValue'],
+								score: item['deductMarksvalue']
+							})
+						}
+					};
 					let temporaryData = {
 						score: this.gradeValue,
-						describe: "问题描述:" + this.problemDescribeValue,
+						describe: JSON.stringify(temporaryProblemDescribeList),
 						file: "",
 						remarks: "备注:" + this.remark,
 						majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
@@ -603,24 +689,81 @@
 				@include bottom-border-1px(#9b9b9b);
 			};
 			.problem-describe {
-				>view {
-					display: inline-block
-				};
-				padding: 8px 4px;
+				padding: 12px 4px;
 				background: #fff;
-				.top {
-					width: 26%;
-					padding-left: 4px;
-					vertical-align: top;
-					color: #5d5d5d
+				> view {
+					width: 100%;
+					display: flex;
+					flex-flow: row nowrap;
 				};
-				.bottom {
-					width: 74%;
-					/deep/ .u-input--border {
-						border: none;
-						background: #f9f9f9
+				.problem-describe-top {
+					margin-bottom: 4px;
+					.problem-describe-top-left {
+						flex: 1;
+						margin-right: 4px
+					};
+					.problem-describe-top-center {
+						width: 70px;
+						margin-right: 4px
+					};
+					.problem-describe-top-right {
+						width: 100px;
+						text-align: center
+					}
+				};
+				.problem-describe-list {
+					margin-bottom: 4px;
+					&:last-child {
+						margin-bottom: 0
+					};
+					.problem-describe-left {
+						flex: 1;
+						margin-right: 4px;
+						/deep/ .u-input--border {
+						 		border: none;
+						 		background: #f9f9f9;
+								height: 45px;
+								overflow: auto
+						 	}
+					};
+					.problem-describe-center {
+						width: 70px;
+						margin-right: 4px;
+						/deep/ .u-input--border {
+							border: none;
+							background: #f9f9f9;
+							height: 45px;
+							overflow: auto
+						}
+					};
+					.problem-describe-right {
+						width: 100px;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						/deep/ .fa-plus-square {
+							margin-right: 6px
+						}
 					}
 				}
+				// >view {
+				// 	display: inline-block
+				// };
+				// padding: 8px 4px;
+				// background: #fff;
+				// .top {
+				// 	width: 26%;
+				// 	padding-left: 4px;
+				// 	vertical-align: top;
+				// 	color: #5d5d5d
+				// };
+				// .bottom {
+				// 	width: 74%;
+				// 	/deep/ .u-input--border {
+				// 		border: none;
+				// 		background: #f9f9f9
+				// 	}
+				// }
 			};
 			.remark-describe {
 				padding: 8px 4px;
