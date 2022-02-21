@@ -32,10 +32,10 @@
 				</view>	
 				<view class="problem-describe-list" v-for="(item,index) in problemDescribeList" :key="index">
 					<view class="problem-describe-left">
-						<u-input v-model="item.problemDescribeValue" placeholder="请输入问题描述" type="textarea" :border="true"  />
+						<textarea :value="item.problemDescribeValue" placeholder="请输入问题描述" @input="(value) => issueDescribeChange(value,index)" />
 					</view>
 					<view class="problem-describe-center">
-						<u-input v-model="item.deductMarksvalue" @input="(value) => buckleScoreChange(value,index)" placeholder="分数" type="number" :border="true"  />
+						<input :value="item.deductMarksvalue" @input="(value) => buckleScoreChange(value,index)" placeholder="分数" type="number" />
 					</view>	
 					<view class="problem-describe-right">
 						<fa-icon type="plus-square" size="26" color="#43c3f4" @click="operateHandle('plus',item,index)"></fa-icon>
@@ -170,12 +170,10 @@
 			operateHandle (operate,item,index) {
 				if (operate === 'plus') {
 					if (this.problemDescribeList.length == 5) {return};
-					this.problemDescribeList.push(
-						{
+					this.$set(this.problemDescribeList, this.problemDescribeList.length , {
 							problemDescribeValue: '',
 							deductMarksvalue: ''
-						}
-					)
+						})
 				} else {
 					if (this.problemDescribeList[index]['deductMarksvalue'] != '') {
 						this.gradeValue = this.gradeValue + Number(this.problemDescribeList[index]['deductMarksvalue'])
@@ -186,13 +184,13 @@
 			
 			// 扣分项的值改变事件
 			buckleScoreChange (value,index) {
-				if(!(/(^[1-9]\d*$)/.test(value)) && value != '') {
+				this.$set(this.problemDescribeList[index], "deductMarksvalue" ,value.detail['value']);
+				if(!(/(^[1-9]\d*$)/.test(value.detail['value'])) && value.detail['value'] != '') {
 					this.$refs.uToast.show({
 						title: '扣分应为正整数',
 						type: 'warning'
 					});
-					this.$set(this.problemDescribeList[index], "deductMarksvalue" ,"");
-					this.$forceUpdate();
+					this.$set(this.problemDescribeList[index], "deductMarksvalue" , null);
 					this.gradeValue = this.subtaskInfo.fullScore - this.totalBuckleScore(this.problemDescribeList)
 					return
 				};
@@ -202,11 +200,16 @@
 						type: 'warning'
 					});
 					this.$set(this.problemDescribeList[index], "deductMarksvalue" ,"");
-					this.$forceUpdate();
 					this.gradeValue = this.subtaskInfo.fullScore - this.totalBuckleScore(this.problemDescribeList)
 					return
 				};
 				this.gradeValue = this.subtaskInfo.fullScore - this.totalBuckleScore(this.problemDescribeList)
+			},
+			
+			// 问题描述事件改变
+			issueDescribeChange (value,index) {
+				this.$set(this.problemDescribeList[index], "problemDescribeValue" ,value.detail['value']);
+				console.log(this.problemDescribeList);
 			},
 			
 			// 计算总扣分之和
@@ -508,9 +511,9 @@
 					return
 				};
 				if (this.subtaskInfo.operation == 2) {
-					if (this.problemDescribeList.some((item,index) => {return item.deductMarksvalue == ''})) {
+					if (this.problemDescribeList.some((item,index) => {return item.deductMarksvalue == '' || item.deductMarksvalue == null})) {
 						this.$refs.uToast.show({
-							title: '扣分不能为空',
+							title: '扣分不能为0或空',
 							type: 'warning'
 						});
 						return
@@ -700,11 +703,11 @@
 					margin-bottom: 4px;
 					.problem-describe-top-left {
 						flex: 1;
-						margin-right: 4px
+						margin-right: 6px
 					};
 					.problem-describe-top-center {
 						width: 70px;
-						margin-right: 4px
+						margin-right: 6px
 					};
 					.problem-describe-top-right {
 						width: 100px;
@@ -712,14 +715,18 @@
 					}
 				};
 				.problem-describe-list {
-					margin-bottom: 4px;
+					margin-bottom: 6px;
 					&:last-child {
 						margin-bottom: 0
 					};
 					.problem-describe-left {
 						flex: 1;
-						margin-right: 4px;
-						/deep/ .u-input--border {
+						margin-right: 6px;
+						textarea {
+								width: 100%;
+								padding: 2px;
+								box-sizing: border-box;
+								font-size: 14px;
 						 		border: none;
 						 		background: #f9f9f9;
 								height: 45px;
@@ -728,9 +735,12 @@
 					};
 					.problem-describe-center {
 						width: 70px;
-						margin-right: 4px;
-						/deep/ .u-input--border {
+						margin-right: 6px;
+						input {
 							border: none;
+							padding: 2px;
+							box-sizing: border-box;
+							font-size: 14px;
 							background: #f9f9f9;
 							height: 45px;
 							overflow: auto

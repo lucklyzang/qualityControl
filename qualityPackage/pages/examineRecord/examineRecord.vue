@@ -24,12 +24,12 @@
 				>
 					<view class="tripItem">
 						<view class="title" v-if="!Array.isArray(item.problemDescription)">{{item.problemDescription}}</view>
-						<view class="title" v-show="Array.isArray(item.problemDescription)">
+						<view class="title" v-else="Array.isArray(item.problemDescription)">
 							<view v-for="(oneItem,oneIndex) in item.problemDescription" :key="oneIndex">
 								{{`${oneIndex + 1}.描述: ${oneItem.desc}`}}
 							</view>
 						</view>
-						<view class="record-img" v-if="item.images">
+						<view class="record-img" v-if="item.images.length > 0">
 							<view v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
 							 @click="imageEvent(innerItem,innerIndex)"
 							>
