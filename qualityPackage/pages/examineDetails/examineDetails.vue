@@ -24,7 +24,7 @@
 						</view>
 						<view class="bottom">
 							<text>考核内容</text>
-							<text>{{tableList[0]['checkName']}}</text>
+							<text>{{tableList.length > 0 ? tableList[0]['checkName'] : ''}}</text>
 						</view>
 					</view>
 				</view>

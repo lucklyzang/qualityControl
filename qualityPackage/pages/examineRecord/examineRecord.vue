@@ -23,8 +23,13 @@
 				v-for="(item,index) in recordList"
 				>
 					<view class="tripItem">
-						<view class="title" v-if="item.problemDescription">{{item.problemDescription}}</view>
-						<view class="record-img" v-if="item.images">
+						<view class="title" v-if="!Array.isArray(item.problemDescription)">{{item.problemDescription}}</view>
+						<view class="title" v-else="Array.isArray(item.problemDescription)">
+							<view v-for="(oneItem,oneIndex) in item.problemDescription" :key="oneIndex">
+								{{`${oneIndex + 1}.描述: ${oneItem.desc}`}}
+							</view>
+						</view>
+						<view class="record-img" v-if="item.images.length > 0">
 							<view v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
 							 @click="imageEvent(innerItem,innerIndex)"
 							>
@@ -121,6 +126,14 @@
 				return str
 			},
 			
+			// 判断字符串是否以指定字符开头和结尾
+			confirmEnding (str, targetOne, targetTwo) {
+				if(str.indexOf(targetOne) === 0 && str.lastIndexOf(targetTwo) === str.length - 1){
+						return true
+				};
+			  return false
+			},
+			
 			// 查询检查项详情
 			getItemDetails (checkId) {
 				this.recordList = [];
@@ -134,12 +147,13 @@
 								this.recordList.push({
 									scrutator: item['operator'],
 									startTime: item['operationTime'],
-									problemDescription: item['describe'],
+									problemDescription: this.confirmEnding(item['describe'],'[',']') ? JSON.parse(item['describe']) : item['describe'],
 									remark: item['remarks'],
 									images: item['images'],
 									files: item.hasOwnProperty('files') ? item['files'] : []
 								})
-							}
+							};
+							console.log('数据',this.recordList);
 						}
 					} else {
 						this.$refs.uToast.show({

@@ -28,7 +28,7 @@ instance.interceptors.request.use(function (config) {
 	if (store.getters.token) {
 	   config.headers['Authorization'] = store.getters.token
 	};
-	 return config;
+	return config;
 }, function (error) {
   //处理请求错误
   return Promise.reject(error.response);
