@@ -2,7 +2,7 @@
 $color-big-icon: #0e89ec;  //主色调（大图标）
 $color-bottom-nav: #2f99f1 ;  //主色调（底部导航）
 $color-text-left: #7d7d7d;  //字体颜色（左边说明文字）
-$color-text-right: #333;  //字体颜色（右边内容文字）
+$color-text-right: black;  //字体颜色（右边内容文字）
 $color-underline: #e5e5e5; // 下划线颜色
 @mixin content-wrapper () {
   display: flex;

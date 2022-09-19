@@ -28,7 +28,7 @@
 						</view>
 					</view>
 				</view>
-			</view>
+			</view> 
 			<view class="examine-items-table-bottom">
 				<view class="examine-items-table-bottom-content">
 					<view class="start-time">

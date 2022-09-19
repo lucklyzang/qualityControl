@@ -2,6 +2,7 @@ export default {
   state:{
     titleText: '',
     bottomBarIndex: 0,
+		taskMessage: {},
 		mainTaskId: '',
 		subtaskInfo: {},
 		disposeSubTaskData: [],
@@ -12,6 +13,7 @@ export default {
   },
   getters:{
     titleText: state => state.titleText,
+		taskMessage: state => state.taskMessage,
     bottomBarIndex: state => state.bottomBarIndex,
 		mainTaskId: state => state.mainTaskId,
 		subtaskInfo: state => state.subtaskInfo,
@@ -28,6 +30,9 @@ export default {
     changeBottomBarIndex (state, playLoad) {
       state.bottomBarIndex = playLoad
     },
+		changeTaskMessage (state, playLoad) {
+			state.taskMessage = playLoad
+		},
 		changeMainTaskId (state, playLoad) {
 		  state.mainTaskId = playLoad
 		},

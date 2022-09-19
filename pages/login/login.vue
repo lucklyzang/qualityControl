@@ -147,8 +147,8 @@
 						type: 'warning'
 					})
 				} else {
-					uni.switchTab({
-						url: '/pages/index/index'
+					uni.navigateTo({
+						url: '/qualityPackage/pages/qualityManagement/index/index'
 					})
 				}
 			},
@@ -190,8 +190,8 @@
 								};
 								this.chooseHospitalShow = true
 							} else {
-								uni.switchTab({
-									url: '/pages/index/index'
+								uni.navigateTo({
+									url: '/qualityPackage/pages/qualityManagement/index/index'
 								})
 							}
 					  } else {
@@ -235,7 +235,20 @@
 			overflow: auto !important;
 			.u-model__content {
 				.slot-content {
-					height: 300px
+					height: 300px;
+					.show-box {
+						.list-container {
+							top: 0;
+							.list {
+								.item {
+									color: #a8a8a8
+								};
+								.active {
+									color: #01a6ff;
+								}
+							}
+						}
+					}
 				}
 			};
 			.u-model__footer__button {
@@ -259,24 +272,24 @@
           span {
             box-shadow: 0 8px 6px -6px black
           }
-			},
+			};
 			.form-box {
         width: 90%;
         margin: 0 auto;
 				padding: 10px;
 				/deep/ .u-input {
 					background: #fff
-				};
+				}
 				text {
 					display: inline-block;
 					margin-bottom: 8px
-				};
+				}
 				.form-account {
-				};
+				}
 				.form-password {
 					margin-top: 20px
 				}
-			};
+			}
       .remember-password {
         width: 100%;
         margin: 0 auto;
@@ -287,7 +300,7 @@
           top: 0;
           right: 0
         }
-      };
+      }
 			.form-btn {
         width: 80%;
         margin: 0 auto;
@@ -311,7 +324,7 @@
           margin: 0 auto;
           image {
             width: 100%;
-            height: 100%
+            height: 100%;
           }
         }
       }

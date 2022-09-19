@@ -12,15 +12,6 @@
 			}
 		},
 		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "",
-				"navigationBarBackgroundColor": "#ffffff",
-				"backgroundColorTop": "#ffffff,",
-				"backgroundColorBottom": "#ffffff"
-			}
-		},
-		{
 			"path": "pages/personInfo/personInfo",
 			"style": {
 				"navigationBarTitleText": "个人资料",
@@ -37,6 +28,15 @@
 			"pages": [
 				{
 					"path": "pages/examineDetails/examineDetails",
+					"style": {
+						"navigationBarTitleText": "检查详情",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/taskDetails/taskDetails",
 					"style": {
 						"navigationBarTitleText": "检查详情",
 						"navigationBarBackgroundColor": "#ffffff",
@@ -96,25 +96,5 @@
 		"navigationBarBackgroundColor": "#fff",
 		"backgroundColor": "#FFFFFF",
 		"navigationStyle": "custom"
-	},
-	"tabBar":{
-	"color":"#333",
-	"selectedColor":"#75b0f0",
-	"backgroundColor":"#fff",
-	"borderStyle":"white",
-	"list":[
-			{
-				"pagePath":"pages/index/index",
-				"text":"首页",
-				"iconPath":"static/img/index.png",
-				"selectedIconPath":"static/img/index-current.png"
-			},
-			{
-				"pagePath":"pages/personInfo/personInfo",
-				"text":"我的",
-				"iconPath":"static/img/my.png",
-				"selectedIconPath":"static/img/my-current.png"
-			}
-		]
 	}
 }
