@@ -5,6 +5,7 @@ export default {
 		taskMessage: {},
 		mainTaskId: '',
 		subtaskInfo: {},
+		subtaskDetails: {},
 		disposeSubTaskData: [],
 		cacheIndex: {},
 		isSkipDetails: false,
@@ -16,6 +17,7 @@ export default {
 		taskMessage: state => state.taskMessage,
     bottomBarIndex: state => state.bottomBarIndex,
 		mainTaskId: state => state.mainTaskId,
+		subtaskDetails: state => state.subtaskDetails,
 		subtaskInfo: state => state.subtaskInfo,
 		disposeSubTaskData: state => state.disposeSubTaskData,
 		cacheIndex: state => state.cacheIndex,
@@ -35,6 +37,9 @@ export default {
 		},
 		changeMainTaskId (state, playLoad) {
 		  state.mainTaskId = playLoad
+		},
+		changeSubtaskDetails (state, playLoad) {
+			state.subtaskDetails = playLoad
 		},
 		changeSubtaskInfo (state, playLoad) {
 		  state.subtaskInfo = playLoad

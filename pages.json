@@ -45,6 +45,24 @@
 					}
 				},
 				{
+					"path": "pages/subtaskDetails/subtaskDetails",
+					"style": {
+						"navigationBarTitleText": "子任务详情",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/allDocuments/allDocuments",
+					"style": {
+						"navigationBarTitleText": "全部文件",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
 					"path": "pages/grade/grade",
 					"style": {
 						"navigationBarTitleText": "评分",

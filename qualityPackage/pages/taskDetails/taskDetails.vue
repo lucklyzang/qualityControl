@@ -11,7 +11,7 @@
 		</view>
 		<view class="content-bottom-area">
 			<view class="details-tilte">
-				<u-icon name="arrow-left" color="orange" size="30"></u-icon>
+				<u-icon name="order" color="orange" size="35"></u-icon>
 				<text>
 					{{`${taskMessage.year}年${taskMessage.examinationTime}${taskMessage.checkName}${taskMessage.examinationType}检查`}}
 				</text>

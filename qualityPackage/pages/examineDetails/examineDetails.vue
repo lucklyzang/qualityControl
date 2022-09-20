@@ -9,61 +9,37 @@
 		<view class="flow-wrapper">
 			<u-steps :list="flowList" mode="number" :current="flowState-1" active-color="#43c3f4"></u-steps>
 		</view>
-		<view class="examine-items-table-wrapper">
-			<view class="examine-items-table-top">  
-				<view class="image-wrapper">
-					<image src="/static/img/examine-background.png"></image>
-					<view class="examine-items-table-top-content">
-						<view class="left">
-							<text>总分值</text>
-							<text>{{ tableList.length > 0 ? tableList[0]['score'] : ''}}</text>
-						</view>
-						<view class="right">
-							<text>当前得分</text>
-							<text>{{tableList.length > 0 ? tableList[0]['resultScore'] : ''}}</text>
-						</view>
-						<view class="bottom">
-							<text>考核内容</text>
-							<text>{{tableList.length > 0 ? tableList[0]['checkName'] : ''}}</text>
-						</view>
-					</view>
+		<view class="examine-pandect" @click="arrowEvent">
+			<view class="examine-pandect-left">
+				<view class="examine-pandect-title">
+					{{`${taskMessage.year}年${taskMessage.examinationTime}${taskMessage.checkName}${taskMessage.examinationType}检查`}}
 				</view>
-			</view> 
-			<view class="examine-items-table-bottom">
-				<view class="examine-items-table-bottom-content">
-					<view class="start-time">
-						<view class="top">
-							<text></text>
-							<text>开始时间</text>
-						</view>
-						<view class="bottom">
-							{{tableList.length > 0 ? tableList[0]['startTime'] : ''}}
-						</view>
-					</view>
-					<view class="query-end-time">
-						<view class="top">
-							<text></text>
-							<text>质疑截止时间</text>
-						</view>
-						<view class="bottom">
-							{{tableList.length > 0 ? tableList[0]['questionTime'] : ''}}
-						</view>
-					</view>
-					<view class="examine-end-time">
-						<view class="top">
-							<text></text>
-							<text>检查截止时间</text>
-						</view>
-						<view class="bottom">
-							{{tableList.length > 0 ? tableList[0]['finishTime'] : ''}}
-						</view>
-					</view>
+				<view class="examine-pandect-grade">
+					<text>{{`总得分 : ${tableList.length > 0 ? tableList[0]['resultScore'] : ''}/${tableList.length > 0 ? tableList[0]['score'] : ''}`}}</text>
 				</view>
+			</view>
+			<view class="examine-pandect-right">
+				<u-icon name="arrow-rightward" color="#fff" size="38"></u-icon>
 			</view>
 		</view>
 		<view class="subtask-wrapper">
-			<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index">
-				<view class="subtask-list-title" @click="subtaskEvent(item,index)">
+			<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index" @click="subtaskClickEvent(item)">
+				<view class="subtask-item-left">
+					<view class="subtask-item-title">{{`${taskMessage.checkName}${taskMessage.examinationType}-${item.subtaskName}`}}</view>
+					<view class="subtask-item-oerson">负责人 : {{item.subtaskPrincipal}}</view>
+					<view class="subtask-item-grade">得分 : {{`${item.subtaskScore}/${item.subtaskFullMark}`}}</view>
+				</view>
+				<view class="subtask-item-right">
+					<view class="subtask-item-right-top">
+							<u-circle-progress :width="80" :border-width="10" active-color="#3e7dff" :percent="50">
+							</u-circle-progress>
+					</view>
+					<view class="subtask-item-right-bottom">
+						<text>检查已完成:</text>
+						<text>60%</text>
+					</view>
+				</view>
+				<!-- <view class="subtask-list-title" @click="subtaskEvent(item,index)">
 					<view class="subtask-list-center-wrapper">
 						<view class="subtask-list-center" :class="{'animate-center':item.isScroll}">
 							<view class="subtask-name">
@@ -94,8 +70,8 @@
 							<u-icon name="arrow-down-fill" v-if="item.unfold"></u-icon>
 						</view>
 					</view>
-				</view>
-				<view class="subtask-list-content" v-if="item.unfold">
+				</view> -->
+				<!-- <view class="subtask-list-content" v-if="item.unfold">
 					<view class="subtask-item-wrapper">
 						<view class="subtask-item" v-for="(itemInner,indexInner) in item.checkItem" :key="indexInner">
 							<view class="subtask-item-title" v-if="itemInner.checkItemList.length > 0">
@@ -132,13 +108,10 @@
 							</view>
 						</view>
 					</view>
-				</view>
+				</view> -->
 			</view>
 		</view>
-		<view class="subtask-btn-wrapper">
-			<text class="btn-left" :class="{'btnRightStyle': flowState == 2 || flowState == 4 || flowState == 6}" @click="submitResult">提 交</text>
-			<text class="btn-right" @click="backTo">返 回</text>
-		</view>
+		<view class="quit-account" :class="{'btnRightStyle': flowState == 2 || flowState == 4 || flowState == 6}" @click="submitResult">提 交</view>
 	</view>
 </template>
 
@@ -191,6 +164,7 @@
 		computed: {
 			...mapGetters([
 				'titleText',
+				'taskMessage',
 				'userInfo',
 				'mainTaskId',
 				'selectHospitalList',
@@ -229,6 +203,7 @@
 				'changeSubtaskInfo',
 				'changeDisposeSubTaskData',
 				'changeIsSkipDetails',
+				'changeSubtaskDetails',
 				'changeCacheIndex'
 			]),
 			
@@ -249,6 +224,24 @@
 					flag = false
 				};
 				return flag
+			},
+			
+			// 进入主任务详情事件
+			arrowEvent () {
+				uni.redirectTo({
+					url: '/qualityPackage/pages/taskDetails/taskDetails'
+				})
+			},
+			
+			// 子任务点击事件
+			subtaskClickEvent (item) {
+				let temporaryObject = {};
+				temporaryObject = item;
+				temporaryObject['flowState'] = this.flowState;
+				this.changeSubtaskDetails(temporaryObject);
+				uni.redirectTo({
+					url: '/qualityPackage/pages/subtaskDetails/subtaskDetails'
+				});
 			},
 			
 			// 检查项状态转换
@@ -784,8 +777,7 @@
 										};
 										this.changeDisposeSubTaskData(this.subtaskList)
 									}	
-								};
-								console.log('子任务详情',this.subtaskList);
+								}
 							}
 						}
 					} else {
@@ -983,117 +975,120 @@
 			padding: 8px 0;
 			background: #fff
 		}
-		.examine-items-table-wrapper {
-			padding: 8px 0;
-			position: relative;
-			.examine-items-table-top {
-				height: 100px;
-				.image-wrapper {
-					position: relative;
-					height: 100px;
-					width: 100%;
-					margin: 0 auto;
-					> image {
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 100%;
-						height: 100%
-					};
-					.examine-items-table-top-content {
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 100%;
-						height: 100px;
-						display: flex;
-						flex-flow: row wrap;
-						justify-content: center;
-						align-items: center;
-						> view {
-							width: 45%;
-							text-align: center;
-							text {
-								&:first-child {
-									color: #bfbfbf;
-									font-size: 12px;
-									margin-right: 8px
-								};
-								&:last-child {
-									color: #fff;
-									font-size: 22px;
-									font-weight: bold
-								}
-							}
-						};
-						.bottom {
-							width: 60%;
-							overflow: auto;
-							max-height: 60px;
-							> text {
-								&:last-child {
-									font-size: 15px
-								}
-							}
-						}
-					}
+		.examine-pandect {
+			padding: 10px 20px;
+			background: #fff;
+			margin-top: 10px;
+			border: 1px solid #e7e7e7;
+			box-shadow: 0px 15px 10px -15px #b0d2ff;
+			border-radius: 50px;
+			box-sizing: border-box;
+			display: flex;
+			flex-flow: row nowrap;
+			justify-content: space-between;
+			align-items: center;
+			.examine-pandect-left {
+				width: 80%;
+				.examine-pandect-title {
+					word-break: break-all;
+					margin-bottom: 6px;
+					color: black;
+					font-size: 14px
+				};
+				.examine-pandect-grade {
+					color: b3b3b0;
+					font-size: 12px;
+					width: 120px;
+					padding: 0 6px;
+					color: #E86F50;
+					background-color:rgba(232,111,80,0.27);
+					height: 24px;
+					border-radius: 20px;
+					text-align: center;
+					line-height: 24px
 				}
 			};
-			.examine-items-table-bottom {
-				height: 75px;
-				position: relative;
-				background: #fff;
-				.examine-items-table-bottom-content {
-					position: absolute;
-					width: 100%;
-					height: 60px;
-					top: 50%;
-					left: 0;
-					transform: translateY(-50%);
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					flex-flow: row nowrap;
-					> view {
-						margin-right: 10px;
-						&:last-child {
-							margin-right: 0
-						};
-						.top {
-							font-size: 14px;
-							color: black;
-							text-align: center;
-							> text {
-								&:first-child {
-									display: inline-block;
-									width: 4px;
-									height: 4px;
-									background: black;
-									border-radius: 50%;
-									margin-right: 6px;
-									vertical-align: middle;
-								}
-							}
-						};
-						.bottom {
-							font-size: 15px;
-							color: #9a9a9a;
-							text-align: center
-						}
-					}
-				}
+			.examine-pandect-right {
+				width: 20%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 45px;
+				height: 45px;
+				border-radius: 50%;
+				background: #FFC65B
 			}
 		}
 		.subtask-wrapper {
 			flex: 1;
+			width: 96%;
+			margin: 0 auto;
 			overflow: auto;
+			padding-bottom: 100px;
+			box-sizing: border-box;
 			margin-top: 8px;
 			.subtask-list {
 				background: #fff;
 				margin-bottom: 8px;
+				display: flex;
+				border-radius: 6px;
+				flex-flow: row nowrap;
+				justify-content: space-between;
+				align-items: center;
+				border: 1px solid #e7e7e7;
+				padding: 10px;
+				box-sizing: border-box;
+				box-shadow: 0px 15px 10px -15px #b0d2ff;
 				&:last-child {
 					margin-bottom: 0
 				};
+				.subtask-item-left {
+					width: 70%;
+					.subtask-item-title {
+						margin-bottom: 6px;
+						color: black;
+						word-break: break-all;
+						font-size: 16px;
+					};
+					.subtask-item-oerson {
+						margin-bottom: 6px;
+						word-break: break-all;
+						color: #adada9;
+						font-size: 14px;
+						margin: 12px 0
+					};
+					.subtask-item-grade {
+						font-size: 12px;
+						width: 110px;
+						padding: 0 6px;
+						color: #3e7dff;
+						border: 1px solid #3e7dff;
+						height: 24px;
+						border-radius: 20px;
+						text-align: center;
+						line-height: 24px;
+					}
+				};
+				.subtask-item-right {
+						width: 30%;
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+						align-items: center;
+					.subtask-item-right-top {};
+					.subtask-item-right-bottom {
+						margin-top: 6px;
+						text {
+							font-size: 12px;
+							&:first-child {
+								color: #adada9
+							};
+							&:last-child {
+								color: #3e7dff
+							}
+						}
+					}
+				}
 				.subtask-list-title {
 					width: 100%;
 					padding: 10px 6px;
@@ -1234,30 +1229,25 @@
 				}
 			}
 		}
-		.subtask-btn-wrapper {
-			height: 60px;
-			width: 80%;
+		.quit-account {
+			position: fixed;
+			bottom: 50px;
+			height: 50px;
+			width: 260px;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size: 16px;
 			margin: 0 auto;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			text {
-				width: 130px;
-				height: 40px;
-				border-radius: 4px;
-				text-align: center;
-				line-height: 40px;
-				color: #fff;
-				background-image: linear-gradient(to right, #37d5fc , #439bff)
-			}
-			.btnRightStyle {
-				background: #e8e8e8;
-				color: #989898
-			}
-			.btn-right {
-				background: #e8e8e8;
-				color: #666
-			}
+			line-height: 50px;
+			background: linear-gradient(to right, #6cd2f8, #2390fe);
+			color: #fff;
+			border-radius: 30px;
+			font-weight: bold;
+			text-align: center
+		};
+		.btnRightStyle {
+			background: #e8e8e8;
+			color: #989898
 		}
 	}	
 </style>

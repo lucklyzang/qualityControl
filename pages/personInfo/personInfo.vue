@@ -65,7 +65,7 @@
 					</text>
 				</view>
 			</view>
-			<view class="content-top-other">
+			<view class="content-top-other" @click="fileViewEvent">
 				<view class="left">
 					<text>
 						<u-icon name="arrow-left" color="#000" size="30"></u-icon>
@@ -173,7 +173,12 @@
 			juddgeAvatarUrl() {
 				return '/static/img/default-person.jpg'
 			},
-
+			// 查看全部文件
+			fileViewEvent () {
+				uni.redirectTo({
+					url: '/qualityPackage/pages/allDocuments/allDocuments'
+				})
+			},
 			isLoginOut() {
 				this.sureCancelShow = true
 			},

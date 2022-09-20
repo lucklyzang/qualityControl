@@ -330,7 +330,7 @@
 			
 			// 头像点击事件
 			headPhotoClickEvent () {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/pages/personInfo/personInfo'
 				})
 			},
@@ -684,10 +684,11 @@
 				};
 				this.changeIsSkipDetails(true);
 				this.changeCacheIndex(temporaryIndex);
+				this.changeTaskMessage(item);
 				this.changeMainTaskId(item.id);
 				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'
-				});
+				})
 			},
 		
 			// 查看更多
