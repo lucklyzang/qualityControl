@@ -6,7 +6,7 @@
 			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查项详情" @backClick="backTo">
 			</nav-bar>
 		</view>
-		<view class="score-box">
+		<!-- <view class="score-box">
 			<image src="/static/img/examine-item-background.png"></image>
 			<view>
 				<text>得分 </text>
@@ -15,8 +15,8 @@
 				<text v-if="subtaskInfo.itemMode == 2 && subtaskInfo.majorState == 6">已确认 不参评</text>
 				<text v-if="(subtaskInfo.itemMode != 2 && subtaskInfo.state != 0) || subtaskInfo.majorState == 3">{{`${subtaskInfo.score}/${subtaskInfo.fullScore}`}}</text>
 			</view>
-		</view>
-		<view class="operite-btn-box" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
+		</view> -->
+	<!-- 	<view class="operite-btn-box" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
 			<view @click="gradeEvent(1)" v-if="fullScoreShow">
 				<view class="image-box">
 					<image src="/static/img/full-mark.png"></image>
@@ -35,8 +35,8 @@
 				</view>
 				<view class="text">不参评</view>
 			</view>
-		</view>
-		<view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 3">
+		</view> -->
+		<!-- <view class="operite-query-btn-box" v-if="subtaskInfo.majorState == 3">
 			<view @click="gradeEvent(-1)">
 				<view class="image-box">
 					<image src="/static/img/again-evaluate.png"></image>
@@ -63,8 +63,11 @@
 				</view>
 				<view class="text">不通过</view>
 			</view>
-		</view>
+		</view> -->
 		<view class="examine-content-box">
+			<view class="examine-content-title">
+				<text>检查项详情</text>
+			</view>
 			<view class="examine-content-box-top">
 				<view class="examine-items-number">
 					<text>检查项编号 : </text>
@@ -79,7 +82,7 @@
 					<text>{{subtaskInfo.describe}}</text>
 				</view>
 				<view class="examine-describe">
-					<text>标准参考 : </text>
+					<text>参考标准 : </text>
 					<text>{{subtaskInfo.standard}}</text>
 				</view>
 				<view class="examine-describe">
@@ -91,11 +94,80 @@
 					<text>{{subtaskInfo.additional === 0 ? '普通' : '附加'}}</text>
 				</view>
 			</view>
+			<view class="examine-content-box-center-title">
+				<text>备注</text>
+			</view>
+			<view class="examine-content-box-center">
+				<view v-for="(item, index) in imgArr" :key='index'>
+					<image :src="item" mode="aspectFit"></image>
+					<fa-icon type="window-close" size="20" color="#000000"></fa-icon>
+				</view>
+				<view>
+					<image class="" mode="aspectFit" :lazy-load="true" src="/static/img/plus.png"  @click="getImg"/>
+				</view>
+			</view>
+			<view class="examine-content-box-remark">
+				<u-input v-model="remark" placeholder="请输入备注" type="textarea" :border="true"  />
+				<view class="submit-box">
+					<text>提交</text>
+				</view>
+			</view>
+			<view class="examine-content-box-check-details-title">
+				<text>检查详情</text>
+			</view>
+			<view class="examine-content-box-check-details-box">
+				<timeline>
+					<timelineItem :leftTime="item.startTime" 
+					:scrutator="item.scrutator" color="#43c3f4"
+					:key="index"
+					v-for="(item,index) in recordList"
+					>
+						<view class="tripItem">
+							<view class="title" v-if="!Array.isArray(item.problemDescription)">{{item.problemDescription}}</view>
+							<view class="title" v-else="Array.isArray(item.problemDescription)">
+								<view v-for="(oneItem,oneIndex) in item.problemDescription" :key="oneIndex">
+									{{`${oneIndex + 1}.描述: ${oneItem.desc}`}}
+								</view>
+							</view>
+							<view class="record-img" v-if="item.images && item.images.length > 0">
+								<view v-for="(innerItem,innerIndex) in item.images" :key="innerIndex"
+								 @click="imageEvent(innerItem,innerIndex)"
+								>
+									<image :src="`${innerItem}`"  mode="aspectFill"></image>
+								</view>
+							</view>
+							<view class="tips" v-if="item.remark">{{item.remark}}</view>
+							<view class="file-down" v-if="item.files.length > 0">
+								<view @click="downFileEvent(innerItem)" v-for="(innerItem,innerIndex) in item.files" :key="innerIndex">
+									{{`${cutStr(innerItem)} 点击下载`}}
+								</view>
+							</view>
+						</view>
+					</timelineItem>
+				</timeline>
+			</view>
 		</view>
-		<view class="btn-box">
+		<view class="operta-box">
+			<image :src="statusBackgroundPng"></image>
+			<view class="btn-content">
+				<view>
+					<image src="/static/img/no-evaluate.png"></image>
+					<view class="text">不参评</view>
+				</view>
+				<view>
+					<image src="/static/img/full-mark.png"></image>
+					<view class="text">满分</view>
+				</view>
+				<view >
+					<image src="/static/img/deduct-mark.png"></image>
+					<view class="text">扣分</view>
+				</view>
+			</view>
+		</view>
+	<!-- 	<view class="btn-box">
 			<text @click="enterRecord" :class="{'btnRightStyle': !subtaskInfo['taskItemId']}">检查记录</text>
 			<text @click="backTo">返回</text>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -105,20 +177,31 @@
 		mapMutations
 	} from 'vuex'
 	import {
-		updateTaskItem
+		queryItemDetails
 	} from '@/api/task.js'
 	import {
 		setCache,
 		getCache
 	} from '@/common/js/utils'
 	import navBar from "@/components/zhouWei-navBar"
+	import timeline from '@/components/chenbin-timeline/timeLine.vue'
+	import timelineItem from '@/components/chenbin-timeline/timelineItem.vue'
 	export default {
 		components: {
-			navBar
+			navBar,
+			timeline,
+			timelineItem
 		},
 		data() {
 			return {
 				taskTypeText: '',
+				imgArr: [],
+				recordList: [],
+				statusBackgroundPng: require("@/static/img/status-background.png"),
+				enlargePhotoShow: false,
+				enlargeImg: '',
+				remark: '',
+				temporaryImgPathArr: [],
 				fullScoreShow: true,
 				deductMarkShow: true,
 				notMarkShow: true,
@@ -157,6 +240,7 @@
 		onLoad(options) {
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText;
+			this.getItemDetails(this.subtaskInfo['taskItemId']);
 			console.log('撒',this.subtaskInfo);
 		},
 
@@ -171,6 +255,132 @@
 				uni.redirectTo({
 					url: '/qualityPackage/pages/examineRecord/examineRecord'
 				})
+			},
+			
+			// 截取字符串
+			cutStr (str) {
+				let strIndex = str.indexOf('_');
+				if (strIndex != -1) {
+					return str.substr(strIndex + 1)
+				};
+				return str
+			},
+			
+			// 判断字符串是否以指定字符开头和结尾
+			confirmEnding (str, targetOne, targetTwo) {
+				if(str.indexOf(targetOne) === 0 && str.lastIndexOf(targetTwo) === str.length - 1){
+						return true
+				};
+			  return false
+			},
+			
+			// 图片放大事件
+			imageEvent (item,index) {
+				this.enlargePhotoShow = true;
+				this.enlargeImg = `${item}`
+			},
+			
+			// 图片关闭事件
+			closeImageEvent () {
+				this.enlargePhotoShow = false
+			},
+			
+			// 文件下载事件
+			downFileEvent (file) {
+				this.infoText = '下载中···';
+				this.showLoadingHint = true;
+				uni.downloadFile({
+				  url: encodeURI(`${file}`), // 文件下载地址
+				  success: response => {
+				    if (response.statusCode === 200) {
+				      uni.saveFile({
+				        tempFilePath: response.tempFilePath,
+				        success: (resData) => {
+									this.showLoadingHint = false;
+									this.$refs.uToast.show({
+										title: '下载成功',
+										type: 'success'
+									});
+									//保存成功并打开文件
+									 uni.openDocument({
+										filePath:resData.savedFilePath
+									})
+				        },
+				        fail: error => {
+									this.showLoadingHint = false;
+				          this.$refs.uToast.show({
+				          	title: `${error}`,
+				          	type: 'warning'
+				          })
+				        }
+				      })
+				    }
+				  }
+				})
+			},
+			
+			// 查询检查项详情
+			getItemDetails (checkId) {
+				this.recordList = [];
+				this.infoText = '加载中···';
+				this.showLoadingHint = true;
+				queryItemDetails(checkId).then((res) => {
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 200) {
+						if (res.data.data.length > 0) {
+							for (let item of res.data.data) {
+								this.recordList.push({
+									scrutator: item['operator'],
+									startTime: item['operationTime'],
+									problemDescription: this.confirmEnding(item['describe'],'[',']') ? JSON.parse(item['describe']) : item['describe'],
+									remark: item['remarks'],
+									images: item['images'],
+									files: item.hasOwnProperty('files') ? item['files'] : []
+								})
+							};
+							console.log('数据',this.recordList);
+						}
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					});
+					this.showLoadingHint = false
+				})
+			},
+			
+			// 选择图片方法
+			getImg() {
+				var that = this
+				uni.chooseImage({
+					count: 4,
+					sizeType: ['original', 'compressed'],
+					sourceType: ['album', 'camera'],
+					success: function(res) {
+						uni.previewImage({
+							urls: res.tempFilePaths
+						});
+						that.temporaryImgPathArr = that.temporaryImgPathArr.concat(res.tempFilePaths);
+						for (let imgI = 0, len = res.tempFilePaths.length; imgI < len; imgI++) {
+							that.srcImage = res.tempFilePaths[imgI];
+							uni.getFileSystemManager().readFile({
+								filePath: that.srcImage,
+								encoding: 'base64',
+								success: res => {
+									let base64 = 'data:image/jpeg;base64,' + res.data;
+									that.imgArr.push(base64);
+								}
+							})
+						}
+					}
+				});
 			},
 			
 			// 判断打分方式 
@@ -396,32 +606,233 @@
 		}
 
 		.examine-content-box {
-			flex: 1;
 			width: 100%;
 			margin: 0 auto;
-			height: 100px;
+			flex: 1;
 			background: #f5f5f5;
 			border-radius: 4px;
+			color: black;
+			padding-bottom: 160px;
+			box-sizing: border-box;
+			font-size: 14px;
+			.examine-content-title {
+				padding-left: 8px;
+				box-sizing: border-box;
+				height: 40px;
+				line-height: 40px
+			}
 			.examine-content-box-top {
-				padding: 8px;
+				padding: 10px 8px 50px 8px;
+				box-sizing: border-box;
 				background: #fff;
 				>view {
 					height: auto;
 					line-height: 30px;
 					>text {
 						&:first-child {
-							margin-right: 6px;
-							color: #9a9a9a
-						}
-				
-						&:last-child {
-							font-weight: bold
+							margin-right: 6px
 						}
 					}
 				}
+			};
+			.examine-content-box-center-title {
+				padding-left: 8px;
+				box-sizing: border-box;
+				height: 40px;
+				line-height: 40px
+			}
+			.examine-content-box-center {
+				padding: 10px 8px 10px 8px;
+				box-sizing: border-box;
+				background: #fff;
+				width: 100%;
+				>view {
+					width: 32%;
+					height: 100px;
+					display: inline-block;
+					vertical-align: top;
+					margin-right: 2%;
+					margin-top: 2%;
+					position: relative;
+					&:nth-child(1) {
+						margin-top: 0;
+					};
+					&:nth-child(2) {
+						margin-top: 0;
+					};
+					&:nth-child(3) {
+						margin-top: 0;
+					};
+					&:nth-child(3n+3) {
+						margin-right: 0;
+					};
+					> fa-icon {
+						position: absolute;
+						top: -12px;
+						right: 0
+					};
+					image {
+						width: 100%;
+						height: 100%
+					}
+				}
+			};
+			.examine-content-box-remark {
+				padding: 10px 8px 50px 8px;
+				box-sizing: border-box;
+				background: #fff;
+				width: 100%;
+				.submit-box {
+					text-align: right;
+					margin-top: 20px;
+					>text {
+						display: inline-block;
+						font-size: 12px;
+						color: #fff;
+						background: #1864FF;
+						width: 70px;
+						border-radius: 4px;
+						height: 25px;
+						text-align: center;
+						line-height: 25px
+					}
+				}
+			};
+			.examine-content-box-check-details-title {
+				padding-left: 8px;
+				box-sizing: border-box;
+				height: 40px;
+				line-height: 40px
+			};
+			.examine-content-box-check-details-box {
+				padding: 10px 8px 50px 8px;
+				box-sizing: border-box;
+				background: #fff;
+				width: 100%;
+				margin: 0 auto;
+				overflow: auto;
+				flex: 1;
+				/deep/ .timeline {
+					height: 100%;
+					.timelineItem {
+						.timeItem {
+							.leftTime {
+								padding: 0 !important;
+								.time {
+									padding: 0 4px;
+									color: black;
+									border-radius: 10px
+								};
+								.scrutator {
+									color: #1864FF;
+									border: 1px solid #1864FF;
+									margin-top: 4px;
+									border-radius: 10px
+								}
+							};
+							.line {
+								margin: 0 10px;
+								background: #1864FF !important;
+								.out {
+									background: #1864FF !important;
+									.inner {
+										background: #1864FF !important
+									}
+									width: 10px;
+									height: 10px;
+									.inner {
+										width: 8px;
+										height: 8px
+									}
+								}
+							}
+						}
+					}
+				};
+				.tripItem {
+						padding: 10px;
+						box-sizing: border-box;
+						margin-bottom: 30px;
+						.title {
+							font-size: 15px;
+							font-weight: bold;
+							color: block
+						}
+						.record-img {
+							margin-top: 10px;
+							 >view {
+								display: inline-block;
+								width: 50px;
+								height: 50px;
+								margin-right: 4px;
+								margin-bottom: 4px;
+								image {
+									width: 100%;
+									height: 100%
+								}
+							}
+						}
+						.tips {
+							font-size:14px;
+							font-weight:400;
+							color:rgba(153,153,153,1);
+							margin-top: 10px
+						}
+						.file-down {
+							> view {
+								margin-bottom: 8px;
+								font-size: 16px;
+								color: #1864FF;
+								word-wrap:break-word;
+								&:last-child {
+									margin-bottom: 0
+								}
+							}
+						}
+				}
 			}
 		}
-
+		.operta-box {
+			width: 100%;
+			height: 160px;
+			position: fixed;
+			left: 0;
+			bottom: 0;
+			>image {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0
+			};
+			.btn-content {
+				margin-top: -20px;
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: center;
+				align-items: center;
+				>view {
+					width: 90px;
+					height: 100px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					>image {
+						width: 65px;
+						height: 65px
+					};
+					>view {
+						z-index: 1000;
+						font-size: 14px;
+						color: #fff
+					};
+					&:nth-child(2) {
+						transform: translateY(-20%);
+					}
+				}
+			}
+		};
 		.btn-box {
 			height: 60px;
 			width: 80%;

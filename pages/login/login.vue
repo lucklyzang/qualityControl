@@ -23,15 +23,21 @@
 		 :show-cancel-button="true" @confirm="sureCancel" @cancel="cancelSure">
 		</u-modal>
 		<view class="container-content">
+			<image :src="loginBackgroundPng"></image>
 			<view class="title">
-        <text>BLINK</text>
+				<view>
+					<image :src="projectLogoPng"></image>
+				</view>
+				<view>
+					<text>质 量 管 理 系 统</text>
+				</view>
       </view>
 			<view class="form-box">
 				<u-form :model="form" ref="uForm">
-					<u-form-item label="账号" right-icon="account-fill" :label-style="{'font-size':'15px'}" :right-icon-style="{'font-size':'20px'}">
+					<u-form-item left-icon="account-fill" :left-icon-style="{'font-size':'20px','color': '#BBBBBB'}">
 						<u-input v-model="form.username" placeholder="请输入账号"/>
 					</u-form-item>
-					<u-form-item label="密码" right-icon="lock-fill" :label-style="{'font-size':'15px'}" :right-icon-style="{'font-size':'20px'}">
+					<u-form-item left-icon="lock-fill" :left-icon-style="{'font-size':'20px','color': '#BBBBBB'}">
 						<u-input v-model="form.password" placeholder="请输入密码" type="password"/>
 					</u-form-item>
 				</u-form>
@@ -42,7 +48,7 @@
                 <u-checkbox 
                   @change="checkboxChange"
                   shape="circle"
-                  active-color="#78d035"
+                  active-color="#289E8E"
                   v-model="item.checked" 
                   v-for="(item, index) in list" :key="index" 
                   :name="item.name"
@@ -79,6 +85,8 @@
 			return {
 				chooseHospitalShow: false,
 				selectHospitalList: [],
+				loginBackgroundPng: require("@/static/img/login-background.png"),
+				projectLogoPng: require("@/static/img/project-logo.png"),
 				hospitalList: [],
 				form: {
 					username: '',
@@ -259,19 +267,41 @@
 			flex: 1;
 			background: #fff;
 			position: relative;
+			> image {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 80vh
+			}
 			.title {
 				width: 100%;
-				height: 190px;
-				line-height: 190px;
-				text-align: center;
+				height: 58vh;
+				display: flex;
+				justify-content: center;
+				flex-direction: column;
+				align-items: center;
 				color: black;
 				font-size: 26px;
-        color: #2c9af1;
+        color: #fff;
         font-weight: bold;
-        font-size: 50px;
-          span {
-            box-shadow: 0 8px 6px -6px black
-          }
+        >view {
+					z-index: 1000;
+					&:first-child {
+						margin-top: -80px;
+						margin-bottom: 8px;
+						width: 135px;
+						height: 30px;
+						 image {
+							 width: 100%;
+							 height: 100%
+						 }
+					};
+					&:last-child {
+						margin-left: -6px;
+						font-size: 16px;
+					}
+				}
 			};
 			.form-box {
         width: 90%;
@@ -310,8 +340,9 @@
 					border: none;
 				};
 				button {
-          background-image: linear-gradient(to right, #37d5fc , #429afe);
-          border-radius: 20px;
+          background-image: linear-gradient(to right, #6ED3F7 , #218FFF);
+					line-height: 50px;
+          border-radius: 30px;
 				}
 			}
       .weixin-login {

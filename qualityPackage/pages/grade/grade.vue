@@ -38,8 +38,8 @@
 						<input :value="item.deductMarksvalue" @input="(value) => buckleScoreChange(value,index)" placeholder="分数" type="number" />
 					</view>	
 					<view class="problem-describe-right">
-						<fa-icon type="plus-square" size="26" color="#43c3f4" @click="operateHandle('plus',item,index)"></fa-icon>
-						<fa-icon v-show="index != 0" type="minus-square" size="26" color="#43c3f4"  @click="operateHandle('minus',item,index)"></fa-icon>
+						<fa-icon type="plus-square" size="26" color="#1864FF" @click="operateHandle('plus',item,index)"></fa-icon>
+						<fa-icon v-show="index != 0" type="minus-square" size="26" color="#1864FF"  @click="operateHandle('minus',item,index)"></fa-icon>
 					</view>
 				</view>	
 			</view>
@@ -66,9 +66,8 @@
 				</view>
 			</view>
 		</view>
-		<view class="btn-box">
-			<text @click="sure">确认</text>
-			<text class="btn-right" @click="backTo">返回</text>
+		<view class="btn-box" @click="sure">
+			提交
 		</view>
 	</view>
 </template>
@@ -674,13 +673,14 @@
 				};
 				.left {
 					vertical-align: middle;
-					width: 26%;
-					color: #5d5d5d;
+					width: 30%;
+					color: black;
+					font-size: 16px;
 					padding-left: 4px;
 					box-sizing: border-box
 				};
 				.right {
-					width: 74%;
+					width: 70%;
 					vertical-align: middle;
 					/deep/ .u-input--border {
 						border: none;
@@ -779,17 +779,16 @@
 				padding: 8px 4px;
 				background: #fff;
 				margin-top: 6px;
-				>view {
-					display: inline-block
-				};
 				.top {
-					width: 26%;
-					padding-left: 4px;
-					vertical-align: top;
-					color: #5d5d5d
+					width: 100%;
+					height: 30px;
+					line-height: 30px;
+					color: #5d5d5d;
+					padding-left: 6px;
+					box-sizing: border-box;
 				};
 				.bottom {
-					width:  74%;
+					width: 100%;
 					/deep/ .u-input--border {
 						border: none;
 						background: #f9f9f9
@@ -801,16 +800,16 @@
 				box-sizing: border-box;
 				padding: 8px 0;
 				>view {
-					display: inline-block;
 					&:first-child {
-						width: 26%;
-						vertical-align: top;
-						height: 100px;
+						width: 100%;
+						height: 30px;
+						line-height: 30px;
 						color: #5d5d5d;
-						padding:4px 0 0 4px
+						padding-left: 6px;
+						box-sizing: border-box;
 					};
 					&:nth-child(2) {
-						width: 74%;
+						width: 100%;
 						font-size: 34px;
 						>view {
 							width: 32%;
@@ -847,25 +846,16 @@
 			}
 		}
 		.btn-box {
-			height: 60px;
-			width: 80%;
+			height: 50px;
+			width: 260px;
+			font-size: 16px;
 			margin: 0 auto;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			text {
-				width: 140px;
-				height: 40px;
-				border-radius: 4px;
-				text-align: center;
-				line-height: 40px;
-				color: #fff;
-				background-image: linear-gradient(to right, #37d5fc , #439bff);
-				&:last-child {
-					color: #666;
-					background: #e8e8e8
-				}
-			}
+			line-height: 50px;
+			background: linear-gradient(to right, #6cd2f8, #2390fe);
+			color: #fff;
+			border-radius: 30px;
+			font-weight: bold;
+			text-align: center
 		}
 	}	
 </style>

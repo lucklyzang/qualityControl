@@ -6,7 +6,7 @@
 		</view>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="加载中···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="top-area">
-			<image src="" alt="">
+			<image :src="statusBackgroundPng">
 			<view class="top-name">
 				<image :src="juddgeAvatarUrl()" @click="headPhotoClickEvent">
 				<text>
@@ -14,8 +14,8 @@
 				</text>
 			</view>
 			<view class="top-hospital">
-				<image src="" alt=""></image>
-				<view>
+				<u-icon name="map" color="#fff" size="35"></u-icon>
+				<view class="select-box">
 					<xfl-select 
 						:list="hospitalList"
 						:clearable="false"
@@ -55,9 +55,16 @@
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-content-top">
 						<view class="content-status-sign">
-							<image src="" alt=""></image>
+							<image :src="statusTransferImg(item.status)" alt=""></image>
 						</view>
-						<view class="specific-status">
+						<view class="specific-status" :class="{'noStartStyle': item.status == 0, 
+								'checkIngStyle': item.status == 1,
+								'confirmIngStyle': item.status == 2,
+								'queryIngStyle': item.status == 3,
+								'changIngStyle': item.status == 5 || item.status == 4,
+								'completedStyle': item.status == 6
+							}"
+							>
 							<text>{{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
@@ -98,9 +105,15 @@
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-content-top">
 						<view class="content-status-sign">
-							<image src="" alt=""></image>
+							<image :src="statusTransferImg(item.status)" alt=""></image>
 						</view>
-						<view class="specific-status">
+						<view class="specific-status" :class="{'noStartStyle': item.status == 0, 
+								'checkIngStyle': item.status == 1,
+								'confirmIngStyle': item.status == 2,
+								'queryIngStyle': item.status == 3,
+								'changIngStyle': item.status == 5 || item.status == 4,
+								'completedStyle': item.status == 6
+							}">
 							<text>{{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
@@ -141,9 +154,15 @@
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-content-top">
 						<view class="content-status-sign">
-							<image src="" alt=""></image>
+							<image :src="statusTransferImg(item.status)" alt=""></image>
 						</view>
-						<view class="specific-status">
+						<view class="specific-status" :class="{'noStartStyle': item.status == 0, 
+								'checkIngStyle': item.status == 1,
+								'confirmIngStyle': item.status == 2,
+								'queryIngStyle': item.status == 3,
+								'changIngStyle': item.status == 5 || item.status == 4,
+								'completedStyle': item.status == 6
+							}">
 							<text>{{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
@@ -222,7 +241,14 @@
 				initValue: '全部',
 				current: 0,
 				goingState: '',
-				statusContentList: []
+				statusContentList: [],
+				statusBackgroundPng: require("@/static/img/status-background.png"),
+				queryPng: require("@/static/img/querying.png"),
+				changPng: require("@/static/img/changing.png"),
+				checkPng: require("@/static/img/checking.png"),
+				confirmPng: require("@/static/img/confirm.png"),
+				completedPng: require("@/static/img/completed.png"),
+				noStartPng: require("@/static/img/no-start.png")
 			}
 		},
 		
@@ -325,7 +351,7 @@
 			
 			// 判断头像
 			juddgeAvatarUrl() {
-				return '/static/img/default-person.jpg'
+				return '/static/img/default-person.png'
 			},
 			
 			// 头像点击事件
@@ -387,6 +413,33 @@
 					break;
 					case 6 :
 					return '已完成'
+			    break;
+			  }
+			},
+			
+			// 任务状态转换图片
+			statusTransferImg (index) {
+			  switch(index) {
+					case 0 :
+					return this.noStartPng
+					break;
+			    case 1 :
+			    return this.checkPng
+			    break;
+			    case 2 :
+			    return this.confirmPng
+			    break;
+			    case 3 :
+			    return this.queryPng
+			    break;
+			    case 4 :
+			    return this.changPng
+					break;
+					case 5 :
+					return this.changPng
+					break;
+					case 6 :
+					return this.completedPng
 			    break;
 			  }
 			},
@@ -733,10 +786,11 @@
 			position: relative;
 			width: 100%;
 			>image {
+				width: 100%;
+				height: 100%;
 				position: absolute;
 				top: 0;
-				left: 0;
-				width: 100%
+				left: 0
 			};
 			.top-name {
 				width: 85%;
@@ -762,11 +816,7 @@
 				margin: 0 auto;
 				display: flex;
 				flex-flow: row nowrap;
-				> image {
-					width: 20px;
-					margin-right: 4px
-				};
-				> view {
+				.select-box {
 					flex: 1;
 					/deep/ .show-box {
 						background: transparent !important;
@@ -894,8 +944,8 @@
 						position: absolute;
 						top: 0;
 						left: 10px;
-						width: 10px;
-						height: 10px;
+						width: 20px;
+						height: 20px;
 						>image {
 							width: 100%;
 							height: 100%
@@ -917,6 +967,24 @@
 						border-radius: 10px;
 						overflow-x: auto;
 						white-space: nowrap
+					};
+					.noStartStyle {
+						color: #E8CB51 !important
+					};
+					.checkIngStyle {
+						color: #289E8E !important
+					};
+					.changIngStyle {
+						color: #E86F50 !important
+					};
+					.queryIngStyle {
+						color: #174E97 !important
+					};
+					.confirmIngStyle {
+						color: #F2A15F !important
+					};
+					.completedStyle {
+						color: #254550 !important
 					}
 				};
 				.status-content-middle {

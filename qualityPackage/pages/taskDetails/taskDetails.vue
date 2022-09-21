@@ -7,7 +7,7 @@
 			</nav-bar>
 		</view>
 		<view class="content-top-area">
-			<image></image>
+			<image :src="statusBackgroundPng"></image>
 		</view>
 		<view class="content-bottom-area">
 			<view class="details-tilte">
@@ -117,6 +117,7 @@
 		data() {
 			return {
 				infoText: '加载中',
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				showLoadingHint: false
 			}
 		},
@@ -238,9 +239,10 @@
 			top: 0;
 			left: 0;
 			width: 100%;
-			background: blue;
+			z-index: 1000;
 			height: 160px;
 			>image {
+				width: 100%;
 				height: 100%;
 				position: absolute;
 				top: 0;

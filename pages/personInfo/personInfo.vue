@@ -10,7 +10,7 @@
 			<nav-bar backState="3000" :home="false" bgColor="#2c9af1" fontColor="#FFF" title="个人中心" @backClick="backTo"></nav-bar>
 		</view>
 		<view class="content-top-area">
-			<image></image>
+			<image :src="statusBackgroundPng"></image>
 			<view class="content-top-content">
 				<view class="user-photo">
 					<image :src="juddgeAvatarUrl()">
@@ -29,7 +29,7 @@
 			<view class="content-top-other">
 				<view class="left">
 					<text>
-						<u-icon name="arrow-left" color="#000" size="30"></u-icon>
+						<image :src="hiredatePng"></image>
 					</text>
 					<text>入职时间</text>
 				</view>
@@ -42,7 +42,7 @@
 			<view class="content-top-other">
 				<view class="left">
 					<text>
-						<u-icon name="arrow-left" color="#000" size="30"></u-icon>
+						<image :src="phoneNumberPng"></image>
 					</text>
 					<text>手机号码</text>
 				</view>
@@ -55,7 +55,7 @@
 			<view class="content-top-other">
 				<view class="left">
 					<text>
-						<u-icon name="arrow-left" color="#000" size="30"></u-icon>
+						<image :src="accountExpirationTimePng"></image>
 					</text>
 					<text>账号过期时间</text>
 				</view>
@@ -68,20 +68,20 @@
 			<view class="content-top-other" @click="fileViewEvent">
 				<view class="left">
 					<text>
-						<u-icon name="arrow-left" color="#000" size="30"></u-icon>
+						<image :src="fileViewPng"></image>
 					</text>
 					<text>文件查看</text>
 				</view>
 				<view class="right">
 					<text>
-						<u-icon name="arrow-right" color="#000" size="30"></u-icon>
+						<u-icon name="arrow-right" color="#000" size="35"></u-icon>
 					</text>
 				</view>
 			</view>
 			<view class="content-top-other">
 				<view class="left">
 					<text>
-						<u-icon name="arrow-left" color="#000" size="30"></u-icon>
+						<image :src="userRolePng"></image>
 					</text>
 					<text>用户角色</text>
 				</view>
@@ -126,7 +126,13 @@
 				content: '',
 				versionNumber: '1.8',
 				sureCancelShow: false,
-				showLoadingHint: false
+				showLoadingHint: false,
+				statusBackgroundPng: require("@/static/img/status-background.png"),
+				accountExpirationTimePng: require("@/static/img/account-expiration-time.png"),
+				fileViewPng: require("@/static/img/file-view.png"),
+				hiredatePng: require("@/static/img/hiredate.png"),
+				phoneNumberPng: require("@/static/img/phone-number.png"),
+				userRolePng: require("@/static/img/user-role.png")
 			}
 		},
 		onReady() {},
@@ -171,7 +177,7 @@
 
 			// 判断头像
 			juddgeAvatarUrl() {
-				return '/static/img/default-person.jpg'
+				return '/static/img/default-person.png'
 			},
 			// 查看全部文件
 			fileViewEvent () {
@@ -229,9 +235,9 @@
 			position: relative;
 			width: 100%;
 			margin: 0 auto;
-			background: blue;
-			height: 140px;
+			height: 170px;
 			>image {
+				width: 100%;
 				height: 100%;
 				position: absolute;
 				top: 0;
@@ -244,15 +250,22 @@
 				flex-flow: row nowrap;
 				align-items: center;
 				.user-photo {
-					width: 55px;
-					height: 55px;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					width: 60px;
+					height: 60px;
+					border-radius: 50%;
+					background: #fff;
+					z-index: 1000;
 					image {
-						width: 100%;
-						height: 100%;
-						border-radius: 50%;
+						vertical-align: middle;
+						width: 55px;
+						height: 55px
 					}
 				};
 				.user-message {
+					z-index: 100;
 					margin-left: 16px;
 					color: #fff;
 					.user-name {
@@ -268,7 +281,9 @@
 			border-top-left-radius: 20px;
 			border-top-right-radius: 20px;
 			background: #fff;
-			margin-top: -20px;
+			margin-top: -35px;
+			padding-top: 10px;
+			box-sizing: border-box;
 			z-index: 10000;
 			height: auto;
 			font-size: 14px;
@@ -282,6 +297,8 @@
 				height: 45px;
 				line-height: 45px;
 				box-sizing: border-box;
+				color: black;
+				font-weight: bold;
 				position: relative;
 				.left {
 					position: absolute;
@@ -290,6 +307,11 @@
 					> text {
 						color: $color-text-right;
 						&:first-child {
+							image {
+								vertical-align: middle;
+								width: 22px;
+								height: 22px;
+							};
 							padding-left: 20px;
 							margin-right: 10px
 						}
@@ -336,14 +358,14 @@
 
 			;
 			.quit-account {
-				height: 45px;
+				height: 50px;
 				width: 260px;
 				font-size: 16px;
 				margin: 0 auto;
-				line-height: 45px;
+				line-height: 50px;
 				background: linear-gradient(to right, #6cd2f8, #2390fe);
 				color: #fff;
-				border-radius: 20px;
+				border-radius: 30px;
 				font-weight: bold;
 				text-align: center
 			}

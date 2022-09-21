@@ -7,7 +7,7 @@
 			</nav-bar>
 		</view>	
 		<view class="content-top-area">
-				<image></image>
+				<image :src="statusBackgroundPng"></image>
 				<view class="subtask-list">
 					<view class="subtask-item-left">
 						<view class="subtask-item-title">{{`${taskMessage.checkName}${taskMessage.examinationType}-${subtaskDetails.subtaskName}`}}</view>
@@ -94,6 +94,7 @@
 		data() {
 			return {
 				infoText: '加载中',
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				showLoadingHint: false
 			}
 		},
@@ -218,9 +219,10 @@
 			position: relative;
 			width: 100%;
 			margin: 0 auto;
-			background: blue;
+			z-index: 1000;
 			height: 110px;
 			>image {
+				width: 100%;
 				height: 100%;
 				position: absolute;
 				top: 0;
@@ -228,7 +230,9 @@
 			};
 			.subtask-list {
 				width: 96%;
-				margin: 0 auto;
+				position: absolute;
+				top: 10px;
+				left: 2%;
 				background: #fff;
 				margin-bottom: 8px;
 				display: flex;
@@ -295,6 +299,7 @@
 		.content-bottom-area {
 			width: 96%;
 			margin: 0 auto;
+			margin-top: 10px;
 			flex: 1;
 			overflow: auto;
 			.subtask-item-list {
