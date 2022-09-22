@@ -95,7 +95,7 @@
 				</view>
 			</view>
 			<view class="examine-content-box-center-title">
-				<text>备注</text>
+				<text>其它建议</text>
 			</view>
 			<view class="examine-content-box-center">
 				<view v-for="(item, index) in imgArr" :key='index'>
@@ -107,8 +107,8 @@
 				</view>
 			</view>
 			<view class="examine-content-box-remark">
-				<u-input v-model="remark" placeholder="请输入备注" type="textarea" :border="true"  />
-				<view class="submit-box">
+				<u-input v-model="remark" placeholder="请输入建议" type="textarea" :border="true"  />
+				<view class="submit-box" @click="suggestEvent">
 					<text>提交</text>
 				</view>
 			</view>
@@ -149,18 +149,38 @@
 		</view>
 		<view class="operta-box">
 			<image :src="statusBackgroundPng"></image>
-			<view class="btn-content">
-				<view>
+			<view class="btn-content" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
+				<view @click="gradeEvent(0)">
 					<image src="/static/img/no-evaluate.png"></image>
 					<view class="text">不参评</view>
 				</view>
-				<view>
+				<view @click="gradeEvent(1)">
 					<image src="/static/img/full-mark.png"></image>
 					<view class="text">满分</view>
 				</view>
-				<view >
+				<view @click="gradeEvent(2)">
 					<image src="/static/img/deduct-mark.png"></image>
 					<view class="text">扣分</view>
+				</view>
+			</view>
+			<view class="btn-content-query" v-if="subtaskInfo.majorState == 3">
+				<view @click="gradeEvent(-1)">
+					<image src="/static/img/again-evaluate.png"></image>
+					<view class="text">重新评价</view>
+				</view>
+				<view @click="gradeEvent(5)">
+					<image src="/static/img/reject.png"></image>
+					<view class="text">驳回</view>
+				</view>
+			</view>
+			<view class="btn-content-is-pass" v-if="subtaskInfo.majorState == 5">
+				<view  @click="gradeEvent(7)">
+					<image src="/static/img/no-pass.png"></image>
+					<view class="text">不通过</view>
+				</view>
+				<view @click="gradeEvent(8)">
+					<image src="/static/img/pass.png"></image>
+					<view class="text">通过</view>
 				</view>
 			</view>
 		</view>
@@ -177,7 +197,12 @@
 		mapMutations
 	} from 'vuex'
 	import {
-		queryItemDetails
+		queryItemDetails,
+		addCheckRecord,
+		updateCheckRecord,
+		updateTaskItem,
+		submitTotalTaskDetails,
+		getAliyunSign
 	} from '@/api/task.js'
 	import {
 		setCache,
@@ -215,6 +240,7 @@
 				'titleText',
 				'userInfo',
 				'subtaskInfo',
+				'subtaskDetails',
 				'selectHospitalList'
 			]),
 			userName() {
@@ -241,7 +267,7 @@
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText;
 			this.getItemDetails(this.subtaskInfo['taskItemId']);
-			console.log('撒',this.subtaskInfo);
+			console.log('撒',this.subtaskInfo,this.subtaskDetails);
 		},
 
 		methods: {
@@ -283,6 +309,11 @@
 			// 图片关闭事件
 			closeImageEvent () {
 				this.enlargePhotoShow = false
+			},
+			
+			// 其它建议提交事件
+			suggestEvent () {
+				
 			},
 			
 			// 文件下载事件
@@ -409,13 +440,117 @@
 				temporaryInfo['operation'] = num;
 				this.changeSubtaskInfo(temporaryInfo);
 				if (num == 5) {
-					this.rejectTaskItem({
-						score: this.subtaskInfo.score,  //得分
-						describe: "问题描述:" + this.subtaskInfo.recordDesc,
+					// this.rejectTaskItem({
+					// 	score: this.subtaskInfo.score,  //得分
+					// 	describe: "问题描述:" + this.subtaskInfo.recordDesc,
+					// 	file: "",
+					// 	remarks: "备注:" + this.subtaskInfo.recordRemarks,
+					// 	majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+					// 	state: 4,	     //检查项状态
+					// 	majorId: this.subtaskInfo.majorId,		//主任务id
+					// 	subId: this.subtaskInfo.subId,		//子任务id
+					// 	fullScore: this.subtaskInfo.fullScore,		//满分
+					// 	taskNum: this.subtaskInfo.taskNum,	//任务编号
+					// 	operator: "检查者",		//检查者（固定）
+					// 	itemId: this.subtaskInfo.checkId,			//检查项id
+					// 	taskItemId: this.subtaskInfo.taskItemId, //检查项id
+					// 	majorState: this.subtaskInfo.majorState,		//主任务当前状态
+					// 	worker: "项目经理",	
+					// 	operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+					// })
+					uni.redirectTo({
+						url: '/qualityPackage/pages/grade/grade'
+					})
+				} else {
+					uni.redirectTo({
+						url: '/qualityPackage/pages/grade/grade'
+					})
+				}
+			},
+			
+			// 评价事件
+			gradeEvent(num,checkItem) {
+				// 操作过的当前不总重复操作
+				if (num == 0) {
+					if (checkItem.itemMode == 2) { return }
+				};
+				if (num == 1) {
+					if (checkItem.itemMode == 1) { return }
+				};
+				if (num == 2) {
+					if (checkItem.itemMode == 3) { return }
+				};
+				// -1: '重新评价'
+				// 0: '不参评', 点击不跳转，直接提交
+				// 1: '满分', 点击不跳转，直接提交
+				// 2: '扣分',
+				// 5: '驳回',
+				// 7: '不通过'
+				// 8: '通过', 点击不跳转，直接提交
+				if (num == 0 || num == 1 || num == 8) {
+					// 直接提交不跳转
+					this.sure()
+				} else {
+					uni.redirectTo({
+						url: '/qualityPackage/pages/grade/grade'
+					})
+				}
+			},
+			
+			// 提交事件
+			sure () {
+				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
+					this.$refs.uToast.show({
+						title: '该子任务为其它人负责，你无操作权限',
+						type: 'warning'
+					});
+					return
+				};
+				this.infoText = '提交中···';
+				this.showLoadingHint = true;
+				// 判断操作方式
+				if (this.subtaskInfo.operation === 0 || this.subtaskInfo.operation === 1 ) {
+					let temporaryData = {
+						score: "",
+						describe: "",
 						file: "",
-						remarks: "备注:" + this.subtaskInfo.recordRemarks,
+						remarks: "",
 						majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
-						state: 4,	     //检查项状态
+						state: this.subtaskInfo.state,	     //检查项状态
+						majorId: this.subtaskInfo.majorId,		//主任务id
+						subId: this.subtaskInfo.subId,		//子任务id
+						fullScore: this.subtaskInfo.fullScore,		//满分
+						taskNum: this.subtaskInfo.taskNum,	//任务编号
+						operator: "检查者",		//检查者（固定）
+						itemId: this.subtaskInfo.checkId,			//检查项id
+						taskItemId: this.subtaskInfo.taskItemId, //检查项id
+						majorState: this.subtaskInfo.majorState, //主任务当前状态
+						worker: this.userName,
+						additional: this.subtaskInfo.additional, //检查项类型
+						mode: this.subtaskInfo.operation == 2 ? 3 : this.subtaskInfo.operation == 1 ? this.subtaskInfo.operation : 2, // 操作方式对应要传的参数值（1满分3扣分2不参评）
+						operation: this.subtaskInfo.operation, //操作方式（1满分2扣分0不参评）
+						imagePaths: [] //上传图片集合 imageList this.imgArr
+					};
+					if (this.subtaskInfo.operation === 1) {
+						// 满分时score字段赋值为满分
+						temporaryData['score'] = this.subtaskInfo.fullScore;
+					};
+					// 判断检查项状态
+					if (this.subtaskInfo.state === 0) {
+						temporaryData['state'] = this.subtaskInfo.state + 1;
+						delete temporaryData.taskItemId;
+						this.addCheckRecordMethod(temporaryData)
+					} else {
+						this.updateCheckRecordMethod(temporaryData)
+					}
+				} else {
+					let temporaryData = {
+						score: this.subtaskInfo.score,  //得分
+						describe: "",
+						file: "",
+						remarks: "",
+						majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+						state: 8,	     //检查项状态
 						majorId: this.subtaskInfo.majorId,		//主任务id
 						subId: this.subtaskInfo.subId,		//子任务id
 						fullScore: this.subtaskInfo.fullScore,		//满分
@@ -424,14 +559,128 @@
 						itemId: this.subtaskInfo.checkId,			//检查项id
 						taskItemId: this.subtaskInfo.taskItemId, //检查项id
 						majorState: this.subtaskInfo.majorState,		//主任务当前状态
-						worker: "项目经理",	
-						operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
-					})
-				} else {
-					uni.redirectTo({
-						url: '/qualityPackage/pages/grade/grade'
-					})
+						worker: this.userName,
+						additional: this.subtaskInfo.additional, //检查项类型	
+						operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+					};
+					this.updateTaskItemRecordMethod(temporaryData)
 				}
+			},
+			
+			// 任务详情检查项第一次操作（满分，扣分，不参评）
+			addCheckRecordMethod (data) {
+				addCheckRecord(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						if (this.subtaskInfo['majorState'] == 0) {
+							// 判断该任务是否为第一次提交(是则更改主任务状态为检查中)
+							if (!this.judgeSubTaskItemState(this.disposeSubTaskData,0)) {
+								this.submitTotalTask({
+									id : this.mainTaskId, // 主任务id
+									modifyName : this.userName, // 修改人名称
+									state : 1 // 主任务状态
+								})
+							}
+						}
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						});
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					});
+					this.showLoadingHint = false
+				})
+			},
+			
+			// 任务详情检查项更新操作（满分，扣分，不参评）
+			updateCheckRecordMethod (data) {
+				updateCheckRecord(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						this.backToExaminePage();
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						});
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					});
+					this.showLoadingHint = false
+				})
+			},
+			
+			//任务详情检查项操作（质疑，确认，复核质疑，上传整改记录，通过，不通过）
+			updateTaskItemRecordMethod (data) {
+				updateTaskItem(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						});
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					});
+					this.showLoadingHint = false
+				})
+			},
+			
+			// 判断子任务对应状态是否全部更改完成
+			judgeSubTaskItemState (data,state) {
+				let temporaryFlag = false;
+				for (let i = 0, len = data.length; i < len; i++) {
+					for (let j = 0, len = data[i]['checkItem'].length; j < len; j++) {
+						for (let k = 0, len = data[i]['checkItem'][j]['checkItemList'].length; k < len; k++) {
+							let temporaryData = data[i]['checkItem'][j]['checkItemList'];
+								temporaryFlag = temporaryData.some((item) => { return item['checkState'] != state})
+							if (temporaryFlag) {
+								return true
+							} 
+						}
+					}
+				};
+				return temporaryFlag
+			},
+			// 更改任务主状态
+			submitTotalTask (data) {
+				submitTotalTaskDetails(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						let temporaryIndex = {};
+						temporaryIndex.current = 1;
+						temporaryIndex.isGoingTask = true;
+						temporaryIndex.selectIndex = 1;
+						this.changeIsSkipDetails(true);
+						this.changeCacheIndex(temporaryIndex)
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					})
+				})
 			},
 			
 			// 检查项驳回操作
@@ -461,7 +710,7 @@
 			// 返回上一页
 			backTo() {
 				uni.redirectTo({
-					url: '/qualityPackage/pages/examineDetails/examineDetails'
+					url: '/qualityPackage/pages/subtaskDetails/subtaskDetails'
 				})
 			}
 		}
@@ -829,6 +1078,56 @@
 					};
 					&:nth-child(2) {
 						transform: translateY(-20%);
+					}
+				}
+			};
+			.btn-content-query {
+				margin-top: -20px;
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: center;
+				align-items: center;
+				>view {
+					width: 90px;
+					height: 100px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					transform: translateY(-20%);
+					>image {
+						width: 65px;
+						height: 65px
+					};
+					>view {
+						z-index: 1000;
+						font-size: 14px;
+						color: #fff
+					}
+				}
+			};
+			.btn-content-is-pass {
+				margin-top: -20px;
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: center;
+				align-items: center;
+				>view {
+					width: 90px;
+					height: 100px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					transform: translateY(-20%);
+					>image {
+						width: 65px;
+						height: 65px
+					};
+					>view {
+						z-index: 1000;
+						font-size: 14px;
+						color: #fff
 					}
 				}
 			}

@@ -38,8 +38,8 @@
 						<input :value="item.deductMarksvalue" @input="(value) => buckleScoreChange(value,index)" placeholder="分数" type="number" />
 					</view>	
 					<view class="problem-describe-right">
-						<fa-icon type="plus-square" size="26" color="#1864FF" @click="operateHandle('plus',item,index)"></fa-icon>
-						<fa-icon v-show="index != 0" type="minus-square" size="26" color="#1864FF"  @click="operateHandle('minus',item,index)"></fa-icon>
+						<fa-icon type="plus-circle" size="26" color="#1864FF" @click="operateHandle('plus',item,index)"></fa-icon>
+						<fa-icon v-show="index != 0" type="minus-circle" size="26" color="#1864FF"  @click="operateHandle('minus',item,index)"></fa-icon>
 					</view>
 				</view>	
 			</view>
@@ -312,14 +312,14 @@
 			// 判断打分方式
 			judgeScoreWay () {
 				 this.subtaskInfo['recordRemarks'] ? this.remark = this.subtaskInfo['recordRemarks'].replace('备注:','') : this.remark = '';
-				 // 判断打分方式(1满分2扣分0不参评-1重新评价7不通过8通过);
+				 // 判断打分方式(1满分2扣分0不参评-1重新评价5驳回7不通过8通过);
 				if (this.subtaskInfo['operation'] == 1) {
 					this.isDisabled = true;
 					this.gradeValue = this.subtaskInfo['fullScore'].toString();
 				} else if (this.subtaskInfo['operation'] === 0) {
 					this.isDisabled = true;
 					this.gradeValue = '0'
-				} else if (this.subtaskInfo['operation'] == 2 ) {
+				} else if (this.subtaskInfo['operation'] == 2 || this.subtaskInfo['operation'] == 5) {
 					this.isDisabled = true;
 					this.gradeValue = this.subtaskInfo['score'].toString();
 					this.subtaskInfo['recordDesc'] ? this.problemDescribeValue = this.subtaskInfo['recordDesc'].replace('描述:','') : this.problemDescribeValue = ''
@@ -486,6 +486,7 @@
 					})
 				})
 			},
+			
 			// 确认事件
 			async sure () {
 				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
@@ -582,24 +583,66 @@
 						this.updateCheckRecordMethod(temporaryData)
 					}
 				} else {
-					let temporaryData = {
-						score: this.gradeValue,  //得分
-						describe: "问题描述:" + this.problemDescribeValue,
-						file: "",
-						remarks: "备注:" + this.remark,
-						majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
-						state: this.subtaskInfo.state,	     //检查项状态
-						majorId: this.subtaskInfo.majorId,		//主任务id
-						subId: this.subtaskInfo.subId,		//子任务id
-						fullScore: this.subtaskInfo.fullScore,		//满分
-						taskNum: this.subtaskInfo.taskNum,	//任务编号
-						operator: "检查者",		//检查者（固定）
-						itemId: this.subtaskInfo.checkId,			//检查项id
-						taskItemId: this.subtaskInfo.taskItemId, //检查项id
-						majorState: this.subtaskInfo.majorState,		//主任务当前状态
-						worker: this.userName,
-						additional: this.subtaskInfo.additional, //检查项类型	
-						operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+					// 驳回操作
+					if (this.subtaskInfo.operation == 5) {
+							let temporaryData = {
+								score: "",  //得分
+								describe: "",
+								file: "",
+								remarks: "备注:" + this.remark,
+								majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+								state: 4,	     //检查项状态
+								majorId: this.subtaskInfo.majorId,		//主任务id
+								subId: this.subtaskInfo.subId,		//子任务id
+								fullScore: this.subtaskInfo.fullScore,		//满分
+								taskNum: this.subtaskInfo.taskNum,	//任务编号
+								operator: "检查者",		//检查者（固定）
+								itemId: this.subtaskInfo.checkId,			//检查项id
+								taskItemId: this.subtaskInfo.taskItemId, //检查项id
+								majorState: this.subtaskInfo.majorState,		//主任务当前状态
+								worker: "项目经理",	
+								imagePaths: [], //上传图片集合 imageList this.imgArr
+								operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+							}
+					} else {
+						let temporaryData = {
+							score: this.gradeValue,  //得分
+							describe: "问题描述:" + this.problemDescribeValue,
+							file: "",
+							remarks: "备注:" + this.remark,
+							majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+							state: this.subtaskInfo.state,	     //检查项状态
+							majorId: this.subtaskInfo.majorId,		//主任务id
+							subId: this.subtaskInfo.subId,		//子任务id
+							fullScore: this.subtaskInfo.fullScore,		//满分
+							taskNum: this.subtaskInfo.taskNum,	//任务编号
+							operator: "检查者",		//检查者（固定）
+							itemId: this.subtaskInfo.checkId,			//检查项id
+							taskItemId: this.subtaskInfo.taskItemId, //检查项id
+							majorState: this.subtaskInfo.majorState,		//主任务当前状态
+							worker: this.userName,
+							additional: this.subtaskInfo.additional, //检查项类型	
+							imagePaths: [], //上传图片集合 imageList this.imgArr
+							operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+						}
+					};
+					// 上传图片到阿里云服务器
+					if (this.temporaryImgPathArr.length > 0) {
+						for (let imgI of this.temporaryImgPathArr) {
+							if (Object.keys(this.timeMessage).length > 0) {
+								// 判断签名信息是否过期
+								if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+									await this.getSign();
+									await this.uploadImageToOss(imgI)
+								} else {
+									await this.uploadImageToOss(imgI)
+								}
+							} else {
+								await this.getSign();
+								await this.uploadImageToOss(imgI)
+							}
+						};
+						temporaryData['imagePaths'] = this.imgOnlinePathArr
 					};
 					if (this.subtaskInfo.majorState == 3) {
 						// 重新评价满分的情况

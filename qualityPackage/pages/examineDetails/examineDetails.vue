@@ -7,7 +7,7 @@
 			</nav-bar> 
 		</view>
 		<view class="flow-wrapper">
-			<u-steps :list="flowList" mode="number" :current="flowState-1" active-color="#43c3f4"></u-steps>
+			<u-steps :list="flowList" dot :current="flowState-1" active-color="#43c3f4"></u-steps>
 		</view>
 		<view class="examine-pandect" @click="arrowEvent">
 			<view class="examine-pandect-left">
