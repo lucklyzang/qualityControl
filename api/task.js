@@ -15,6 +15,13 @@ export function querySingleMainTask(majorId) {
 	    method: 'get'
 	  })
 }
+// 查询单个子任务详情
+export function querySingleSubTask(subTaskId) {
+	return request({
+	    url: `quality/subTask/queryById/${subTaskId}`,
+	    method: 'get'
+	  })
+}
 //任务详情检查项操作（满分，扣分，不参评）newCheckRecord
 export function addCheckRecord(data) {
 	return request({

@@ -3,7 +3,7 @@
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="子任务详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="子任务详情" @backClick="backTo">
 			</nav-bar>
 		</view>	
 		<view class="content-top-area">
@@ -34,7 +34,7 @@
 					<view class="subtask-subitem-list" v-for="(checkItem,checkIndex) in itemInner.checkItemList" :key="checkIndex">
 						<view class="subtask-subitem-top">
 							<view class="subtask-subitem-top-left">
-								<text>得分 : {{ `${checkItem.score}/${checkItem.fullScore}`}}</text>
+								<text>得分 : {{ `${checkItem.checkState == 0 || checkItem.itemMode == 2 ? '-' : checkItem.score}/${checkItem.itemMode == 2 ? '-' : checkItem.fullScore}`}}</text>
 							</view>
 							<view class="subtask-subitem-top-right" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
 								{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && subtaskDetails.flowState == 3},
@@ -102,11 +102,12 @@
 		updateTaskItem,
 		submitTotalTaskDetails,
 		getAliyunSign,
-		queryItemDetails
+		querySingleSubTask
 	} from '@/api/task.js'
 	import {
 		setCache,
-		getCache
+		getCache,
+		getStringLength
 	} from '@/common/js/utils'
 	import navBar from "@/components/zhouWei-navBar"
 	import timeline from '@/components/chenbin-timeline/timeLine.vue'
@@ -120,6 +121,8 @@
 		data() {
 			return {
 				infoText: '加载中',
+				subtaskList: [],
+				subtaskMessage: {},
 				statusBackgroundPng: require("@/static/img/status-background.png"),
 				showLoadingHint: false
 			}
@@ -157,7 +160,8 @@
 		},
 		
 		onLoad(options) {
-				console.log('子任务详情',this.subtaskDetails.checkItem)
+			// this.getSubtaskDetails(this.subtaskDetails.subId);
+			console.log('子任务详情',this.subtaskDetails)
 		},
 		
 		methods: {
@@ -171,6 +175,513 @@
 			backTo() {
 				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'
+				})
+			},
+			
+			//提取负责人
+			extractPrincipal (data) {
+				let temporaryData = [];
+				for (let item of data) {
+					temporaryData.push(item.name)
+				};
+				return temporaryData.join("、")
+			},
+			
+			// 查询子任务详情
+			getSubtaskDetails (subtaskId) {
+				this.infoText = '加载中···';
+				this.showLoadingHint = true;
+				querySingleSubTask(subtaskId).then((res) => {
+					this.showLoadingHint = false;
+					if ( res && res.data.code == 200) {
+						this.subtaskMessage = {};
+						if (res.data.data.subTaskList.length > 0) {
+							for (let i = 0, len = res.data.data.subTaskList.length; i < len; i++) {
+								this.subtaskList.push({
+									subId: res.data.data.subTaskList[i].id,
+									taskNum: res.data.data.number, // 主任务编号
+									enabled: res.data.data.subTaskList[i].enabled, // 是否启用
+									majorId: this.mainTaskId,
+									majorSubId: res.data.data.subTaskList[i].majorSubId,
+									subtaskName: res.data.data.subTaskList[i].name,
+									subtaskFullMark: res.data.data.subTaskList[i].score,
+									subtaskScore: res.data.data.subTaskList[i].resultScore,
+									subtaskPrincipal: this.extractPrincipal(res.data.data.subTaskList[i]['persons']),
+									persons: res.data.data.subTaskList[i]['persons'],
+									unfold: res.data.data.subTaskList[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
+									isScroll: getStringLength(res.data.data.subTaskList[i].name + this.extractPrincipal(res.data.data.subTaskList[i].persons)) >= 20 ? true : false,
+									checkItem: []
+								});
+								if (res.data.data.subTaskList[i].checkItems.length > 0) {
+									for (let innerItem of res.data.data.subTaskList[i].checkItems) {
+										// 判断是否存在标签名称
+										if (JSON.parse(innerItem['tags']).length == 0) {
+											// 判断之前的数组里是否存在无的标签名
+											let tagsIndex = this.subtaskList[i]['checkItem'].indexOf(this.subtaskList[i]['checkItem'].filter((tagName) => {  return tagName['checkItemName'].length == 0 })[0]);
+											if (tagsIndex != -1) {
+												// “复核质疑”和“复查”状态下，任务详情场景只展示“待复核”、“已整改”、“整改未通过”四个状态的检查项
+												if (this.subtaskDetails.flowState == 3 || this.subtaskDetails.flowState == 5) {
+													if (this.subtaskDetails.flowState == 3) {
+														if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
+															this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId')? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													} else {
+														if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 3 && innerItem['state'] != 8) {
+															this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId')? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													}
+												} else {
+													if (this.subtaskDetails.flowState == 4) {
+														if (innerItem['itemMode'] != 2 && innerItem['score'] < innerItem['fullScore'] && innerItem['state'] != 8) {
+															this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId')? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													} else {
+														this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+															confirm : innerItem['confirm'], //是否确认地点
+															standard : innerItem['standard'], //评价标准
+															itemName : innerItem['describe'], //检查描述
+															number : innerItem['number'], //检查项编号
+															additional : innerItem['additional'], //检查项类型
+															mode : innerItem['mode'], //评价方式
+															itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+															checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+															score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+															fullScore : innerItem['fullScore'], //满分
+															checkId: innerItem.id, // 检查项id
+															taskItemId: innerItem.hasOwnProperty('taskItemId')? innerItem['taskItemId'] : '', // 检查项id
+															content : innerItem['content'], //评价内容
+															recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+															recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+														})
+													}
+												}
+											} else {
+												this.subtaskList[i]['checkItem'].push({
+													checkItemName: [], //标签名称
+													checkItemList: []
+												});
+												if (this.subtaskDetails.flowState == 3 || this.subtaskDetails.flowState == 5) {
+													if (this.subtaskDetails.flowState == 3) {
+														if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
+															this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													} else {
+														if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 3 && innerItem['state'] != 8) {
+															this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													}
+												} else {
+													if (this.subtaskDetails.flowState == 4) {
+														if (innerItem['itemMode'] != 2 && innerItem['score'] < innerItem['fullScore'] && innerItem['state'] != 8) {
+															this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													}	else {
+														this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+															confirm : innerItem['confirm'], //是否确认地点
+															standard : innerItem['standard'], //评价标准
+															itemName : innerItem['describe'], //检查描述
+															number : innerItem['number'], //检查项编号
+															additional : innerItem['additional'], //检查项类型
+															mode : innerItem['mode'], //评价方式
+															itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+															checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+															score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+															fullScore : innerItem['fullScore'], //满分
+															checkId: innerItem.id, // 检查项id
+															taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+															content : innerItem['content'], //评价内容
+															recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+															recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+														})
+													}
+												}
+											}
+										} else {
+											// 按标签给检查项重新分组(标签相同的在同一组)
+											if (this.subtaskList[i]['checkItem'].length == 0) {
+												this.subtaskList[i]['checkItem'].push({
+													checkItemName: JSON.parse(innerItem['tags'])[0]['name'], //标签名称
+													checkItemList: []
+												});
+												if (this.subtaskDetails.flowState == 3 || this.subtaskDetails.flowState == 5) {
+													if (this.subtaskDetails.flowState == 3) {
+														if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
+															this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													} else {
+														if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 3 && innerItem['state'] != 8) {
+															this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													}
+												} else {
+													if (this.subtaskDetails.flowState == 4) {
+														if (innerItem['itemMode'] != 2 && innerItem['score'] < innerItem['fullScore'] && innerItem['state'] != 8) {
+															this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													}	else {
+														this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+															confirm : innerItem['confirm'], //是否确认地点
+															standard : innerItem['standard'], //评价标准
+															itemName : innerItem['describe'], //检查描述
+															number : innerItem['number'], //检查项编号
+															additional : innerItem['additional'], //检查项类型
+															mode : innerItem['mode'], //评价方式
+															itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+															checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+															score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+															fullScore : innerItem['fullScore'], //满分
+															checkId: innerItem.id, // 检查项id
+															taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+															content : innerItem['content'], //评价内容
+															recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+															recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+														})
+													}	
+												}
+											} else {
+												// 判断之前的数组里是否存在相同的标签名
+												let tagsIndex = this.subtaskList[i]['checkItem'].indexOf(this.subtaskList[i]['checkItem'].filter((tagName) => { return tagName['checkItemName'] == JSON.parse(innerItem['tags'])[0]['name']})[0]);
+												if (tagsIndex != -1) {
+													if (this.flowState == 3 || this.flowState == 5) {
+														if (this.flowState == 3) {
+															if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
+																this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+																	confirm : innerItem['confirm'], //是否确认地点
+																	standard : innerItem['standard'], //评价标准
+																	itemName : innerItem['describe'], //检查描述
+																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
+																	mode : innerItem['mode'], //评价方式
+																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																	score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																	fullScore : innerItem['fullScore'], //满分
+																	checkId: innerItem.id, // 检查项id
+																	taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																	content : innerItem['content'], //评价内容
+																	recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																	recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+																})
+															}
+														} else {
+															if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 3 && innerItem['state'] != 8) {
+																this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+																	confirm : innerItem['confirm'], //是否确认地点
+																	standard : innerItem['standard'], //评价标准
+																	itemName : innerItem['describe'], //检查描述
+																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
+																	mode : innerItem['mode'], //评价方式
+																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																	score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																	fullScore : innerItem['fullScore'], //满分
+																	checkId: innerItem.id, // 检查项id
+																	taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																	content : innerItem['content'], //评价内容
+																	recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																	recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+																})
+															}
+														}
+													}	else {
+														if (this.subtaskDetails.flowState == 4) {
+															if (innerItem['itemMode'] != 2 && innerItem['score'] < innerItem['fullScore'] && innerItem['state'] != 8) {
+																this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+																	confirm : innerItem['confirm'], //是否确认地点
+																	standard : innerItem['standard'], //评价标准
+																	itemName : innerItem['describe'], //检查描述
+																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
+																	mode : innerItem['mode'], //评价方式
+																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																	score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																	fullScore : innerItem['fullScore'], //满分
+																	checkId: innerItem.id, // 检查项id
+																	taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																	content : innerItem['content'], //评价内容
+																	recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																	recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+																})
+															}
+														} else {
+															this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}	
+													}
+												} else {
+													this.subtaskList[i]['checkItem'].push({
+														checkItemName: JSON.parse(innerItem['tags'])[0]['name'], //标签名称
+														checkItemList: []
+													});
+													if (this.subtaskDetails.flowState == 3 || this.subtaskDetails.flowState == 5) {
+														if (this.subtaskDetails.flowState == 3) {
+															if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
+																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																	confirm : innerItem['confirm'], //是否确认地点
+																	standard : innerItem['standard'], //评价标准
+																	itemName : innerItem['describe'], //检查描述
+																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
+																	mode : innerItem['mode'], //评价方式
+																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																	score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																	fullScore : innerItem['fullScore'], //满分
+																	checkId: innerItem.id, // 检查项id
+																	taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																	content : innerItem['content'], //评价内容
+																	recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																	recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+																})
+															}
+														} else {
+															if (innerItem['state'] != 6 && innerItem['state'] != 4 && innerItem['state'] != 3 && innerItem['state'] != 8) {
+																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																	confirm : innerItem['confirm'], //是否确认地点
+																	standard : innerItem['standard'], //评价标准
+																	itemName : innerItem['describe'], //检查描述
+																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
+																	mode : innerItem['mode'], //评价方式
+																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																	score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																	fullScore : innerItem['fullScore'], //满分
+																	checkId: innerItem.id, // 检查项id
+																	taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																	content : innerItem['content'], //评价内容
+																	recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																	recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+																})
+															}
+														}
+													}	else {
+														if (this.subtaskDetails.flowState == 4) {
+															if (innerItem['itemMode'] != 2 && innerItem['score'] < innerItem['fullScore'] && innerItem['state'] != 8) {
+																this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																	confirm : innerItem['confirm'], //是否确认地点
+																	standard : innerItem['standard'], //评价标准
+																	itemName : innerItem['describe'], //检查描述
+																	number : innerItem['number'], //检查项编号
+																	additional : innerItem['additional'], //检查项类型
+																	mode : innerItem['mode'], //评价方式
+																	itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																	checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																	score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																	fullScore : innerItem['fullScore'], //满分
+																	checkId: innerItem.id, // 检查项id
+																	taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																	content : innerItem['content'], //评价内容
+																	recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																	recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+																})
+															}
+														}	else {
+															this.subtaskList[i]['checkItem'][this.subtaskList[i]['checkItem'].length-1]['checkItemList'].push({
+																confirm : innerItem['confirm'], //是否确认地点
+																standard : innerItem['standard'], //评价标准
+																itemName : innerItem['describe'], //检查描述
+																number : innerItem['number'], //检查项编号
+																additional : innerItem['additional'], //检查项类型
+																mode : innerItem['mode'], //评价方式
+																itemMode: innerItem.hasOwnProperty('itemMode') ? innerItem['itemMode']: 0, //打分方式
+																checkState: innerItem.hasOwnProperty('state') ? innerItem['state'] : 0, //检查项状态
+																score : innerItem.hasOwnProperty('score') ? innerItem['score'] : 0, //检查项得分
+																fullScore : innerItem['fullScore'], //满分
+																checkId: innerItem.id, // 检查项id
+																taskItemId: innerItem.hasOwnProperty('taskItemId') ? innerItem['taskItemId'] : '', // 检查项id
+																content : innerItem['content'], //评价内容
+																recordDesc: innerItem.hasOwnProperty('recordDesc') ? innerItem['recordDesc'] : '', //记录的描述
+																recordRemarks: innerItem.hasOwnProperty('recordRemarks') ? innerItem['recordRemarks'] : '' //记录的备注
+															})
+														}
+													}
+												}
+											}
+										}
+									}
+								};
+								// 子任务详情数据存入store
+								let temporaryObject = {};
+								temporaryObject = this.subtaskList[0];
+								temporaryObject['flowState'] = this.subtaskDetails.flowState;
+								this.changeSubtaskDetails(temporaryObject);
+							}
+						}
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					});
+					this.showLoadingHint = false
 				})
 			},
 			

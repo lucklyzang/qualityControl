@@ -13,7 +13,6 @@
 			</view>
 			<view class="content-top-right">
 				<view class="search" @click="searchEvent">搜索</view>
-				<view class="import" @click="importEvent">导入</view>
 			</view>
 		</view>
 		<view class="content-bottom-area">
@@ -120,10 +119,7 @@
 			},
 			
 			// 搜索事件
-			searchEvent () {},
-			
-			// 导入事件
-			importEvent () {}
+			searchEvent () {}
 		}	
 	}	
 </script>
@@ -153,7 +149,7 @@
 			flex-flow: row nowrap;
 			.content-top-left {
 				position: relative;
-				width: 64%;
+				flex: 1;
 				margin-right: 6px;
 				/deep/ .u-icon {
 					position: absolute;
@@ -166,10 +162,6 @@
 				}
 			};
 			.content-top-right {
-				width: 34%;
-				display: flex;
-				flex-flow: row nowrap;
-				justify-content: space-between;
 				>view {
 					height: 32px;
 					line-height: 32px;
@@ -179,13 +171,8 @@
 					color: #fff
 				}
 				.search {
-					width: 49%;
-					margin-right: 6px;
+					width: 60px;
 					background: #1864ff
-				};
-				.import {
-					width: 49%;
-					background: #289e8e
 				}
 			}
 		};

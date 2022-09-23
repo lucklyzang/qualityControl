@@ -6,7 +6,7 @@
 		 @cancel="cancelSure">
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="评分" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="评分" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content">

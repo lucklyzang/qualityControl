@@ -3,11 +3,12 @@
 		<u-toast ref="uToast" />
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="检查详情" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="flow-wrapper">
-			<u-steps :list="flowList" dot :current="flowState-1" active-color="#43c3f4"></u-steps>
+			<image :src="statusBackgroundPng">
+			<u-steps :list="flowList" dot :current="flowState-1" un-active-color="#82acfe" active-color="#fff"></u-steps>
 		</view>
 		<view class="examine-pandect" @click="arrowEvent">
 			<view class="examine-pandect-left">
@@ -140,6 +141,7 @@
 				flowState: '',
 				infoText: '',
 				showLoadingHint: false,
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				flowList: [
 					{
 					name: '检查中'
@@ -973,14 +975,28 @@
 		}
 		.flow-wrapper {
 			padding: 8px 0;
-			background: #fff
+			display: flex;
+			align-items: center;
+			height: 80px;
+			position: relative;
+			width: 100%;
+			>image {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0
+			};
+			>view {
+				width: 100%
+			}
 		}
 		.examine-pandect {
 			padding: 10px 20px;
 			background: #fff;
 			margin-top: 10px;
 			border: 1px solid #e7e7e7;
-			box-shadow: 0px 15px 10px -15px #b0d2ff;
+			box-shadow: 0px 1px 3px 0 #93b4f7;
 			border-radius: 50px;
 			box-sizing: border-box;
 			display: flex;

@@ -1,17 +1,6 @@
+import { getDefaultQualityState } from '@/common/js/resetStore/resetStore.js'
 export default {
-  state:{
-    titleText: '',
-    bottomBarIndex: 0,
-		taskMessage: {},
-		mainTaskId: '',
-		subtaskInfo: {},
-		subtaskDetails: {},
-		disposeSubTaskData: [],
-		cacheIndex: {},
-		isSkipDetails: false,
-		timeMessage: {},
-		ossMessage: {}
-  },
+  state: getDefaultQualityState(),
   getters:{
     titleText: state => state.titleText,
 		taskMessage: state => state.taskMessage,
@@ -58,7 +47,15 @@ export default {
 		},
 		changeOssMessage (state, playLoad) {
 			state.ossMessage = playLoad
+		},
+		//重置质量管理的状态
+		resetQualityInfoState(state) {
+				Object.assign(state, getDefaultQualityState())
 		}
   },
-  actions:{}
+  actions: {
+		resetQualityState({ commit }) {
+				commit('resetQualityInfoState')
+		}
+	}
 }

@@ -3,7 +3,7 @@
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="检查详情" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content-top-area">
@@ -51,7 +51,7 @@
 				</view>
 				<view class="item-line">
 					<text>检查结束时间:</text>
-					<text>{{taskMessage.examinationStartTime}}</text>
+					<text>{{taskMessage.finishTime}}</text>
 				</view>
 				<view class="item-line">
 					<text>整改结束时间:</text>
@@ -235,30 +235,24 @@
 			width: 100%
 		};
 		.content-top-area {
-			position: absolute;
-			top: 0;
-			left: 0;
 			width: 100%;
 			z-index: 1000;
 			height: 160px;
 			>image {
 				width: 100%;
 				height: 100%;
-				position: absolute;
-				top: 0;
-				left: 0
 			}
 		};
 		.content-bottom-area {
 			width: 94%;
 			margin: 0 auto;
-			margin-top: 10px;
+			margin-top: -150px;
 			padding: 10px 20px 0 20px;
 			box-sizing: border-box;
 			flex: 1;
 			background: #fff;
 			border: 1px solid #f2f2f2;
-			box-shadow: 0px 15px 10px -15px #b0d2ff;
+			box-shadow: 0px 1px 3px 0 #93b4f7;
 			z-index: 1000;
 			border-radius: 8px;
 			.details-tilte {

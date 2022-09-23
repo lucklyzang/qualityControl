@@ -2,8 +2,14 @@
 	<view class="container">
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
+		<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
+			<view class="slot-content">
+				<u-icon name="close-circle-fill" @click="closeImageEvent"></u-icon>
+				<image :src="enlargeImg"></image>
+			</view>
+		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查项详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="检查项详情" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<!-- <view class="score-box">
@@ -267,7 +273,7 @@
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText;
 			this.getItemDetails(this.subtaskInfo['taskItemId']);
-			console.log('撒',this.subtaskInfo,this.subtaskDetails);
+			console.log('撒',this.subtaskInfo['taskItemId']);
 		},
 
 		methods: {
@@ -350,7 +356,7 @@
 				})
 			},
 			
-			// 查询检查项详情
+			// 查询检查记录详情
 			getItemDetails (checkId) {
 				this.recordList = [];
 				this.infoText = '加载中···';
@@ -363,13 +369,12 @@
 								this.recordList.push({
 									scrutator: item['operator'],
 									startTime: item['operationTime'],
-									problemDescription: this.confirmEnding(item['describe'],'[',']') ? JSON.parse(item['describe']) : item['describe'],
+									problemDescription: item['describe'] ? this.confirmEnding(item['describe'],'[',']') ? JSON.parse(item['describe']) : item['describe'] : '',
 									remark: item['remarks'],
 									images: item['images'],
 									files: item.hasOwnProperty('files') ? item['files'] : []
 								})
-							};
-							console.log('数据',this.recordList);
+							}
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -435,50 +440,50 @@
 			},
 			
 			// 进入评分页
-			gradeEvent(num) {
-				let temporaryInfo = this.subtaskInfo;
-				temporaryInfo['operation'] = num;
-				this.changeSubtaskInfo(temporaryInfo);
-				if (num == 5) {
-					// this.rejectTaskItem({
-					// 	score: this.subtaskInfo.score,  //得分
-					// 	describe: "问题描述:" + this.subtaskInfo.recordDesc,
-					// 	file: "",
-					// 	remarks: "备注:" + this.subtaskInfo.recordRemarks,
-					// 	majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
-					// 	state: 4,	     //检查项状态
-					// 	majorId: this.subtaskInfo.majorId,		//主任务id
-					// 	subId: this.subtaskInfo.subId,		//子任务id
-					// 	fullScore: this.subtaskInfo.fullScore,		//满分
-					// 	taskNum: this.subtaskInfo.taskNum,	//任务编号
-					// 	operator: "检查者",		//检查者（固定）
-					// 	itemId: this.subtaskInfo.checkId,			//检查项id
-					// 	taskItemId: this.subtaskInfo.taskItemId, //检查项id
-					// 	majorState: this.subtaskInfo.majorState,		//主任务当前状态
-					// 	worker: "项目经理",	
-					// 	operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
-					// })
-					uni.redirectTo({
-						url: '/qualityPackage/pages/grade/grade'
-					})
-				} else {
-					uni.redirectTo({
-						url: '/qualityPackage/pages/grade/grade'
-					})
-				}
-			},
+			// gradeEvent(num) {
+			// 	let temporaryInfo = this.subtaskInfo;
+			// 	temporaryInfo['operation'] = num;
+			// 	this.changeSubtaskInfo(temporaryInfo);
+			// 	if (num == 5) {
+			// 		// this.rejectTaskItem({
+			// 		// 	score: this.subtaskInfo.score,  //得分
+			// 		// 	describe: "问题描述:" + this.subtaskInfo.recordDesc,
+			// 		// 	file: "",
+			// 		// 	remarks: "备注:" + this.subtaskInfo.recordRemarks,
+			// 		// 	majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+			// 		// 	state: 4,	     //检查项状态
+			// 		// 	majorId: this.subtaskInfo.majorId,		//主任务id
+			// 		// 	subId: this.subtaskInfo.subId,		//子任务id
+			// 		// 	fullScore: this.subtaskInfo.fullScore,		//满分
+			// 		// 	taskNum: this.subtaskInfo.taskNum,	//任务编号
+			// 		// 	operator: "检查者",		//检查者（固定）
+			// 		// 	itemId: this.subtaskInfo.checkId,			//检查项id
+			// 		// 	taskItemId: this.subtaskInfo.taskItemId, //检查项id
+			// 		// 	majorState: this.subtaskInfo.majorState,		//主任务当前状态
+			// 		// 	worker: "项目经理",	
+			// 		// 	operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+			// 		// })
+			// 		uni.redirectTo({
+			// 			url: '/qualityPackage/pages/grade/grade'
+			// 		})
+			// 	} else {
+			// 		uni.redirectTo({
+			// 			url: '/qualityPackage/pages/grade/grade'
+			// 		})
+			// 	}
+			// },
 			
 			// 评价事件
-			gradeEvent(num,checkItem) {
+			gradeEvent(num) {
 				// 操作过的当前不总重复操作
 				if (num == 0) {
-					if (checkItem.itemMode == 2) { return }
+					if (this.subtaskInfo.itemMode == 2) { return }
 				};
 				if (num == 1) {
-					if (checkItem.itemMode == 1) { return }
+					if (this.subtaskInfo.itemMode == 1) { return }
 				};
 				if (num == 2) {
-					if (checkItem.itemMode == 3) { return }
+					if (this.subtaskInfo.itemMode == 3) { return }
 				};
 				// -1: '重新评价'
 				// 0: '不参评', 点击不跳转，直接提交
@@ -734,7 +739,31 @@
 		font-size: 14px;
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
-
+		/deep/ .u-model {
+			height: 600px;
+			padding: 15px;
+			position: relative;
+			box-sizing: border-box;
+			.u-model__content {
+				.slot-content {
+					height: 580px;
+					u-icon {
+						position: absolute;
+						top: 0;
+						right: 0;
+						z-index: 100;
+						font-size: 34px
+					}
+					image {
+						width: 100%;
+						height: 100%
+					}
+				}
+			}
+			.u-model__footer {
+				display: none
+			}
+		};
 		::-webkit-scrollbar {
 			width: 0;
 			height: 0;

@@ -8,10 +8,14 @@
 		<view class="top-area">
 			<image :src="statusBackgroundPng">
 			<view class="top-name">
-				<image :src="juddgeAvatarUrl()" @click="headPhotoClickEvent">
-				<text>
-					上午好! {{userName}}
-				</text>
+				<view class="top-image">
+					<image :src="juddgeAvatarUrl()" @click="headPhotoClickEvent">
+				</view>
+				<view class="top-text">
+					<text>
+						上午好! {{userName}}
+					</text>
+				</view>
 			</view>
 			<view class="top-hospital">
 				<u-icon name="map" color="#fff" size="35"></u-icon>
@@ -232,6 +236,7 @@
 			return {
 				hospitalList: [],
 				selectHomeHospitalList: [],
+				temporaryIndex: {},
 				taskTypeText: '',
 				isFresh: false,
 				noDataShow: false,
@@ -345,7 +350,8 @@
 				'changeCacheIndex',
 				'changeSelectHospitalList',
 				'changeIsSkipDetails',
-				'changeTaskMessage'
+				'changeTaskMessage',
+				'resetQualityState'
 			]),
 			
 			
@@ -356,6 +362,20 @@
 			
 			// 头像点击事件
 			headPhotoClickEvent () {
+				this.temporaryIndex = {};
+				if (this.current == 0) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				} else if (this.current == 1) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = true;
+					this.temporaryIndex.selectIndex = this.goingState;
+				} else {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				};
+				this.changeIsSkipDetails(true);
+				this.changeCacheIndex(this.temporaryIndex);
 				uni.redirectTo({
 					url: '/pages/personInfo/personInfo'
 				})
@@ -372,17 +392,75 @@
 				};
 			},
 			
+			// tab切换改变事件
+			tabChange (index) {
+				this.current = index;
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : "", //任务类型
+					person : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.current //主任务状态
+				};
+				if (index == 2) {
+					data.state = 6
+				};
+				if (index == 1) {
+					data.state = -1;
+					this.initValue = '全部'
+				};
+				this.getAllMainTasks(data)
+			},
+			
+			// 任务状态下拉事件
+			statusChange (val) {
+				this.goingState = val.index;
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : "", //任务类型
+					person : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.goingState //主任务状态
+				};
+				if (val.index == 0) {
+					data.state = -1
+				};
+				this.getAllMainTasks(data)
+			},
+			
 			// 医院下拉框下拉选择确定事件
 			hosipitalChange (val) {
 				this.selectHomeHospitalList = [];
-				this.selectHospitalList.push(val.orignItem);
-				this.changeSelectHospitalList(this.selectHospitalList);
-				setCache('selectHospitalList',this.selectHospitalList)
-			},
-			
-			// 医院下拉框下拉确定事件
-			chooseHospitalEvent () {
-				
+				this.selectHomeHospitalList.push(val.orignItem);
+				this.changeSelectHospitalList(this.selectHomeHospitalList);
+				setCache('selectHospitalList',this.selectHomeHospitalList);
+				this.$store.dispatch('resetQualityState');
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : "", //任务类型
+					person : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.goingState //主任务状态, //主任务状态
+				};
+				if (this.current == 1) {
+					if (this.goingState == 0) {
+						data.state = -1
+					}
+				} else if (this.current == 0) {
+					data.state = 0
+				} else if (this.current == 2) {
+					data.state = 6
+				};
+				this.getAllMainTasks(data)
 			},
 			
 			// 提取年份
@@ -637,7 +715,7 @@
 									examinationPrincipal: this.extractPrincipal(item.persons),
 									examinationStartTime: item.startTime,
 									assessmentFormat: item.mode,
-									checkName: item.checkName,
+									checkName: item.checkName ? item.checkName : '',
 									isQuery: item.question,
 									fullMark: item.score,
 									year: item.year,
@@ -677,66 +755,26 @@
 					}
 				})
 			},
-			
-			// tab切换改变事件
-			tabChange (index) {
-				this.current = index;
-				let data = {
-					hospitals : this.proId, //检查项目(指的是医院)
-					mode : 1, //评价方式
-					type : "", //任务类型
-					person : this.workerId, //任务负责人
-					subPersons : "", //子任务负责人
-					startTime: "",//检查时间
-					createTime : "", //创建时间
-					state : this.current //主任务状态
-				};
-				if (index == 2) {
-					data.state = 6
-				};
-				if (index == 1) {
-					data.state = -1;
-					this.initValue = '全部'
-				};
-				this.getAllMainTasks(data)
-			},
-			// 任务状态下拉事件
-			statusChange (val) {
-				this.goingState = val.index;
-				let data = {
-					hospitals : this.proId, //检查项目(指的是医院)
-					mode : 1, //评价方式
-					type : "", //任务类型
-					person : this.workerId, //任务负责人
-					subPersons : "", //子任务负责人
-					startTime: "",//检查时间
-					createTime : "", //创建时间
-					state : this.goingState //主任务状态
-				};
-				if (val.index == 0) {
-					data.state = -1
-				};
-				this.getAllMainTasks(data)
-			},
+	
 			// 进入任务
 			enterTask (item,index) {
 				// if (item.status === 0) {
 				// 	return
 				// };
-				let temporaryIndex = {};
+				this.temporaryIndex = {};
 				if (this.current == 0) {
-					temporaryIndex.current = this.current;
-					temporaryIndex.isGoingTask = false
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
 				} else if (this.current == 1) {
-					temporaryIndex.current = this.current;
-					temporaryIndex.isGoingTask = true;
-					temporaryIndex.selectIndex = this.goingState;
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = true;
+					this.temporaryIndex.selectIndex = this.goingState;
 				} else {
-					temporaryIndex.current = this.current;
-					temporaryIndex.isGoingTask = false
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
 				};
 				this.changeIsSkipDetails(true);
-				this.changeCacheIndex(temporaryIndex);
+				this.changeCacheIndex(this.temporaryIndex);
 				this.changeTaskMessage(item);
 				this.changeMainTaskId(item.id);
 				uni.redirectTo({
@@ -746,7 +784,22 @@
 		
 			// 查看更多
 			viewMore (item,index) {
+				this.temporaryIndex = {};
+				if (this.current == 0) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				} else if (this.current == 1) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = true;
+					this.temporaryIndex.selectIndex = this.goingState;
+				} else {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				};
+				this.changeIsSkipDetails(true);
+				this.changeCacheIndex(this.temporaryIndex);
 				this.changeTaskMessage(item);
+				this.changeMainTaskId(item.id);
 				uni.redirectTo({
 					url: '/qualityPackage/pages/taskDetails/taskDetails'
 				})
@@ -782,7 +835,6 @@
 		};
 		.top-area {
 			height: 160px;
-			background: #638ef6;
 			position: relative;
 			width: 100%;
 			>image {
@@ -800,14 +852,25 @@
 				display: flex;
 				flex-flow: row nowrap;
 				align-items: center;
-				> image {
+				.top-image {
+					display: flex;
+					justify-content: center;
+					align-items: center;
 					width: 40px;
 					height: 40px;
 					border-radius: 50%;
-					margin-right: 10px
+					background: #fff;
+					z-index: 1000;
+					margin-right: 8px;
+					image {
+						vertical-align: middle;
+						width: 35px;
+						height: 35px
+					}
 				};
-				text {
-					color: #fff
+				.top-text {
+					color: #fff;
+					z-index: 1000
 				}
 			};
 			.top-hospital {
