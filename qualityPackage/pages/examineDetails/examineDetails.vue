@@ -32,12 +32,12 @@
 				</view>
 				<view class="subtask-item-right">
 					<view class="subtask-item-right-top">
-							<u-circle-progress :width="80" :border-width="10" active-color="#3e7dff" :percent="50">
+							<u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#299f8f' : '#3e7dff'" :percent="item.complete">
 							</u-circle-progress>
 					</view>
 					<view class="subtask-item-right-bottom">
 						<text>检查已完成:</text>
-						<text>60%</text>
+						<text :class="{'textStyle': item.complete == 100}">{{`${item.complete}%`}}</text>
 					</view>
 				</view>
 				<!-- <view class="subtask-list-title" @click="subtaskEvent(item,index)">
@@ -216,6 +216,26 @@
 				})
 			},
 			
+			// 子任务完成进度计算
+			subtaskCompleteProgress (checkItems) {
+				let percent;
+				// 根据主任务流程判断对应子任务检查项是否全部完成
+				if (this.flowState == 0 || this.flowState == 1) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,0)
+				} else if (this.flowState == 2) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,1)
+				} else if (this.flowState == 3) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,2)
+				} else if (this.flowState == 4) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,4)
+				} else if (this.flowState == 5) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,5)
+				};		
+				// if () {
+					
+				// }
+			},
+			
 			// 判断权限
 			judgePermission (arrayInfo) {
 				let flag;
@@ -230,7 +250,7 @@
 			
 			// 进入主任务详情事件
 			arrowEvent () {
-				uni.redirectTo({
+				uni.navigateTo({
 					url: '/qualityPackage/pages/taskDetails/taskDetails'
 				})
 			},
@@ -324,6 +344,7 @@
 										subtaskScore: res.data.data.subTaskList[i].resultScore,
 										subtaskPrincipal: this.extractPrincipal(res.data.data.subTaskList[i]['persons']),
 										persons: res.data.data.subTaskList[i]['persons'],
+										complete: res.data.data.subTaskList[i]['complete'],
 										unfold: res.data.data.subTaskList[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
 										isScroll: getStringLength(res.data.data.subTaskList[i].name + this.extractPrincipal(res.data.data.subTaskList[i].persons)) >= 20 ? true : false,
 										checkItem: []
@@ -988,7 +1009,15 @@
 				left: 0
 			};
 			>view {
-				width: 100%
+				width: 100%;
+				/deep/ .u-steps{
+					.u-steps__item--row  {
+						.u-steps__item__line {
+							left: 55% !important;
+							width: 100% !important
+						}
+					}
+				}
 			}
 		}
 		.examine-pandect {
@@ -1094,6 +1123,9 @@
 					.subtask-item-right-top {};
 					.subtask-item-right-bottom {
 						margin-top: 6px;
+						.textStyle {
+							color: #299f8f !important
+						};
 						text {
 							font-size: 12px;
 							&:first-child {

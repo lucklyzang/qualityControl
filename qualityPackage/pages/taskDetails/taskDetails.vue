@@ -206,9 +206,12 @@
 	
 			// 返回上一页
 			backTo() {
-				uni.redirectTo({
-					url: '/qualityPackage/pages/qualityManagement/index/index'
+				uni.navigateBack({
+					delta: 1
 				})
+				// uni.redirectTo({
+				// 	url: '/qualityPackage/pages/qualityManagement/index/index'
+				// })
 			},
 			
 			backEvent() {

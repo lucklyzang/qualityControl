@@ -16,17 +16,17 @@
 					</view>
 					<view class="subtask-item-right">
 						<view class="subtask-item-right-top">
-								<u-circle-progress :width="80" :border-width="10" active-color="#3e7dff" :percent="50">
+								<u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#299f8f' : '#3e7dff'" :percent="subtaskDetails.complete">
 								</u-circle-progress>
 						</view>
 						<view class="subtask-item-right-bottom">
 							<text>检查已完成:</text>
-							<text>60%</text>
+							<text :class="{'textStyle': subtaskDetails.complete == 100}">{{`${subtaskDetails.complete}%`}}</text>
 						</view>
 					</view>
 				</view>
 			</view>
-			<view class="content-bottom-area">
+			<view class="content-bottom-area" ref="contentBottomArea">
 				<view class="subtask-item-list" v-for="(itemInner,indexInner) in subtaskDetails.checkItem" :key="indexInner">
 					<view class="subtask-item-name">
 						{{itemInner.checkItemName.length == 0 ? '无标签' : itemInner.checkItemName}}
@@ -122,7 +122,7 @@
 			return {
 				infoText: '加载中',
 				subtaskList: [],
-				subtaskMessage: {},
+				subtaskMessage: [],
 				statusBackgroundPng: require("@/static/img/status-background.png"),
 				showLoadingHint: false
 			}
@@ -160,7 +160,8 @@
 		},
 		
 		onLoad(options) {
-			// this.getSubtaskDetails(this.subtaskDetails.subId);
+			window.addEventListener('scroll', this.handleScroll);
+			this.getSubtaskDetails(this.subtaskDetails.majorId,this.subtaskDetails.subId);
 			console.log('子任务详情',this.subtaskDetails)
 		},
 		
@@ -178,6 +179,16 @@
 				})
 			},
 			
+			scrollEvent () {
+				console.log(this.$refs['contentBottomArea'])
+			},
+			
+			//页面滚动事件
+			handleScroll () {
+				let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+				console.log('滚动距离',scrollTop)
+			},
+			
 			//提取负责人
 			extractPrincipal (data) {
 				let temporaryData = [];
@@ -188,32 +199,33 @@
 			},
 			
 			// 查询子任务详情
-			getSubtaskDetails (subtaskId) {
+			getSubtaskDetails (majorId,subtaskId) {
 				this.infoText = '加载中···';
 				this.showLoadingHint = true;
-				querySingleSubTask(subtaskId).then((res) => {
+				querySingleSubTask(majorId,subtaskId).then((res) => {
+					console.log('详情数据',res);
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 200) {
-						this.subtaskMessage = {};
-						if (res.data.data.subTaskList.length > 0) {
-							for (let i = 0, len = res.data.data.subTaskList.length; i < len; i++) {
+						this.subtaskMessage.push(res.data.data);
+						if (this.subtaskMessage.length > 0) {
+							for (let i = 0, len = this.subtaskMessage.length; i < len; i++) {
 								this.subtaskList.push({
-									subId: res.data.data.subTaskList[i].id,
-									taskNum: res.data.data.number, // 主任务编号
-									enabled: res.data.data.subTaskList[i].enabled, // 是否启用
-									majorId: this.mainTaskId,
-									majorSubId: res.data.data.subTaskList[i].majorSubId,
-									subtaskName: res.data.data.subTaskList[i].name,
-									subtaskFullMark: res.data.data.subTaskList[i].score,
-									subtaskScore: res.data.data.subTaskList[i].resultScore,
-									subtaskPrincipal: this.extractPrincipal(res.data.data.subTaskList[i]['persons']),
-									persons: res.data.data.subTaskList[i]['persons'],
-									unfold: res.data.data.subTaskList[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
-									isScroll: getStringLength(res.data.data.subTaskList[i].name + this.extractPrincipal(res.data.data.subTaskList[i].persons)) >= 20 ? true : false,
+									subId: this.subtaskMessage[i].id,
+									taskNum: this.subtaskDetails.number, // 主任务编号
+									enabled: this.subtaskMessage[i].enabled, // 是否启用
+									majorId: this.subtaskMessage[i].majorId,
+									majorSubId: this.subtaskMessage[i].majorSubId,
+									subtaskName: this.subtaskMessage[i].name,
+									subtaskFullMark: this.subtaskMessage[i].score,
+									subtaskScore: this.subtaskMessage[i].resultScore,
+									subtaskPrincipal: this.extractPrincipal(this.subtaskMessage[i]['persons']),
+									persons: this.subtaskMessage[i]['persons'],
+									unfold: this.subtaskMessage[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
+									isScroll: getStringLength(this.subtaskMessage[i].name + this.extractPrincipal(this.subtaskMessage[i].persons)) >= 20 ? true : false,
 									checkItem: []
 								});
-								if (res.data.data.subTaskList[i].checkItems.length > 0) {
-									for (let innerItem of res.data.data.subTaskList[i].checkItems) {
+								if (this.subtaskMessage[i].checkItems.length > 0) {
+									for (let innerItem of this.subtaskMessage[i].checkItems) {
 										// 判断是否存在标签名称
 										if (JSON.parse(innerItem['tags']).length == 0) {
 											// 判断之前的数组里是否存在无的标签名
@@ -1095,6 +1107,9 @@
 					.subtask-item-right-top {};
 					.subtask-item-right-bottom {
 						margin-top: 6px;
+						.textStyle {
+							color: #299f8f !important
+						};
 						text {
 							font-size: 12px;
 							&:first-child {

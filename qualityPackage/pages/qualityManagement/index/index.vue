@@ -800,7 +800,7 @@
 				this.changeCacheIndex(this.temporaryIndex);
 				this.changeTaskMessage(item);
 				this.changeMainTaskId(item.id);
-				uni.redirectTo({
+				uni.navigateTo({
 					url: '/qualityPackage/pages/taskDetails/taskDetails'
 				})
 			}
@@ -1087,11 +1087,13 @@
 						}
 					};
 					.status-content-middle-four-line {
+						display: inline-block;
+						margin-top: 4px;
 						> view {
 							max-width: 100%;
 							background: #dae6ff;
-							border-radius: 10px;
-							padding-left: 4px;
+							border-radius: 20px;
+							padding: 0 10px;
 							box-sizing: border-box;
 							text-align: left;
 							height: 30px;
@@ -1100,7 +1102,7 @@
 							// overflow: hidden;
 							> text {
 								display: inline-block;
-								color: #286fff;
+								color: #0455ff;
 							}
 							// .animate-center {
 							// 	white-space: nowrap;

@@ -16,9 +16,9 @@ export function querySingleMainTask(majorId) {
 	  })
 }
 // 查询单个子任务详情
-export function querySingleSubTask(subTaskId) {
+export function querySingleSubTask(majorId,subTaskId) {
 	return request({
-	    url: `quality/subTask/queryById/${subTaskId}`,
+	    url: `quality/subTask/queryById/${majorId}/${subTaskId}`,
 	    method: 'get'
 	  })
 }

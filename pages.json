@@ -4,6 +4,14 @@
 	},
 	"pages": [
 		{
+			"path": "pages/bootPage/bootPage",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#75b0f0",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "",

@@ -332,7 +332,7 @@
         }
       }
 			.form-btn {
-        width: 80%;
+        width: 70%;
         margin: 0 auto;
         margin-top: 30px;
 				::after {

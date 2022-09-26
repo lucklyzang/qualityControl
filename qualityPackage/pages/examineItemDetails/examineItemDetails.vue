@@ -156,16 +156,25 @@
 		<view class="operta-box">
 			<image :src="statusBackgroundPng"></image>
 			<view class="btn-content" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
-				<view @click="gradeEvent(0)">
-					<image src="/static/img/no-evaluate.png"></image>
+				<view>
+					<view @click="gradeEvent(0)" :class="{'imgBoxImageStyle': subtaskInfo.itemMode == 2 }">
+						<image src="/static/img/evaluated.png" v-if="subtaskInfo.itemMode == 2"></image>
+						<image src="/static/img/no-evaluate.png" v-else></image>
+					</view>
 					<view class="text">不参评</view>
 				</view>
-				<view @click="gradeEvent(1)">
-					<image src="/static/img/full-mark.png"></image>
+				<view>
+					<view @click="gradeEvent(1)" :class="{'imgBoxImageStyle': subtaskInfo.itemMode == 1 }">
+						<image src="/static/img/full-marked.png" v-if="subtaskInfo.itemMode == 1"></image>
+						<image src="/static/img/full-mark.png" v-else></image>
+					</view>
 					<view class="text">满分</view>
 				</view>
-				<view @click="gradeEvent(2)">
-					<image src="/static/img/deduct-mark.png"></image>
+				<view>
+					<view @click="gradeEvent(2)" :class="{'imgBoxImageStyle': subtaskInfo.itemMode == 3 }">
+						<image src="/static/img/deduct-marked.png" v-if="subtaskInfo.itemMode == 3"></image>
+						<image src="/static/img/deduct-mark.png" v-else></image>
+					</view>
 					<view class="text">扣分</view>
 				</view>
 			</view>
@@ -358,6 +367,7 @@
 			
 			// 查询检查记录详情
 			getItemDetails (checkId) {
+				if (!checkId) { return };
 				this.recordList = [];
 				this.infoText = '加载中···';
 				this.showLoadingHint = true;
@@ -1003,6 +1013,7 @@
 								};
 								.scrutator {
 									color: #1864FF;
+									padding: 0 10px;
 									border: 1px solid #1864FF;
 									margin-top: 4px;
 									border-radius: 10px
@@ -1076,6 +1087,7 @@
 			position: fixed;
 			left: 0;
 			bottom: 0;
+			background: #5d76e8;
 			>image {
 				width: 100%;
 				height: 100%;
@@ -1086,27 +1098,45 @@
 			.btn-content {
 				margin-top: -20px;
 				display: flex;
-				flex-flow: row nowrap;
+				flex-direction: row nowrap;
 				justify-content: center;
 				align-items: center;
 				>view {
-					width: 90px;
-					height: 100px;
-					display: flex;
 					flex-direction: column;
-					justify-content: center;
+					justify-content: space-around;
 					align-items: center;
-					>image {
-						width: 65px;
-						height: 65px
-					};
+					display: flex;
+					width: 85px;
+					height: 100px;
+					z-index: 1000;
 					>view {
-						z-index: 1000;
-						font-size: 14px;
-						color: #fff
+						&:first-child {
+							width: 55px;
+							height: 55px;
+							background: #fff;
+							border: 1px solid #ebebeb;
+							z-index: 100;
+							border-radius: 50%;
+							display: flex;
+							flex-direction: column;
+							justify-content: center;
+							align-items: center;
+							>image {
+								width: 25px;
+								height: 25px
+							}
+						};
+						&:last-child {
+							font-size: 14px;
+							color: #fff
+						}
+					};
+					.imgBoxImageStyle {
+						background: #1864ff !important;
+						border: none !important
 					};
 					&:nth-child(2) {
-						transform: translateY(-20%);
+						transform: translateY(-20%)
 					}
 				}
 			};
