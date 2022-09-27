@@ -120,7 +120,8 @@
 				'storeUserInfo',
 				'changeOverDueWay',
 				'changeSelectHospitalList',
-				'changePermissionInfo'
+				'changePermissionInfo',
+				'changeRoleNameList'
 			]),
       
       // 选中某个复选框时，由checkbox时触发
@@ -183,10 +184,12 @@
                 removeCache('userPassword', this.form.password);
               };
 							setCache('userInfo', res.data.data.worker);
+							setCache('roleNameList', res.data.data.roleNameList);
 							setCache('permissionInfo', res.data.data.authorities);
 							setCache('isLogin', true);
 							this.storeUserInfo(res.data.data.worker);
 							this.changePermissionInfo(res.data.data.authorities);
+							this.changeRoleNameList(res.data.data.roleNameList);
 							if (this.userInfo.hospitalList.length > 1) {
 								this.hospitalList = [];
 								this.selectHospitalList = [];

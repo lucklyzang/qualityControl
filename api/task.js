@@ -57,7 +57,7 @@ export function submitTotalTaskDetails(data) {
 // 查询子检查项的检查记录
 export function queryItemDetails(checkId) {
 	return request({
-	    url: `quality/checkRecord/queryByCheckId/${checkId}`,
+	    url: `quality/checkRecord/queryAllByCheckId/${checkId}`,
 	    method: 'get'
 	  })
 }
@@ -65,6 +65,13 @@ export function queryItemDetails(checkId) {
 export function getAliyunSign() {
 	return request({
 	    url: 'quality/oss/getSign',
+	    method: 'get'
+	})
+}
+// 查询所有文件列表
+export function getFiles(workerId) {
+	return request({
+	    url: `quality/file/files/${workerId} `,
 	    method: 'get'
 	})
 }

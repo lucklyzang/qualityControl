@@ -35,7 +35,7 @@
 				</view>
 				<view class="right">
 					<text>
-						无
+						{{ userInfo.joinTime }}
 					</text>
 				</view>
 			</view>
@@ -48,7 +48,7 @@
 				</view>
 				<view class="right">
 					<text>
-						无
+						{{ userInfo.workPhone ? userInfo.workPhone : '无' }}
 					</text>
 				</view>
 			</view>
@@ -73,9 +73,7 @@
 					<text>文件查看</text>
 				</view>
 				<view class="right">
-					<text>
-						<u-icon name="arrow-right" color="#000" size="35"></u-icon>
-					</text>
+					<u-icon name="arrow-right" color="#000" size="35"></u-icon>
 				</view>
 			</view>
 			<view class="content-top-other">
@@ -86,8 +84,8 @@
 					<text>用户角色</text>
 				</view>
 				<view class="right">
-					<text>
-						无
+					<text v-for="(item,index) in roleNameList" :key="index">
+						{{ item }}
 					</text>
 				</view>
 			</view>
@@ -135,11 +133,14 @@
 				userRolePng: require("@/static/img/user-role.png")
 			}
 		},
-		onReady() {},
+		onReady() {
+			console.log('角色列表',this.roleNameList);
+		},
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'selectHospitalList'
+				'selectHospitalList',
+				'roleNameList'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -321,6 +322,9 @@
 						position: absolute;
 						right: 20px;
 						top: 0;
+						width: 60%;
+						text-align: right;
+						word-break: break-all;
 						> text {
 							color: $color-text-right;
 							padding-left: 20px;

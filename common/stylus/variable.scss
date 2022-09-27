@@ -38,3 +38,18 @@ $color-underline: #e5e5e5; // 下划线颜色
     transform: scaleY(0.5)
   }
 }
+// 一像素上边框
+@mixin top-border-1px($color) {
+  position: relative;
+  border: none;
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 1px;
+    background-color: $color;
+    transform: scaleY(0.5)
+  }
+}

@@ -1001,6 +1001,9 @@
 			height: 80px;
 			position: relative;
 			width: 100%;
+			/deep/ u-steps {
+				width: 100%
+			};
 			>image {
 				width: 100%;
 				height: 100%;

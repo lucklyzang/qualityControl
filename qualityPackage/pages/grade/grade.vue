@@ -666,16 +666,22 @@
 			
 			// 返回上一页
 			backTo() {
-				uni.redirectTo({
-					url: '/qualityPackage/pages/examineItemDetails/examineItemDetails'
+				uni.navigateBack({
+					delta: 1
 				})
+				// uni.redirectTo({
+				// 	url: '/qualityPackage/pages/examineItemDetails/examineItemDetails'
+				// })
 			},
 			
 			// 返回任务详情页
 			backToExaminePage() {
-				uni.redirectTo({
-					url: '/qualityPackage/pages/examineDetails/examineDetails'
+				uni.navigateBack({
+					delta: 1
 				})
+				// uni.redirectTo({
+				// 	url: '/qualityPackage/pages/examineDetails/examineDetails'
+				// })
 			}	
 		}	
 	}	

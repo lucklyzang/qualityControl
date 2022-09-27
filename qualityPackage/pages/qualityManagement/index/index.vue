@@ -23,7 +23,7 @@
 					<xfl-select 
 						:list="hospitalList"
 						:clearable="false"
-						:initValue="selectHospitalList[0].value"
+						:initValue="userInfo.hospitalList.length > 1 ? selectHospitalList[0].value : userInfo.hospitalList[0]['hospitalName']"
 						:showItemNum="8"
 						 @change="hosipitalChange"
 						placeholder = "请选择医院"
@@ -834,8 +834,9 @@
 			margin: auto
 		};
 		.top-area {
-			height: 160px;
+			height: 224px;
 			position: relative;
+			padding-top: 44px;
 			width: 100%;
 			>image {
 				width: 100%;
@@ -907,7 +908,7 @@
 			};
 			.tabs-title-wrapper {
 					position: absolute;
-					top: 100px;
+					top: 144px;
 					z-index: 10;
 					left: 3%;
 					background: #fff;
@@ -937,7 +938,7 @@
 			width: 100%;
 			margin: 0 auto;
 			background: #fafafa;
-			margin-top: 20px;
+			margin-top: 2px;
 			font-size: 13px;
 			display: flex;
 			flex-flow: row;

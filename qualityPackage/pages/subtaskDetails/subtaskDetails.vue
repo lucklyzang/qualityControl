@@ -169,6 +169,7 @@
 			...mapMutations([
 				'changeSubtaskInfo',
 				'changeIsSkipDetails',
+				'changeSubtaskDetails',
 				'changeCacheIndex'
 			]),
 	
@@ -211,9 +212,10 @@
 							for (let i = 0, len = this.subtaskMessage.length; i < len; i++) {
 								this.subtaskList.push({
 									subId: this.subtaskMessage[i].id,
-									taskNum: this.subtaskDetails.number, // 主任务编号
+									taskNum: this.subtaskDetails.taskNum, // 主任务编号
 									enabled: this.subtaskMessage[i].enabled, // 是否启用
-									majorId: this.subtaskMessage[i].majorId,
+									majorId: this.subtaskDetails.majorId,
+									complete: this.subtaskMessage[i].complete,
 									majorSubId: this.subtaskMessage[i].majorSubId,
 									subtaskName: this.subtaskMessage[i].name,
 									subtaskFullMark: this.subtaskMessage[i].score,
@@ -789,7 +791,7 @@
 					// 直接提交不跳转
 					this.sure()
 				} else {
-					uni.redirectTo({
+					uni.navigateTo({
 						url: '/qualityPackage/pages/grade/grade'
 					})
 				}

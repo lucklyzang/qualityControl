@@ -1,6 +1,9 @@
 <template>
 	<view class="container">
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
+		<u-modal v-model="sureCancelShow" :content="content" title="确定删除此图片?" :show-cancel-button="true" @confirm="sureCancel"
+		 @cancel="cancelSure">
+		</u-modal>
 		<u-toast ref="uToast" />
 		<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
 			<view class="slot-content">
@@ -106,18 +109,30 @@
 			<view class="examine-content-box-center">
 				<view v-for="(item, index) in imgArr" :key='index'>
 					<image :src="item" mode="aspectFit"></image>
-					<fa-icon type="window-close" size="20" color="#000000"></fa-icon>
+					<fa-icon type="window-close" size="20" color="#000000" @click="photoDelete(item,index)"></fa-icon>
 				</view>
 				<view>
 					<image class="" mode="aspectFit" :lazy-load="true" src="/static/img/plus.png"  @click="getImg"/>
 				</view>
 			</view>
 			<view class="examine-content-box-remark">
-				<u-input v-model="remark" placeholder="请输入建议" type="textarea" :border="true"  />
+				<u-input v-model="otherSuggest" placeholder="请输入建议" type="textarea" :border="true"  />
 				<view class="submit-box" @click="suggestEvent">
 					<text>提交</text>
 				</view>
 			</view>
+			<view class="suggestion-list-box">
+				<view class="suggestion-list" v-for="(item,index) in suggestionList" :key="index">
+					<view class="suggestion-date">
+						<text>{{ item.startTime}}</text>
+					</view>
+					<view class="suggestion-image-list">
+						<image :src="imgItem" v-for="(imgItem,imgIndex) in item.images"
+								 @click="imageEvent(imgItem,imgIndex)":key="imgIndex"></image>
+					</view>
+					<view class="suggestion-content">{{ item.remark }}</view>
+				</view>
+			</view>	
 			<view class="examine-content-box-check-details-title">
 				<text>检查详情</text>
 			</view>
@@ -237,16 +252,21 @@
 				taskTypeText: '',
 				imgArr: [],
 				recordList: [],
+				suggestionList: [],
 				statusBackgroundPng: require("@/static/img/status-background.png"),
 				enlargePhotoShow: false,
 				enlargeImg: '',
-				remark: '',
+				content: '',
+				otherSuggest: '',
 				temporaryImgPathArr: [],
+				imgOnlinePathArr: [],
 				fullScoreShow: true,
 				deductMarkShow: true,
 				notMarkShow: true,
 				rejectShow: true,
-				infoText: '',
+				infoText: '加载中',
+				imgIndex: '',
+				sureCancelShow: false,
 				showLoadingHint: false
 			}
 		},
@@ -256,7 +276,9 @@
 				'userInfo',
 				'subtaskInfo',
 				'subtaskDetails',
-				'selectHospitalList'
+				'selectHospitalList',
+				'timeMessage',
+				'ossMessage'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -287,7 +309,9 @@
 
 		methods: {
 			...mapMutations([
-				'changeSubtaskInfo'
+				'changeSubtaskInfo',
+				'changeTimeMessage',
+				'changeOssMessage'
 			]),
 
 			// 进入检查记录页
@@ -315,10 +339,26 @@
 			  return false
 			},
 			
+			// 图片删除事件
+			photoDelete(item, index) {
+				this.sureCancelShow = true;
+				this.imgIndex = index
+			},
+			
+			// 弹框确定按钮
+			sureCancel() {
+				this.imgArr.splice(this.imgIndex, 1);
+				this.temporaryImgPathArr.splice(this.imgIndex, 1)
+			},
+			
 			// 图片放大事件
 			imageEvent (item,index) {
 				this.enlargePhotoShow = true;
 				this.enlargeImg = `${item}`
+			},
+			
+			// 弹框取消按钮
+			cancelSure() {
 			},
 			
 			// 图片关闭事件
@@ -326,9 +366,159 @@
 				this.enlargePhotoShow = false
 			},
 			
+			// 获取阿里云签名接口
+			getSign (filePath = '') {
+				return new Promise((resolve, reject) => {
+					getAliyunSign().then((res) => {
+						if (res && res.data.code == 200) {
+							// 存储签名信息
+							this.changeOssMessage(res.data.data);
+							let temporaryTimeInfo = {};
+							temporaryTimeInfo['expire'] = Number(res.data.data.expire);
+							// 存储过期时间信息
+							this.changeTimeMessage(temporaryTimeInfo);
+							if (this.isExpire) {
+								this.uploadImageToOss(filePath)
+							};
+							this.isExpire = false;
+							resolve()
+						} else {
+							this.$refs.uToast.show({
+								title: `${res.data.data.msg}`,
+								type: 'warning'
+							});
+							reject()
+						}
+					})
+					.catch((err) => {
+						this.$refs.uToast.show({
+							title: `${err}`,
+							type: 'warning'
+						});
+						reject()
+					})
+				})	
+			},
+			
+			// 上传图片到阿里云服务器
+			uploadImageToOss (filePath) {
+				 return new Promise((resolve, reject) => {
+					 // OSS地址
+					 const aliyunServerURL = this.ossMessage.host;
+					 // 存储路径(后台固定位置+随即数+文件格式)
+					 const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + filePath.substring(filePath.lastIndexOf('.'),filePath.length);
+					 // 临时AccessKeyID0
+					 const OSSAccessKeyId = this.ossMessage.accessid;
+					 // 加密策略
+					 const policy = this.ossMessage.policy;
+					 // 签名
+					 const signature = this.ossMessage.signature;
+					 uni.uploadFile({
+					 	url: aliyunServerURL,
+					 	filePath: filePath,//要上传文件资源的路径
+					 	name: 'file',//必须填file
+					 	formData: {
+					 		'key': aliyunFileKey,
+					 		'policy': policy,
+					 		'OSSAccessKeyId': OSSAccessKeyId,
+					 		'signature': signature,
+					 		'success_action_status': '200',
+					 	},
+					 	success: (res) => {
+							if (res.statusCode == 200) {
+								this.imgOnlinePathArr.push(`${aliyunServerURL}/${aliyunFileKey}`);
+								resolve()
+							} else if (res.statusCode == 403) { 
+								// 后端签名过期后重新请求获取新的签名信息
+								this.isExpire = true;
+								this.getSign(filePath)
+							} else {
+								this.$refs.uToast.show({
+									title: '上传图片失败',
+									type: 'warning'
+								});
+								reject()
+							}
+					 	},
+					 	fail: (err) => {
+							this.$refs.uToast.show({
+								title: `${err}`,
+								type: 'warning'
+							});
+							reject()
+					 	}
+					})
+				})
+			},
+			
 			// 其它建议提交事件
-			suggestEvent () {
-				
+			async suggestEvent () {
+				this.showLoadingHint = true;
+				this.infoText = '提交中';
+				let temporaryData = {
+					score: '',
+					describe: '',
+					file: "",
+					remarks: this.otherSuggest,
+					majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+					state: this.subtaskInfo.state,	     //检查项状态
+					majorId: this.subtaskInfo.majorId,		//主任务id
+					subId: this.subtaskInfo.subId,		//子任务id
+					fullScore: this.subtaskInfo.fullScore,		//满分
+					taskNum: this.subtaskInfo.taskNum,	//任务编号
+					operator: "检查者",		//检查者（固定）
+					itemId: this.subtaskInfo.checkId,			//检查项id
+					taskItemId: this.subtaskInfo.taskItemId, //检查项id
+					majorState: this.subtaskInfo.majorState, //主任务当前状态
+					worker: this.userName,
+					additional: this.subtaskInfo.additional, //检查项类型
+					mode: '', // 操作方式（1满分3扣分2不参评）
+					operation: '', //操作方式（1满分2扣分0不参评）
+					type: 1,
+					imagePaths: [] //上传图片集合 imageList this.imgArr
+				};
+				// 上传图片到阿里云服务器
+				if (this.temporaryImgPathArr.length > 0) {
+					for (let imgI of this.temporaryImgPathArr) {
+						if (Object.keys(this.timeMessage).length > 0) {
+							// 判断签名信息是否过期
+							if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+								await this.getSign();
+								await this.uploadImageToOss(imgI)
+							} else {
+								await this.uploadImageToOss(imgI)
+							}
+						} else {
+							await this.getSign();
+							await this.uploadImageToOss(imgI)
+						}
+					};
+					temporaryData['imagePaths'] = this.imgOnlinePathArr
+				};
+				addCheckRecord(temporaryData).then((res) => {
+						this.showLoadingHint = false;
+						if (res && res.data.code == 200) {
+							this.temporaryImgPathArr = [];
+							this.otherSuggest = '';
+							this.getItemDetails(this.subtaskInfo['taskItemId']);
+							this.$refs.uToast.show({
+								title: '提交成功',
+								type: 'warning'
+							});
+						} else {
+							this.$refs.uToast.show({
+								title: `${res.data.data.msg}`,
+								type: 'success'
+							})
+						}
+					})
+					.catch((err) => {
+						this.$refs.uToast.show({
+							title: `${err}`,
+							type: 'warning'
+						});
+						this.showLoadingHint = false
+					})
 			},
 			
 			// 文件下载事件
@@ -369,14 +559,25 @@
 			getItemDetails (checkId) {
 				if (!checkId) { return };
 				this.recordList = [];
+				this.suggestionList = [];
 				this.infoText = '加载中···';
 				this.showLoadingHint = true;
 				queryItemDetails(checkId).then((res) => {
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 200) {
-						if (res.data.data.length > 0) {
-							for (let item of res.data.data) {
+						if (res.data.data.normal.length > 0) {
+							for (let item of res.data.data.normal) {
 								this.recordList.push({
+									scrutator: item['operator'],
+									startTime: item['operationTime'],
+									problemDescription: item['describe'] ? this.confirmEnding(item['describe'],'[',']') ? JSON.parse(item['describe']) : item['describe'] : '',
+									remark: item['remarks'],
+									images: item['images'],
+									files: item.hasOwnProperty('files') ? item['files'] : []
+								})
+							};
+							for (let item of res.data.data.special) {
+								this.suggestionList.push({
 									scrutator: item['operator'],
 									startTime: item['operationTime'],
 									problemDescription: item['describe'] ? this.confirmEnding(item['describe'],'[',']') ? JSON.parse(item['describe']) : item['describe'] : '',
@@ -485,6 +686,9 @@
 			
 			// 评价事件
 			gradeEvent(num) {
+				let temporarySubtaskInfo = this.subtaskInfo;
+				temporarySubtaskInfo['operation'] = num;
+				this.changeSubtaskInfo(temporarySubtaskInfo);
 				// 操作过的当前不总重复操作
 				if (num == 0) {
 					if (this.subtaskInfo.itemMode == 2) { return }
@@ -506,7 +710,7 @@
 					// 直接提交不跳转
 					this.sure()
 				} else {
-					uni.redirectTo({
+					uni.navigateTo({
 						url: '/qualityPackage/pages/grade/grade'
 					})
 				}
@@ -934,6 +1138,7 @@
 				box-sizing: border-box;
 				background: #fff;
 				width: 100%;
+				font-size: 34px;
 				>view {
 					width: 32%;
 					height: 100px;
@@ -966,7 +1171,7 @@
 				}
 			};
 			.examine-content-box-remark {
-				padding: 10px 8px 50px 8px;
+				padding: 10px 8px 10px 8px;
 				box-sizing: border-box;
 				background: #fff;
 				width: 100%;
@@ -986,6 +1191,45 @@
 					}
 				}
 			};
+			.suggestion-list-box {
+				background: #fff;
+				width: 100%;
+				.suggestion-list {
+					width: 94%;
+					margin: 0 auto;
+					margin-top: 10px;
+					@include top-border-1px(#bebebe);
+					.suggestion-date {
+						line-height: 40px;
+						height: 40px;
+						color: black;
+						font-size: 14px
+					};
+					.suggestion-image-list {
+						display: flex;
+						justify-content: flex-start;
+						flex-wrap: wrap;
+						>image {
+							width: 23.5%;
+							margin-right: 2%;
+							margin-bottom: 2%;
+							height: 80px;
+							&:nth-child(4n) {
+								margin-right: 0
+							}
+						}
+					};
+					.suggestion-content {
+						line-height: 30px;
+						color: black;
+						font-size: 16px;
+						word-break: break-all
+					};
+					&:first-child {
+						margin-top: 0
+					}
+				}
+			}	
 			.examine-content-box-check-details-title {
 				padding-left: 8px;
 				box-sizing: border-box;

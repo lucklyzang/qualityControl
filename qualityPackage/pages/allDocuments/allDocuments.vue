@@ -2,21 +2,30 @@
 	<view class="container">
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
+		<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
+			<view class="slot-content">
+				<u-icon name="close-circle-fill" @click="closeImageEvent"></u-icon>
+				<image :src="enlargeImg"></image>
+			</view>
+		</u-modal>
+		<view class="empty-info" v-if="noDataShow">
+			<u-empty text="暂无文件" mode="list"></u-empty>
+		</view>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="全部文件" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="全部文件" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content-top-area">
 			<view class="content-top-left">
 				<u-icon name="search" color="#e3e3e1" size="45"></u-icon>
-				<u-input v-model="textValue" type="text" height="65" :border="true" placeholder="在全部文件中搜索" />
+				<u-input v-model="textValue" type="text" height="65" :border="true" :clearable="false" placeholder="在全部文件中搜索" />
 			</view>
 			<view class="content-top-right">
 				<view class="search" @click="searchEvent">搜索</view>
 			</view>
 		</view>
 		<view class="content-bottom-area">
-			<view class="file-list" v-for="(item,index) in fileList" :key="index">
+			<view class="file-list" v-for="(item,index) in fileList" :key="index" @click="fileListEvent(item)">
 				<view class="file-list-top">
 					<text>
 						{{ item.fileName }}
@@ -41,7 +50,7 @@
 		mapMutations
 	} from 'vuex'
 	import {
-		queryItemDetails
+		getFiles
 	} from '@/api/task.js'
 	import {
 		setCache,
@@ -59,18 +68,11 @@
 		data() {
 			return {
 				textValue: '',
-				fileList: [
-					{
-						fileName: '手机卡洛杉矶卡卡撒撒娇萨斯喀里就是时间',
-						uploadAuthor: '张新',
-						uploadDate: '2021-03-24'
-					},
-					{
-						fileName: '手机卡洛杉矶卡卡撒撒娇萨斯喀里就是时间',
-						uploadAuthor: '张新',
-						uploadDate: '2021-03-24'
-					}
-				],
+				fileList: [],
+				noDataShow: false,
+				enlargePhotoShow: false,
+				enlargeImg: '',
+				temporaryFileList: [],
 				infoText: '加载中',
 				showLoadingHint: false
 			}
@@ -104,7 +106,8 @@
 		},
 		
 		onLoad(options) {
-				console.log(this.taskMessage)
+			this.getFilesList();
+			console.log(this.taskMessage)
 		},
 		
 		methods: {
@@ -118,8 +121,105 @@
 				})
 			},
 			
+			// 图片关闭事件
+			closeImageEvent () {
+				this.enlargePhotoShow = false
+			},
+			
+			// 文件点击事件
+			fileListEvent (item) {
+				// 判断是图片还是文件
+				if (item.file.indexOf('.png') != -1 || item.file.indexOf('.jpg') != -1 || item.file.indexOf('.gif') != -1) {
+					this.imageEvent(item.file)
+				} else {
+					this.downFileEvent(item.file)
+				}
+			},
+			
+			// 图片放大事件
+			imageEvent (item,index) {
+				this.enlargePhotoShow = true;
+				this.enlargeImg = `${item}`
+			},
+			
+			// 文件下载事件
+			downFileEvent (file) {
+				this.infoText = '下载中···';
+				this.showLoadingHint = true;
+				uni.downloadFile({
+				  url: encodeURI(`${file}`), // 文件下载地址
+				  success: response => {
+				    if (response.statusCode === 200) {
+				      uni.saveFile({
+				        tempFilePath: response.tempFilePath,
+				        success: (resData) => {
+									this.showLoadingHint = false;
+									this.$refs.uToast.show({
+										title: '下载成功',
+										type: 'success'
+									});
+									//保存成功并打开文件
+									 uni.openDocument({
+										filePath:resData.savedFilePath
+									})
+				        },
+				        fail: error => {
+									this.showLoadingHint = false;
+				          this.$refs.uToast.show({
+				          	title: `${error}`,
+				          	type: 'warning'
+				          })
+				        }
+				      })
+				    }
+				  }
+				})
+			},
+			
 			// 搜索事件
-			searchEvent () {}
+			searchEvent () {
+				if (this.textValue) {
+					this.fileList = this.temporaryFileList.filter((item) => { return item.fileName.indexOf(this.textValue) != -1 || item.uploadAuthor.indexOf(this.textValue) != -1 || item.uploadDate.indexOf(this.textValue) != -1})
+				} else {
+					this.fileList = this.temporaryFileList
+				}
+			},
+			
+			// 查询文件列表
+			getFilesList () {
+				this.showLoadingHint = true;
+				this.fileList = [];
+				getFiles(this.workerId).then((res) => {
+					if (res && res.data.code == 200) {
+						if (res.data.data.length > 0) {
+							for (let item of res.data.data) {
+								this.fileList.push({
+									fileName: item.name,
+									file: item.path,
+									uploadAuthor: item.createName,
+									uploadDate: item.createTime
+								})
+							};
+							this.temporaryFileList = this.fileList
+						} else {
+							this.noDataShow = true
+						}
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						});
+					};
+					this.showLoadingHint = false
+				})
+				.catch((err) => {
+					this.showLoadingHint = false
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'error'
+					})
+				})
+			}
 		}	
 	}	
 </script>
@@ -137,11 +237,45 @@
 		font-size: 14px;
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
+		/deep/ .u-model {
+			height: 600px;
+			padding: 15px;
+			position: relative;
+			box-sizing: border-box;
+			.u-model__content {
+				.slot-content {
+					height: 580px;
+					u-icon {
+						position: absolute;
+						top: 0;
+						right: 0;
+						z-index: 100;
+						font-size: 34px
+					}
+					image {
+						width: 100%;
+						height: 100%
+					}
+				}
+			}
+			.u-model__footer {
+				display: none
+			}
+		};
+		.empty-info {
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			right: 0;
+			margin: auto
+		};
 		.nav {
 			width: 100%
 		};
 		.content-top-area {
 			width: 96%;
+			font-size: 0;
 			height: 50px;
 			align-items: center;
 			margin: 0 auto;
