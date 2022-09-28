@@ -207,7 +207,7 @@
 				</view>
 			</view>
 			<view class="btn-content-is-pass" v-if="subtaskInfo.majorState == 5">
-				<view  @click="gradeEvent(7)">
+				<view  @click="gradeEvent(7)" v-show="subtaskInfo.state!=7">
 					<image src="/static/img/no-pass.png"></image>
 					<view class="text">不通过</view>
 				</view>
@@ -312,7 +312,7 @@
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText;
 			this.getItemDetails(this.subtaskInfo['taskItemId']);
-			console.log('撒',this.subtaskInfo['taskItemId']);
+			console.log('撒',this.subtaskInfo);
 		},
 
 		methods: {

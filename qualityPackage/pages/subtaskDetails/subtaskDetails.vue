@@ -77,7 +77,7 @@
 								</view>
 							</view>
 							<view class="operite-is-pass-btn-box" v-if="subtaskDetails.flowState == 5">
-								<view class="no-pass" @click="gradeEvent(7,checkItem)">
+								<view class="no-pass" @click="gradeEvent(7,checkItem)" v-show="checkItem.checkState !=7">
 									<text>不通过</text>
 								</view>
 								<view class="pass" @click="gradeEvent(8,checkItem)">
