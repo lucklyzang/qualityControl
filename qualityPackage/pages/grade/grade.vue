@@ -10,12 +10,12 @@
 			</nav-bar>
 		</view>
 		<view class="content">
-			<view class="score">
+			<view class="score" v-show="isShowInput">
 				<view class="left">
 					<text>{{`得分 (满分${subtaskInfo.fullScore})`}}</text>
 				</view>
 				<view class="right">
-					<u-input v-model="gradeValue" placeholder="请输入分数" type="number" :border="true"  :disabled="isDisabled"/>
+					<u-input v-model="gradeValue" placeholder="请输入分数" :disabled="isDisabled" type="number" :border="true" />
 				</view>
 			</view>
 			<view class="problem-describe" v-show="subtaskInfo.operation == 2" :class="{'problemDescribeStyle': subtaskInfo.operation == 2}">
@@ -43,9 +43,9 @@
 					</view>
 				</view>	
 			</view>
-			<view class="problem-photo" v-show="subtaskInfo.operation == 2">
+			<view class="problem-photo" v-show="subtaskInfo.operation == 2 || subtaskInfo.operation == 7 || subtaskInfo.operation == 5 || subtaskInfo.operation == -1">
 				<view> 
-					<text>问题拍照</text>
+					<text>{{subtaskInfo.operation == 2 ? '问题拍照' : '拍照'}}</text>
 				</view>
 				<view>
 					<view v-for="(item, index) in imgArr" :key='index'>
@@ -100,6 +100,7 @@
 			return {
 				gradeValue: '0',
 				infoText: '',
+				isShowInput: true,
 				problemDescribeValue: '',
 				problemDescribeList: [
 					{
@@ -129,7 +130,8 @@
 				'mainTaskId',
 				'selectHospitalList',
 				'timeMessage',
-				'ossMessage'
+				'ossMessage',
+				'enterGradeSource'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -152,6 +154,7 @@
 		},
 		
 		onLoad(options) {
+			console.log('跳转源',this.enterGradeSource);
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText
 		},
@@ -312,7 +315,8 @@
 			// 判断打分方式
 			judgeScoreWay () {
 				 this.subtaskInfo['recordRemarks'] ? this.remark = this.subtaskInfo['recordRemarks'].replace('备注:','') : this.remark = '';
-				 // 判断打分方式(1满分2扣分0不参评-1重新评价5驳回7不通过8通过);
+				// 判断打分方式(1满分2扣分0不参评-1重新评价5驳回7不通过8通过);
+				if (this.subtaskInfo['operation'] == 5 || this.subtaskInfo['operation'] == 7) {this.isShowInput = false};
 				if (this.subtaskInfo['operation'] == 1) {
 					this.isDisabled = true;
 					this.gradeValue = this.subtaskInfo['fullScore'].toString();
@@ -603,7 +607,42 @@
 								worker: "项目经理",	
 								imagePaths: [], //上传图片集合 imageList this.imgArr
 								operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+							};
+							// 上传图片到阿里云服务器
+							if (this.temporaryImgPathArr.length > 0) {
+								for (let imgI of this.temporaryImgPathArr) {
+									if (Object.keys(this.timeMessage).length > 0) {
+										// 判断签名信息是否过期
+										if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+											await this.getSign();
+											await this.uploadImageToOss(imgI)
+										} else {
+											await this.uploadImageToOss(imgI)
+										}
+									} else {
+										await this.getSign();
+										await this.uploadImageToOss(imgI)
+									}
+								};
+								temporaryData['imagePaths'] = this.imgOnlinePathArr
+							};
+							if (this.subtaskInfo.majorState == 3) {
+								// 重新评价满分的情况
+								if (this.gradeValue == this.subtaskInfo['fullScore']) {
+									temporaryData['state'] = 6;
+									temporaryData['operation'] = 7
+								} else {
+									temporaryData['state'] = 4;
+									temporaryData['operation'] = 7
+								}
+							} else if (this.subtaskInfo.majorState == 5) { 
+								if (this.subtaskInfo.operation == 8) {
+									temporaryData['state'] = 8
+								} else if (this.subtaskInfo.operation == 7) {
+									temporaryData['state'] = 7
+								}
 							}
+							this.updateTaskItemRecordMethod(temporaryData)
 					} else {
 						let temporaryData = {
 							score: this.gradeValue,  //得分
@@ -624,64 +663,58 @@
 							additional: this.subtaskInfo.additional, //检查项类型	
 							imagePaths: [], //上传图片集合 imageList this.imgArr
 							operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
-						}
-					};
-					// 上传图片到阿里云服务器
-					if (this.temporaryImgPathArr.length > 0) {
-						for (let imgI of this.temporaryImgPathArr) {
-							if (Object.keys(this.timeMessage).length > 0) {
-								// 判断签名信息是否过期
-								if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+						};
+						// 上传图片到阿里云服务器
+						if (this.temporaryImgPathArr.length > 0) {
+							for (let imgI of this.temporaryImgPathArr) {
+								if (Object.keys(this.timeMessage).length > 0) {
+									// 判断签名信息是否过期
+									if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+										await this.getSign();
+										await this.uploadImageToOss(imgI)
+									} else {
+										await this.uploadImageToOss(imgI)
+									}
+								} else {
 									await this.getSign();
 									await this.uploadImageToOss(imgI)
-								} else {
-									await this.uploadImageToOss(imgI)
 								}
-							} else {
-								await this.getSign();
-								await this.uploadImageToOss(imgI)
-							}
+							};
+							temporaryData['imagePaths'] = this.imgOnlinePathArr
 						};
-						temporaryData['imagePaths'] = this.imgOnlinePathArr
-					};
-					if (this.subtaskInfo.majorState == 3) {
-						// 重新评价满分的情况
-						if (this.gradeValue == this.subtaskInfo['fullScore']) {
-							temporaryData['state'] = 6;
-							temporaryData['operation'] = 7
-						} else {
-							temporaryData['state'] = 4;
-							temporaryData['operation'] = 7
+						if (this.subtaskInfo.majorState == 3) {
+							// 重新评价满分的情况
+							if (this.gradeValue == this.subtaskInfo['fullScore']) {
+								temporaryData['state'] = 6;
+								temporaryData['operation'] = 7
+							} else {
+								temporaryData['state'] = 4;
+								temporaryData['operation'] = 7
+							}
+						} else if (this.subtaskInfo.majorState == 5) { 
+							if (this.subtaskInfo.operation == 8) {
+								temporaryData['state'] = 8
+							} else if (this.subtaskInfo.operation == 7) {
+								temporaryData['state'] = 7
+							}
 						}
-					} else if (this.subtaskInfo.majorState == 5) { 
-						if (this.subtaskInfo.operation == 8) {
-							temporaryData['state'] = 8
-						} else if (this.subtaskInfo.operation == 7) {
-							temporaryData['state'] = 7
-						}
+						this.updateTaskItemRecordMethod(temporaryData)
 					}
-					this.updateTaskItemRecordMethod(temporaryData)
 				}
 			},
 			
 			// 返回上一页
 			backTo() {
-				uni.navigateBack({
-					delta: 1
+				uni.redirectTo({
+					url: this.enterGradeSource
 				})
-				// uni.redirectTo({
-				// 	url: '/qualityPackage/pages/examineItemDetails/examineItemDetails'
-				// })
 			},
 			
 			// 返回任务详情页
 			backToExaminePage() {
-				uni.navigateBack({
-					delta: 1
+				uni.redirectTo({
+					url: this.enterGradeSource
 				})
-				// uni.redirectTo({
-				// 	url: '/qualityPackage/pages/examineDetails/examineDetails'
-				// })
 			}	
 		}	
 	}	

@@ -45,7 +45,7 @@
 		mounted() {
 			setTimeout(() => {uni.redirectTo({
 					url: '/pages/login/login'
-				})},1000)
+				})},2000)
 		},
 		methods: {
 			...mapMutations([

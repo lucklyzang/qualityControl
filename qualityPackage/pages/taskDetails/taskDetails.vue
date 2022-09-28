@@ -79,7 +79,7 @@
 				</view>
 				<view class="item-line">
 					<text>检查陪同人:</text>
-					<text>{{taskMessage.examinationPrincipal}}</text>
+					<text>{{taskMessage.companion ? taskMessage.companion : ''}}</text>
 				</view>
 				<view class="item-line">
 					<text>备注:</text>
@@ -127,7 +127,8 @@
 				'userInfo',
 				'taskMessage',
 				'subtaskInfo',
-				'selectHospitalList'
+				'selectHospitalList',
+				'enterTaskDetailsSource'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -206,16 +207,15 @@
 	
 			// 返回上一页
 			backTo() {
-				uni.navigateBack({
-					delta: 1
+				uni.redirectTo({
+					url: this.enterTaskDetailsSource
 				})
-				// uni.redirectTo({
-				// 	url: '/qualityPackage/pages/qualityManagement/index/index'
-				// })
 			},
 			
 			backEvent() {
-				this.backTo()
+				uni.redirectTo({
+					url: this.enterTaskDetailsSource
+				})
 			}
 		}	
 	}	

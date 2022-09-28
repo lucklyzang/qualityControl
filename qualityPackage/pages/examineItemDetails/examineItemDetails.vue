@@ -1,16 +1,19 @@
 <template>
 	<view class="container">
+		<hint-dialog v-show="hintDialog" :dialogText="dialogText" :iconColor="iconColor"></hint-dialog>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-modal v-model="sureCancelShow" :content="content" title="确定删除此图片?" :show-cancel-button="true" @confirm="sureCancel"
 		 @cancel="cancelSure">
 		</u-modal>
 		<u-toast ref="uToast" />
-		<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
-			<view class="slot-content">
-				<u-icon name="close-circle-fill" @click="closeImageEvent"></u-icon>
-				<image :src="enlargeImg"></image>
-			</view>
-		</u-modal>
+		<view class="enlarge-modal-box">
+			<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
+				<view class="slot-content">
+					<u-icon name="close-circle-fill" @click="closeImageEvent"></u-icon>
+					<image :src="enlargeImg"></image>
+				</view>
+			</u-modal>
+		</view>	
 		<view class="nav">
 			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="检查项详情" @backClick="backTo">
 			</nav-bar>
@@ -240,16 +243,21 @@
 	} from '@/common/js/utils'
 	import navBar from "@/components/zhouWei-navBar"
 	import timeline from '@/components/chenbin-timeline/timeLine.vue'
+	import faIcon from "@/components/kilvn-fa-icon/fa-icon.vue"
 	import timelineItem from '@/components/chenbin-timeline/timelineItem.vue'
 	export default {
 		components: {
 			navBar,
 			timeline,
-			timelineItem
+			timelineItem,
+			faIcon
 		},
 		data() {
 			return {
 				taskTypeText: '',
+				hintDialog: false,
+				dialogText: '满分',
+				iconColor: '#1864FF',
 				imgArr: [],
 				recordList: [],
 				suggestionList: [],
@@ -300,7 +308,7 @@
 			}
 		},
 
-		onLoad(options) {
+		mounted() {
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText;
 			this.getItemDetails(this.subtaskInfo['taskItemId']);
@@ -311,7 +319,8 @@
 			...mapMutations([
 				'changeSubtaskInfo',
 				'changeTimeMessage',
-				'changeOssMessage'
+				'changeOssMessage',
+				'changeEnterGradeSource'
 			]),
 
 			// 进入检查记录页
@@ -499,12 +508,12 @@
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
 							this.temporaryImgPathArr = [];
+							this.imgArr = [];
 							this.otherSuggest = '';
 							this.getItemDetails(this.subtaskInfo['taskItemId']);
-							this.$refs.uToast.show({
-								title: '提交成功',
-								type: 'warning'
-							});
+							this.hintDialog = true;
+							this.dialogText = '提交成功';
+							this.iconColor = '#1864FF'
 						} else {
 							this.$refs.uToast.show({
 								title: `${res.data.data.msg}`,
@@ -708,16 +717,17 @@
 				// 8: '通过', 点击不跳转，直接提交
 				if (num == 0 || num == 1 || num == 8) {
 					// 直接提交不跳转
-					this.sure()
+					this.sure(num)
 				} else {
-					uni.navigateTo({
+					this.changeEnterGradeSource('/qualityPackage/pages/examineItemDetails/examineItemDetails');
+					uni.redirectTo({
 						url: '/qualityPackage/pages/grade/grade'
 					})
 				}
 			},
 			
 			// 提交事件
-			sure () {
+			sure (num) {
 				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
 					this.$refs.uToast.show({
 						title: '该子任务为其它人负责，你无操作权限',
@@ -758,9 +768,9 @@
 					if (this.subtaskInfo.state === 0) {
 						temporaryData['state'] = this.subtaskInfo.state + 1;
 						delete temporaryData.taskItemId;
-						this.addCheckRecordMethod(temporaryData)
+						this.addCheckRecordMethod(num,temporaryData)
 					} else {
-						this.updateCheckRecordMethod(temporaryData)
+						this.updateCheckRecordMethod(num,temporaryData)
 					}
 				} else {
 					let temporaryData = {
@@ -782,15 +792,24 @@
 						additional: this.subtaskInfo.additional, //检查项类型	
 						operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
 					};
-					this.updateTaskItemRecordMethod(temporaryData)
+					this.updateTaskItemRecordMethod(num,temporaryData)
 				}
 			},
 			
 			// 任务详情检查项第一次操作（满分，扣分，不参评）
-			addCheckRecordMethod (data) {
+			addCheckRecordMethod (num,data) {
 				addCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.hintDialog = true;
+						if (num == 1) {
+							this.dialogText = '已满分';
+							this.iconColor = '#289E8E'
+						} else if (num == 0) {
+							this.dialogText = '已放弃';
+							this.iconColor = '#F2A15F'
+						};
+						this.backTo();
 						if (this.subtaskInfo['majorState'] == 0) {
 							// 判断该任务是否为第一次提交(是则更改主任务状态为检查中)
 							if (!this.judgeSubTaskItemState(this.disposeSubTaskData,0)) {
@@ -818,11 +837,19 @@
 			},
 			
 			// 任务详情检查项更新操作（满分，扣分，不参评）
-			updateCheckRecordMethod (data) {
+			updateCheckRecordMethod (num,data) {
 				updateCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						this.backToExaminePage();
+						this.hintDialog = true;
+						if (num == 1) {
+							this.dialogText = '已满分';
+							this.iconColor = '#289E8E'
+						} else if (num == 0) {
+							this.dialogText = '已放弃';
+							this.iconColor = '#F2A15F'
+						};
+						this.backTo()
 					} else {
 						this.$refs.uToast.show({
 							title: `${res.data.data.msg}`,
@@ -840,10 +867,19 @@
 			},
 			
 			//任务详情检查项操作（质疑，确认，复核质疑，上传整改记录，通过，不通过）
-			updateTaskItemRecordMethod (data) {
+			updateTaskItemRecordMethod (num,data) {
 				updateTaskItem(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.hintDialog = true;
+						if (num == 8) {
+							this.dialogText = '已通过';
+							this.iconColor = '#289E8E'
+						} else if (num == -1) {
+							this.dialogText = '评价成功';
+							this.iconColor = '#1864FF'
+						};
+						this.backTo()
 					} else {
 						this.$refs.uToast.show({
 							title: `${res.data.data.msg}`,
@@ -953,31 +989,33 @@
 		font-size: 14px;
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
-		/deep/ .u-model {
-			height: 600px;
-			padding: 15px;
-			position: relative;
-			box-sizing: border-box;
-			.u-model__content {
-				.slot-content {
-					height: 580px;
-					u-icon {
-						position: absolute;
-						top: 0;
-						right: 0;
-						z-index: 100;
-						font-size: 34px
-					}
-					image {
-						width: 100%;
-						height: 100%
+		.enlarge-modal-box {
+			/deep/ .u-model {
+				height: 600px;
+				padding: 15px;
+				position: relative;
+				box-sizing: border-box;
+				.u-model__content {
+					.slot-content {
+						height: 580px;
+						u-icon {
+							position: absolute;
+							top: 0;
+							right: 0;
+							z-index: 100;
+							font-size: 34px
+						}
+						image {
+							width: 100%;
+							height: 100%
+						}
 					}
 				}
+				.u-model__footer {
+					display: none
+				}
 			}
-			.u-model__footer {
-				display: none
-			}
-		};
+		};	
 		::-webkit-scrollbar {
 			width: 0;
 			height: 0;

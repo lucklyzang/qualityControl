@@ -12,5 +12,7 @@ export function getDefaultQualityState() {
 			isSkipDetails: false,
 			timeMessage: {},
 			ossMessage: {},
+			enterTaskDetailsSource: '',
+			enterGradeSource: ''
 		}	
 };

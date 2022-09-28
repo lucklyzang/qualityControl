@@ -2,6 +2,8 @@ import { getDefaultQualityState } from '@/common/js/resetStore/resetStore.js'
 export default {
   state: getDefaultQualityState(),
   getters:{
+		enterTaskDetailsSource: state => state.enterTaskDetailsSource,
+		enterGradeSource: state => state.enterGradeSource,
     titleText: state => state.titleText,
 		taskMessage: state => state.taskMessage,
     bottomBarIndex: state => state.bottomBarIndex,
@@ -18,6 +20,12 @@ export default {
     changeTitleText (state, playLoad) {
       state.titleText = playLoad
     },
+		changeEnterTaskDetailsSource (state, playLoad) {
+		  state.enterTaskDetailsSource = playLoad
+		},
+		changeEnterGradeSource(state, playLoad) {
+		  state.enterGradeSource = playLoad
+		},
     changeBottomBarIndex (state, playLoad) {
       state.bottomBarIndex = playLoad
     },

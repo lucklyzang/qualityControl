@@ -351,7 +351,8 @@
 				'changeSelectHospitalList',
 				'changeIsSkipDetails',
 				'changeTaskMessage',
-				'resetQualityState'
+				'resetQualityState',
+				'changeEnterTaskDetailsSource'
 			]),
 			
 			
@@ -715,6 +716,7 @@
 									examinationPrincipal: this.extractPrincipal(item.persons),
 									examinationStartTime: item.startTime,
 									assessmentFormat: item.mode,
+									companion: item.companion,
 									checkName: item.checkName ? item.checkName : '',
 									isQuery: item.question,
 									fullMark: item.score,
@@ -738,8 +740,7 @@
 							title: `${res.data.data.msg}`,
 							type: 'warning'
 						});
-						this.showLoadingHint = false;
-						this.noDataShow = true
+						this.showLoadingHint = false
 					}
 				})
 				.catch((err) => {
@@ -748,7 +749,6 @@
 						type: 'error'
 					});
 					this.showLoadingHint = false;
-					this.noDataShow = true;
 					if (this.isFresh) {
 					  uni.stopPullDownRefresh();
 					  this.isFresh = false
@@ -797,10 +797,11 @@
 					this.temporaryIndex.isGoingTask = false
 				};
 				this.changeIsSkipDetails(true);
+				this.changeEnterTaskDetailsSource('/qualityPackage/pages/qualityManagement/index/index');
 				this.changeCacheIndex(this.temporaryIndex);
 				this.changeTaskMessage(item);
 				this.changeMainTaskId(item.id);
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/qualityPackage/pages/taskDetails/taskDetails'
 				})
 			}

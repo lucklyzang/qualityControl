@@ -206,7 +206,8 @@
 				'changeDisposeSubTaskData',
 				'changeIsSkipDetails',
 				'changeSubtaskDetails',
-				'changeCacheIndex'
+				'changeCacheIndex',
+				'changeEnterTaskDetailsSource'
 			]),
 			
 			// 返回上一页
@@ -250,7 +251,8 @@
 			
 			// 进入主任务详情事件
 			arrowEvent () {
-				uni.navigateTo({
+				this.changeEnterTaskDetailsSource('/qualityPackage/pages/examineDetails/examineDetails');
+				uni.redirectTo({
 					url: '/qualityPackage/pages/taskDetails/taskDetails'
 				})
 			},
@@ -1013,7 +1015,7 @@
 			};
 			>view {
 				width: 100%;
-				/deep/ .u-steps{
+				::v-deep .u-steps{
 					.u-steps__item--row  {
 						.u-steps__item__line {
 							left: 55% !important;
