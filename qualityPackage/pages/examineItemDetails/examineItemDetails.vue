@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<hint-dialog v-show="hintDialog" :dialogText="dialogText" :iconColor="iconColor"></hint-dialog>
+		<hint-dialog v-show="hintDialog" :dialogText="dialogText" :iconColor="iconColor" @setTipMsg='setTipMsg'></hint-dialog>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-modal v-model="sureCancelShow" :content="content" title="确定删除此图片?" :show-cancel-button="true" @confirm="sureCancel"
 		 @cancel="cancelSure">
@@ -322,6 +322,10 @@
 				'changeOssMessage',
 				'changeEnterGradeSource'
 			]),
+			
+			setTipMsg (text) {
+				this.hintDialog = false
+			},
 
 			// 进入检查记录页
 			enterRecord() {

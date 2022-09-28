@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<hint-dialog :dialogShow="hintDialog" :dialogText="dialogText" :iconColor="iconColor"></hint-dialog>
+		<hint-dialog v-if="hintDialog" :dialogText="dialogText" :iconColor="iconColor" @setTipMsg='setTipMsg'></hint-dialog>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
 		<view class="nav">
@@ -137,6 +137,7 @@
 			...mapGetters([
 				'titleText',
 				'userInfo',
+				'disposeSubTaskData',
 				'mainTaskId',
 				'subtaskDetails',
 				'permissionInfo',
@@ -184,6 +185,10 @@
 				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'
 				})
+			},
+			
+			setTipMsg (text) {
+				this.hintDialog = false
 			},
 			
 			scrollEvent () {

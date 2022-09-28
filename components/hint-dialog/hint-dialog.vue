@@ -1,5 +1,5 @@
 <template>
-	<view class="contain" v-show="dialogShow">
+	<view class="contain">
 		<view class="contain-content">
 			<u-icon name="checkmark-circle" :size="iconSize" :color="iconColor"></u-icon>
 			<text :style="{'color':iconColor}">{{dialogText}}</text>
@@ -26,28 +26,26 @@
 			durationTime: {
 				type: Number,
 				default: 2000
-			},
-			dialogShow: {
-				type: Boolean,
-				default: false
 			}
 		},
 		data () {
 			return {
-			}
-		},
-		watch: {
-			dialogShow () {
-				this.showEvent()
+				isMsg: ''
 			}
 		},
 		mounted () {
-			this.showEvent()
+			this.isMsg = this.dialogText;
+			console.log(this.isMsg);
+			this.isShow();
 		},
 		methods: {
-			showEvent () {
-				setTimeout(()=> { console.log('关闭'); this.dialogShow = false },this.durationTime)
+			isShow () {
+			if (this.isMsg) {
+			  setTimeout(() => {
+				this.$emit('setTipMsg')
+			  }, 2000);
 			}
+		  }
 		}
 	};
 </script>
