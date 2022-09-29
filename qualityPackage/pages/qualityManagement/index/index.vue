@@ -35,7 +35,7 @@
 				<view class="tabs-title-wrapper">
 					<view class="tabs-name">任务列表</view>
 					<view class="tabs-title">
-							<u-tabs :list="statusList" :is-scroll="false" font-size="35" active-color="#2c9af1" inactive-color="#7d7d7d" bar-width="150" :current="current" @change="tabChange"></u-tabs>
+							<u-tabs :list="statusList" :is-scroll="false" font-size="35" active-color="#1864FF" inactive-color="#101010" bar-width="100" :current="current" @change="tabChange"></u-tabs>
 					</view>
 				</view>	
 		</view>
@@ -872,6 +872,7 @@
 				};
 				.top-text {
 					color: #fff;
+					font-size: 12px;
 					z-index: 1000
 				}
 			};
@@ -1009,8 +1010,8 @@
 						position: absolute;
 						top: 0;
 						left: 10px;
-						width: 20px;
-						height: 20px;
+						width: 22px;
+						height: 22px;
 						>image {
 							width: 100%;
 							height: 100%
@@ -1021,7 +1022,7 @@
 						top: 0;
 						right: 10px;
 						max-width: 150px;
-						font-size: 14px;
+						font-size: 12px;
 						text-align: center;
 						height: 30px;
 						line-height: 30px;
@@ -1061,7 +1062,7 @@
 							line-height: 25px;
 							word-break: break-all;
 							>text {
-								color: black;
+								color: #101010;
 								font-weight: bold;
 							}
 						}
@@ -1070,10 +1071,11 @@
 						.content-assessment-format {
 							width: 100%;
 							line-height: 25px;
+							margin: 4px 0;
 							word-break: break-all;
 							font-size: 14px;
 							>text {
-								color: #bfbfbf
+								color: #9E9E9A
 							}
 						}
 					};
@@ -1084,13 +1086,13 @@
 							word-break: break-all;
 							font-size: 14px;
 							>text {
-								color: #bfbfbf
+								color: #9E9E9A
 							}
 						}
 					};
 					.status-content-middle-four-line {
 						display: inline-block;
-						margin-top: 4px;
+						margin-top: 5px;
 						> view {
 							max-width: 100%;
 							background: #dae6ff;
@@ -1098,9 +1100,9 @@
 							padding: 0 10px;
 							box-sizing: border-box;
 							text-align: left;
-							height: 30px;
-							line-height: 30px;
-							font-size: 13px;
+							height: 23px;
+							line-height: 23px;
+							font-size: 12px;
 							// overflow: hidden;
 							> text {
 								display: inline-block;
@@ -1139,7 +1141,7 @@
 						color: #666 !important
 					};
 					text {
-						font-size: 15px;
+						font-size: 14px;
 						width: 90px;
 						height: 30px;
 						border-radius: 20px;

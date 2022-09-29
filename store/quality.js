@@ -14,7 +14,8 @@ export default {
 		cacheIndex: state => state.cacheIndex,
 		isSkipDetails: state => state.isSkipDetails,
 		timeMessage: state => state.timeMessage,
-		ossMessage: state => state.ossMessage
+		ossMessage: state => state.ossMessage,
+		recordExamineItemScrollTop: state => state.recordExamineItemScrollTop
   },
   mutations:{
     changeTitleText (state, playLoad) {
@@ -55,6 +56,9 @@ export default {
 		},
 		changeOssMessage (state, playLoad) {
 			state.ossMessage = playLoad
+		},
+		changeRecordExamineItemScrollTop (state, playLoad) {
+			state.recordExamineItemScrollTop = playLoad
 		},
 		//重置质量管理的状态
 		resetQualityInfoState(state) {

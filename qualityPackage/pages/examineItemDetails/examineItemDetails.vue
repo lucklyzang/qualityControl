@@ -1,13 +1,13 @@
 <template>
 	<view class="container">
-		<hint-dialog v-show="hintDialog" :dialogText="dialogText" :iconColor="iconColor" @setTipMsg='setTipMsg'></hint-dialog>
+		<hint-dialog v-if="hintDialog" :dialogText="dialogText" :iconColor="iconColor" @setTipMsg='setTipMsg'></hint-dialog>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-modal v-model="sureCancelShow" :content="content" title="确定删除此图片?" :show-cancel-button="true" @confirm="sureCancel"
 		 @cancel="cancelSure">
 		</u-modal>
 		<u-toast ref="uToast" />
 		<view class="enlarge-modal-box">
-			<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
+			<u-modal v-model="enlargePhotoShow" width="100%" :zoom="false" :show-title="false" :mask-close-able="true">
 				<view class="slot-content">
 					<u-icon name="close-circle-fill" @click="closeImageEvent"></u-icon>
 					<image :src="enlargeImg"></image>
@@ -172,7 +172,7 @@
 			</view>
 		</view>
 		<view class="operta-box">
-			<image :src="statusBackgroundPng"></image>
+			<image :src="examineItemDetailsBg"></image>
 			<view class="btn-content" v-if="subtaskInfo.majorState == 1 || subtaskInfo.majorState == 0">
 				<view>
 					<view @click="gradeEvent(0)" :class="{'imgBoxImageStyle': subtaskInfo.itemMode == 2 }">
@@ -207,11 +207,11 @@
 				</view>
 			</view>
 			<view class="btn-content-is-pass" v-if="subtaskInfo.majorState == 5">
-				<view  @click="gradeEvent(7)" v-show="subtaskInfo.state!=7">
+				<view  @click="gradeEvent(7)" v-if="subtaskInfo.state != 7">
 					<image src="/static/img/no-pass.png"></image>
 					<view class="text">不通过</view>
 				</view>
-				<view @click="gradeEvent(8)">
+				<view @click="gradeEvent(8)" v-if="subtaskInfo.state != 8">
 					<image src="/static/img/pass.png"></image>
 					<view class="text">通过</view>
 				</view>
@@ -231,6 +231,7 @@
 	} from 'vuex'
 	import {
 		queryItemDetails,
+		queryItemRecords,
 		addCheckRecord,
 		updateCheckRecord,
 		updateTaskItem,
@@ -261,7 +262,7 @@
 				imgArr: [],
 				recordList: [],
 				suggestionList: [],
-				statusBackgroundPng: require("@/static/img/status-background.png"),
+				examineItemDetailsBg: require("@/static/img/examine-item-details-bg.png"),
 				enlargePhotoShow: false,
 				enlargeImg: '',
 				content: '',
@@ -309,10 +310,11 @@
 		},
 
 		mounted() {
+			console.log('检查项详情store',this.subtaskInfo);
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText;
 			this.getItemDetails(this.subtaskInfo['taskItemId']);
-			console.log('撒',this.subtaskInfo);
+			this.getItemRecords(this.subtaskInfo['taskItemId'])
 		},
 
 		methods: {
@@ -477,7 +479,7 @@
 					state: this.subtaskInfo.state,	     //检查项状态
 					majorId: this.subtaskInfo.majorId,		//主任务id
 					subId: this.subtaskInfo.subId,		//子任务id
-					fullScore: this.subtaskInfo.fullScore,		//满分
+					fullScore: '',		//满分
 					taskNum: this.subtaskInfo.taskNum,	//任务编号
 					operator: "检查者",		//检查者（固定）
 					itemId: this.subtaskInfo.checkId,			//检查项id
@@ -514,7 +516,7 @@
 							this.temporaryImgPathArr = [];
 							this.imgArr = [];
 							this.otherSuggest = '';
-							this.getItemDetails(this.subtaskInfo['taskItemId']);
+							this.getItemRecords(this.subtaskInfo['taskItemId']);
 							this.hintDialog = true;
 							this.dialogText = '提交成功';
 							this.iconColor = '#1864FF'
@@ -568,14 +570,38 @@
 				})
 			},
 			
-			// 查询检查记录详情
+			// 查询检查详情事件
 			getItemDetails (checkId) {
+				if (!checkId) { return };
+				queryItemDetails(checkId).then((res) => {
+					if ( res && res.data.code == 200) {
+						let temporaryInfo = this.subtaskInfo;
+						temporaryInfo['itemMode'] = res.data.data.itemMode;
+						temporaryInfo['state'] = res.data.data.state;
+						this.changeSubtaskInfo(temporaryInfo)
+					} else {
+						this.$refs.uToast.show({
+							title: `${res.data.data.msg}`,
+							type: 'warning'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+						title: `${err}`,
+						type: 'warning'
+					})
+				})
+			},
+			
+			// 查询检查记录详情
+			getItemRecords (checkId) {
 				if (!checkId) { return };
 				this.recordList = [];
 				this.suggestionList = [];
 				this.infoText = '加载中···';
 				this.showLoadingHint = true;
-				queryItemDetails(checkId).then((res) => {
+				queryItemRecords(checkId).then((res) => {
 					this.showLoadingHint = false;
 					if ( res && res.data.code == 200) {
 						if (res.data.data.normal.length > 0) {
@@ -813,7 +839,7 @@
 							this.dialogText = '已放弃';
 							this.iconColor = '#F2A15F'
 						};
-						this.backTo();
+						this.getItemDetails(this.subtaskInfo['taskItemId']);
 						if (this.subtaskInfo['majorState'] == 0) {
 							// 判断该任务是否为第一次提交(是则更改主任务状态为检查中)
 							if (!this.judgeSubTaskItemState(this.disposeSubTaskData,0)) {
@@ -853,7 +879,7 @@
 							this.dialogText = '已放弃';
 							this.iconColor = '#F2A15F'
 						};
-						this.backTo()
+						this.getItemDetails(this.subtaskInfo['taskItemId'])
 					} else {
 						this.$refs.uToast.show({
 							title: `${res.data.data.msg}`,
@@ -881,9 +907,9 @@
 							this.iconColor = '#289E8E'
 						} else if (num == -1) {
 							this.dialogText = '评价成功';
-							this.iconColor = '#1864FF'
-						};
-						this.backTo()
+							this.iconColor = '#1864FF';
+						}
+						this.getItemDetails(this.subtaskInfo['taskItemId'])
 					} else {
 						this.$refs.uToast.show({
 							title: `${res.data.data.msg}`,
@@ -1001,7 +1027,7 @@
 				box-sizing: border-box;
 				.u-model__content {
 					.slot-content {
-						height: 580px;
+						height: 600px;
 						u-icon {
 							position: absolute;
 							top: 0;
@@ -1146,7 +1172,7 @@
 			background: #f5f5f5;
 			border-radius: 4px;
 			color: black;
-			padding-bottom: 160px;
+			padding-bottom: 140px;
 			box-sizing: border-box;
 			font-size: 14px;
 			.examine-content-title {
@@ -1369,11 +1395,10 @@
 		}
 		.operta-box {
 			width: 100%;
-			height: 160px;
+			height: 130px;
 			position: fixed;
 			left: 0;
 			bottom: 0;
-			background: #5d76e8;
 			>image {
 				width: 100%;
 				height: 100%;
@@ -1382,7 +1407,7 @@
 				left: 0
 			};
 			.btn-content {
-				margin-top: -20px;
+				margin-top: -15px;
 				display: flex;
 				flex-direction: row nowrap;
 				justify-content: center;
@@ -1427,7 +1452,7 @@
 				}
 			};
 			.btn-content-query {
-				margin-top: -20px;
+				margin-top: -15px;
 				display: flex;
 				flex-flow: row nowrap;
 				justify-content: center;
@@ -1452,7 +1477,7 @@
 				}
 			};
 			.btn-content-is-pass {
-				margin-top: -20px;
+				margin-top: -15px;
 				display: flex;
 				flex-flow: row nowrap;
 				justify-content: center;

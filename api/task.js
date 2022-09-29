@@ -55,9 +55,16 @@ export function submitTotalTaskDetails(data) {
 	  })
 }
 // 查询子检查项的检查记录
-export function queryItemDetails(checkId) {
+export function queryItemRecords(checkId) {
 	return request({
 	    url: `quality/checkRecord/queryAllByCheckId/${checkId}`,
+	    method: 'get'
+	  })
+}
+// 查询子检查项详情
+export function queryItemDetails(checkId) {
+	return request({
+	    url: `quality/taskCheckItem/itemInfo/${checkId}`,
 	    method: 'get'
 	  })
 }

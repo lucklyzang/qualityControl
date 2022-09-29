@@ -2,6 +2,7 @@
 export function getDefaultQualityState() {
     return {
 			titleText: '',
+			recordExamineItemScrollTop: 0,
 			bottomBarIndex: 0,
 			taskMessage: {},
 			mainTaskId: '',

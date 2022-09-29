@@ -207,7 +207,8 @@
 				'changeIsSkipDetails',
 				'changeSubtaskDetails',
 				'changeCacheIndex',
-				'changeEnterTaskDetailsSource'
+				'changeEnterTaskDetailsSource',
+				'changeRecordExamineItemScrollTop'
 			]),
 			
 			// 返回上一页
@@ -263,6 +264,8 @@
 				temporaryObject = item;
 				temporaryObject['flowState'] = this.flowState;
 				this.changeSubtaskDetails(temporaryObject);
+				// 重置检查项滚动距离
+				this.changeRecordExamineItemScrollTop(0);
 				uni.redirectTo({
 					url: '/qualityPackage/pages/subtaskDetails/subtaskDetails'
 				});

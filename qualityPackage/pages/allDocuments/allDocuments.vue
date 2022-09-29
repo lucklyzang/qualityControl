@@ -2,7 +2,7 @@
 	<view class="container">
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
-		<u-modal v-model="enlargePhotoShow" width="90%" :zoom="false" :show-title="false" :mask-close-able="true">
+		<u-modal v-model="enlargePhotoShow" width="100%" :zoom="false" :show-title="false" :mask-close-able="true">
 			<view class="slot-content">
 				<u-icon name="close-circle-fill" @click="closeImageEvent"></u-icon>
 				<image :src="enlargeImg"></image>
@@ -244,7 +244,7 @@
 			box-sizing: border-box;
 			.u-model__content {
 				.slot-content {
-					height: 580px;
+					height: 600px;
 					u-icon {
 						position: absolute;
 						top: 0;

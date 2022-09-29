@@ -79,7 +79,7 @@
 				</view>
 				<view class="item-line">
 					<text>检查陪同人:</text>
-					<text>{{taskMessage.companion ? taskMessage.companion : ''}}</text>
+					<text>{{taskMessage.companion ? taskMessage.companion : '无'}}</text>
 				</view>
 				<view class="item-line">
 					<text>备注:</text>

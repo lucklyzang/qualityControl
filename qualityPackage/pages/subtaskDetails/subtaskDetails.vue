@@ -28,65 +28,67 @@
 				</view>
 			</view>
 			<view class="content-bottom-area" ref="contentBottomArea">
-				<view class="subtask-item-list" v-for="(itemInner,indexInner) in subtaskDetails.checkItem" :key="indexInner">
-					<view class="subtask-item-name">
-						{{itemInner.checkItemName.length == 0 ? '无标签' : itemInner.checkItemName}}
+				<scroll-view style="height:100%" scroll-y="true" @scroll="scroll" :scroll-top="scrollTop">
+					<view class="subtask-item-list" v-for="(itemInner,indexInner) in subtaskDetails.checkItem" :key="indexInner">
+						<view class="subtask-item-name">
+							{{itemInner.checkItemName.length == 0 ? '无标签' : itemInner.checkItemName}}
+						</view>
+						<view class="subtask-subitem-list" v-for="(checkItem,checkIndex) in itemInner.checkItemList" :key="checkIndex">
+							<view class="subtask-subitem-top">
+								<view class="subtask-subitem-top-left">
+									<text>得分 : {{ `${checkItem.checkState == 0 || checkItem.itemMode == 2 ? '-' : checkItem.score}/${checkItem.itemMode == 2 ? '-' : checkItem.fullScore}`}}</text>
+								</view>
+								<view class="subtask-subitem-top-right" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
+									{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && subtaskDetails.flowState == 3},
+									{'willChangeStyle': checkItem.checkState == 4 && subtaskDetails.flowState == 4},{'changedStyle': checkItem.checkState == 5},
+									{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
+									{'passStyle': checkItem.checkState == 8}]"
+								>
+									<text>{{taskItemStatusTransfer(checkItem.checkState)}}</text>
+								</view>
+							</view>
+							<view class="subtask-subitem-center">
+								<text>检查描述 : </text>
+								<text>
+									{{ checkItem.itemName}}
+								</text>
+							</view>
+							<view class="subtask-subitem-bottom">
+								<view class="subtask-subitem-bottom-left" @click="checkItemClickEvent(checkItem)">
+									<text>详情</text>
+									<u-icon name="arrow-right" color="#3175ff" size="30"></u-icon>
+								</view>
+								<view class="subtask-subitem-bottom-right" v-if="subtaskDetails.flowState == 1 || subtaskDetails.flowState == 0">
+									<view class="no-evaluate" @click="gradeEvent(0,checkItem)" :class="{'noEvaluateStyle' : checkItem.itemMode == 2}">
+										<text>不参评</text>
+									</view>
+									<view class="deduct-mark" @click="gradeEvent(2,checkItem)" :class="{'deductMarkStyle' :checkItem.itemMode == 3}">
+										<text>扣分</text>
+									</view>
+									<view class="full-mark" @click="gradeEvent(1,checkItem)" :class="{'fullMarkStyle': checkItem.itemMode == 1 }">
+										<text>满分</text>
+									</view>
+								</view>
+								<view class="operite-query-btn-box" v-if="subtaskDetails.flowState == 3">
+									<view class="revaluation" @click="gradeEvent(-1,checkItem)">
+										<text>重新评价</text>
+									</view>
+									<view class="reject" @click="gradeEvent(5,checkItem)">
+										<text>驳回</text>
+									</view>
+								</view>
+								<view class="operite-is-pass-btn-box" v-if="subtaskDetails.flowState == 5">
+									<view class="no-pass" @click="gradeEvent(7,checkItem)" v-show="checkItem.checkState != 7">
+										<text>不通过</text>
+									</view>
+									<view class="pass" @click="gradeEvent(8,checkItem)" v-show="checkItem.checkState != 8">
+										<text>通过</text>
+									</view>
+								</view>
+							</view>
+						</view>
 					</view>
-					<view class="subtask-subitem-list" v-for="(checkItem,checkIndex) in itemInner.checkItemList" :key="checkIndex">
-						<view class="subtask-subitem-top">
-							<view class="subtask-subitem-top-left">
-								<text>得分 : {{ `${checkItem.checkState == 0 || checkItem.itemMode == 2 ? '-' : checkItem.score}/${checkItem.itemMode == 2 ? '-' : checkItem.fullScore}`}}</text>
-							</view>
-							<view class="subtask-subitem-top-right" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
-								{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && subtaskDetails.flowState == 3},
-								{'willChangeStyle': checkItem.checkState == 4 && subtaskDetails.flowState == 4},{'changedStyle': checkItem.checkState == 5},
-								{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
-								{'passStyle': checkItem.checkState == 8}]"
-							>
-								<text>{{taskItemStatusTransfer(checkItem.checkState)}}</text>
-							</view>
-						</view>
-						<view class="subtask-subitem-center">
-							<text>检查描述 : </text>
-							<text>
-								{{ checkItem.itemName}}
-							</text>
-						</view>
-						<view class="subtask-subitem-bottom">
-							<view class="subtask-subitem-bottom-left" @click="checkItemClickEvent(checkItem)">
-								<text>详情</text>
-								<u-icon name="arrow-right" color="#3175ff" size="30"></u-icon>
-							</view>
-							<view class="subtask-subitem-bottom-right" v-if="subtaskDetails.flowState == 1 || subtaskDetails.flowState == 0">
-								<view class="no-evaluate" @click="gradeEvent(0,checkItem)" :class="{'noEvaluateStyle' : checkItem.itemMode == 2}">
-									<text>不参评</text>
-								</view>
-								<view class="deduct-mark" @click="gradeEvent(2,checkItem)" :class="{'deductMarkStyle' :checkItem.itemMode == 3}">
-									<text>扣分</text>
-								</view>
-								<view class="full-mark" @click="gradeEvent(1,checkItem)" :class="{'fullMarkStyle': checkItem.itemMode == 1 }">
-									<text>满分</text>
-								</view>
-							</view>
-							<view class="operite-query-btn-box" v-if="subtaskDetails.flowState == 3">
-								<view class="revaluation" @click="gradeEvent(-1,checkItem)">
-									<text>重新评价</text>
-								</view>
-								<view class="reject" @click="gradeEvent(5,checkItem)">
-									<text>驳回</text>
-								</view>
-							</view>
-							<view class="operite-is-pass-btn-box" v-if="subtaskDetails.flowState == 5">
-								<view class="no-pass" @click="gradeEvent(7,checkItem)" v-show="checkItem.checkState !=7">
-									<text>不通过</text>
-								</view>
-								<view class="pass" @click="gradeEvent(8,checkItem)">
-									<text>通过</text>
-								</view>
-							</view>
-						</view>
-					</view>
-				</view>
+				</scroll-view>	
 			</view>
 		</view>
 	</view>
@@ -124,6 +126,7 @@
 		data() {
 			return {
 				infoText: '加载中',
+				scrollTop: 0,
 				hintDialog: false,
 				dialogText: '满分',
 				iconColor: '#1864FF',
@@ -144,7 +147,8 @@
 				'taskMessage',
 				'subtaskInfo',
 				'permissionInfo',
-				'selectHospitalList'
+				'selectHospitalList',
+				'recordExamineItemScrollTop'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -166,9 +170,9 @@
 			}
 		},
 		
+		
 		mounted() {
-			this.getSubtaskDetails(this.subtaskDetails.majorId,this.subtaskDetails.subId);
-			console.log('刷新',this.subtaskDetails)
+			this.getSubtaskDetails(this.subtaskDetails.majorId,this.subtaskDetails.subId)
 		},
 		
 		methods: {
@@ -177,7 +181,8 @@
 				'changeIsSkipDetails',
 				'changeSubtaskDetails',
 				'changeCacheIndex',
-				'changeEnterGradeSource'
+				'changeEnterGradeSource',
+				'changeRecordExamineItemScrollTop'
 			]),
 	
 			// 返回上一页
@@ -191,8 +196,10 @@
 				this.hintDialog = false
 			},
 			
-			scrollEvent () {
-				console.log(this.$refs['contentBottomArea'])
+			// 监听检查项列表滚动距离
+			scroll (event) {
+				//存储列表滚动距离
+				this.changeRecordExamineItemScrollTop(Math.ceil(event.detail.scrollTop))
 			},
 			
 			//提取负责人
@@ -506,8 +513,8 @@
 												// 判断之前的数组里是否存在相同的标签名
 												let tagsIndex = this.subtaskList[i]['checkItem'].indexOf(this.subtaskList[i]['checkItem'].filter((tagName) => { return tagName['checkItemName'] == JSON.parse(innerItem['tags'])[0]['name']})[0]);
 												if (tagsIndex != -1) {
-													if (this.flowState == 3 || this.flowState == 5) {
-														if (this.flowState == 3) {
+													if (this.subtaskDetails.flowState == 3 || this.subtaskDetails.flowState == 5) {
+														if (this.subtaskDetails.flowState == 3) {
 															if (innerItem['state'] != 8 && innerItem['state'] != 6 && innerItem['state'] != 4) {
 																this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																	confirm : innerItem['confirm'], //是否确认地点
@@ -570,6 +577,7 @@
 																})
 															}
 														} else {
+															// 静茹了
 															this.subtaskList[i]['checkItem'][tagsIndex]['checkItemList'].push({
 																confirm : innerItem['confirm'], //是否确认地点
 																standard : innerItem['standard'], //评价标准
@@ -683,6 +691,8 @@
 									}
 								}
 							};
+							// 恢复检查项之前的滚动距离
+							this.scrollTop = this.recordExamineItemScrollTop;
 							// 子任务详情数据存入store
 							let temporaryObject = {};
 							temporaryObject = this.subtaskList[0];
@@ -724,13 +734,13 @@
 				if (index == 0) {
 					transferStr = '未评价'
 				} else if (index == 1) {
-					if (this.flowState == 1) {
+					if (this.subtaskDetails.flowState == 1) {
 						transferStr = '已评价'
 					} else {
-						transferStr = '已评价'
+						transferStr = '待确认'
 					}
 				}  else if (index == 2) {
-					if (this.flowState == 2) {
+					if (this.subtaskDetails.flowState == 2) {
 						transferStr = '请复核'
 					} else {
 						transferStr = '待复核'
