@@ -17,7 +17,7 @@
 					</view>
 					<view class="subtask-item-right">
 						<view class="subtask-item-right-top">
-								<u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#299f8f' : '#3e7dff'" :percent="subtaskDetails.complete">
+								<u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#289E8E' : '#1684FC'" :percent="subtaskDetails.complete">
 								</u-circle-progress>
 						</view>
 						<view class="subtask-item-right-bottom">
@@ -56,7 +56,7 @@
 							<view class="subtask-subitem-bottom">
 								<view class="subtask-subitem-bottom-left" @click="checkItemClickEvent(checkItem)">
 									<text>详情</text>
-									<u-icon name="arrow-right" color="#3175ff" size="30"></u-icon>
+									<u-icon name="arrow-right" color="#1864FF" size="30"></u-icon>
 								</view>
 								<view class="subtask-subitem-bottom-right" v-if="subtaskDetails.flowState == 1 || subtaskDetails.flowState == 0">
 									<view class="no-evaluate" @click="gradeEvent(0,checkItem)" :class="{'noEvaluateStyle' : checkItem.itemMode == 2}">
@@ -81,7 +81,7 @@
 									<view class="no-pass" @click="gradeEvent(7,checkItem)" v-show="checkItem.checkState != 7">
 										<text>不通过</text>
 									</view>
-									<view class="pass" @click="gradeEvent(8,checkItem)" v-show="checkItem.checkState != 8">
+									<view class="pass" @click="gradeEvent(8,checkItem)">
 										<text>通过</text>
 									</view>
 								</view>
@@ -182,7 +182,10 @@
 				'changeSubtaskDetails',
 				'changeCacheIndex',
 				'changeEnterGradeSource',
-				'changeRecordExamineItemScrollTop'
+				'changeRecordExamineItemScrollTop',
+				'changeIsShowRevaluationBtn',
+				'changeIsShowRejectBtn',
+				'changeTitleText'
 			]),
 	
 			// 返回上一页
@@ -691,14 +694,15 @@
 									}
 								}
 							};
-							// 恢复检查项之前的滚动距离
-							this.scrollTop = this.recordExamineItemScrollTop;
 							// 子任务详情数据存入store
 							let temporaryObject = {};
 							temporaryObject = this.subtaskList[0];
 							temporaryObject['flowState'] = this.subtaskDetails.flowState;
 							this.changeSubtaskDetails(temporaryObject);
-							console.log('更新后的详情数据',this.subtaskList)
+							this.$nextTick(() => {
+								// 恢复检查项之前的滚动距离
+								this.scrollTop = this.recordExamineItemScrollTop
+							})
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -734,7 +738,7 @@
 				if (index == 0) {
 					transferStr = '未评价'
 				} else if (index == 1) {
-					if (this.subtaskDetails.flowState == 1) {
+					if (this.subtaskDetails.flowState == 1 || this.subtaskDetails.flowState == 0) {
 						transferStr = '已评价'
 					} else {
 						transferStr = '待确认'
@@ -808,6 +812,15 @@
 					// 直接提交不跳转
 					this.sure(num)
 				} else {
+					if (num == 2) {
+						this.changeTitleText('扣分')
+					} else if (num == -1) {
+						this.changeTitleText('重新评价')
+					} else if (num == 5) {
+						this.changeTitleText('驳回')
+					} else if (num == 7) {
+						this.changeTitleText('不通过')
+					};
 					this.changeEnterGradeSource('/qualityPackage/pages/subtaskDetails/subtaskDetails');
 					uni.redirectTo({
 						url: '/qualityPackage/pages/grade/grade'
@@ -1029,7 +1042,6 @@
 			
 			// 检查项详情点击事件
 			checkItemClickEvent (checkItem) {
-				console.log('检查项详情',checkItem,this.subtaskDetails);
 				// 判断是否为检查者
 				if (!this.judgePermission(this.permissionInfo)) {
 					this.$refs.uToast.show({
@@ -1038,6 +1050,8 @@
 					});
 					return
 				};
+				this.changeIsShowRevaluationBtn(true);
+				this.changeIsShowRejectBtn(true);
 				let temporaryInfo = {
 				 	majorSubId: this.subtaskDetails['majorSubId'],  //主任务子任务关联id
 				 	state: checkItem['checkState'],	 //检查项状态
@@ -1113,7 +1127,7 @@
 				border: 1px solid #e7e7e7;
 				padding: 10px;
 				box-sizing: border-box;
-				box-shadow: 0px 15px 10px -15px #b0d2ff;
+				box-shadow: 0px 1px 3px 0 rgba(0, 0, 0, 0.23);
 				&:last-child {
 					margin-bottom: 0
 				};
@@ -1121,14 +1135,14 @@
 					width: 70%;
 					.subtask-item-title {
 						margin-bottom: 6px;
-						color: black;
+						color: #101010;
 						word-break: break-all;
 						font-size: 16px;
 					};
 					.subtask-item-oerson {
 						margin-bottom: 6px;
 						word-break: break-all;
-						color: #adada9;
+						color: #9E9E9A;
 						font-size: 14px;
 						margin: 12px 0
 					};
@@ -1136,8 +1150,8 @@
 						font-size: 12px;
 						width: 110px;
 						padding: 0 6px;
-						color: #3e7dff;
-						border: 1px solid #3e7dff;
+						color: #1864FF;
+						border: 1px solid #1864FF;
 						height: 24px;
 						border-radius: 20px;
 						text-align: center;
@@ -1154,15 +1168,15 @@
 					.subtask-item-right-bottom {
 						margin-top: 6px;
 						.textStyle {
-							color: #299f8f !important
+							color: #289E8E !important
 						};
 						text {
 							font-size: 12px;
 							&:first-child {
-								color: #adada9
+								color: #9E9E9A
 							};
 							&:last-child {
-								color: #3e7dff
+								color: #1864FF
 							}
 						}
 					}
@@ -1184,7 +1198,7 @@
 					height: 40px;
 					line-height: 40px;
 					font-size: 14px;
-					color: black;
+					color: #101010;
 					font-weight: bold
 				};
 				.subtask-subitem-list {
@@ -1201,15 +1215,15 @@
 						flex-flow: row nowrap;
 						align-items: center;
 						justify-content: space-between;
-						@include bottom-border-1px(#cecece);
+						@include bottom-border-1px(rgba(187, 187, 187, 0.47));
 						.subtask-subitem-top-left {
-							color: black;
-							font-size: 13px
+							color: #101010;
+							font-size: 14px
 						};
 						.subtask-subitem-top-right {
-							color: #518aff;
+							color: #1864FF;
 							font-weight: bold;
-							font-size: 13px
+							font-size: 14px
 						};
 						.willEvaluateStyle {
 							color: #1864FF !important
@@ -1240,7 +1254,7 @@
 					.subtask-subitem-center {
 						padding: 0 12px;
 						box-sizing: border-box;
-						color: #b7b7b4;
+						color: #9E9E9A;
 						line-height: 20px;
 						font-size: 12px;
 						word-break: break-all;
@@ -1248,7 +1262,7 @@
 						margin: 4px 0;
 						>text {
 							&:first-child {
-								color: black
+								color: #101010
 							}
 						}
 					};
@@ -1263,9 +1277,14 @@
 						.subtask-subitem-bottom-left {
 							>text {
 								font-size: 12px;
-								color: #3175ff;
+								color: #1864FF;
 								font-weight: bold;
 								margin-right: 20px
+							};
+							::v-deep {
+								.u-icon {
+									vertical-align: middle
+								}
 							}
 						};
 						.subtask-subitem-bottom-right {

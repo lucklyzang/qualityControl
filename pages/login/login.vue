@@ -65,9 +65,9 @@
           <image src="/static/img/weixin.png">
         </view>
       </view> -->
-      <view class="bottom-character">
+      <!-- <view class="bottom-character">
         <text>内部系统,仅限医护进行下单使用</text>
-      </view>
+      </view> -->
 		</view>
 	</view>
 </template>
@@ -331,7 +331,15 @@
         .remember-password-content {
           position: absolute;
           top: 0;
-          right: 0
+          right: 20px;
+					::v-deep .u-checkbox-group{
+						.u-checkbox {
+							.u-checkbox__label {
+								color: #565656 !important;
+								font-weight: 14px !important
+							}
+						}
+					}
         }
       }
 			.form-btn {
@@ -344,7 +352,8 @@
 				};
 				button {
           background-image: linear-gradient(to right, #6ED3F7 , #218FFF);
-					line-height: 50px;
+					box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
+					line-height: 48px;
           border-radius: 30px;
 				}
 			}

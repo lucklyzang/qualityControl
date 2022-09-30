@@ -197,17 +197,17 @@
 				</view>
 			</view>
 			<view class="btn-content-query" v-if="subtaskInfo.majorState == 3">
-				<view @click="gradeEvent(-1)">
+				<view @click="gradeEvent(-1)" v-if="isShowRevaluationBtn && isShowRejectBtn">
 					<image src="/static/img/again-evaluate.png"></image>
 					<view class="text">重新评价</view>
 				</view>
-				<view @click="gradeEvent(5)">
+				<view @click="gradeEvent(5)" v-if="isShowRevaluationBtn && isShowRejectBtn">
 					<image src="/static/img/reject.png"></image>
 					<view class="text">驳回</view>
 				</view>
 			</view>
 			<view class="btn-content-is-pass" v-if="subtaskInfo.majorState == 5">
-				<view  @click="gradeEvent(7)" v-if="subtaskInfo.state != 7">
+				<view  @click="gradeEvent(7)" v-if="subtaskInfo.state != 7 && subtaskInfo.state != 8">
 					<image src="/static/img/no-pass.png"></image>
 					<view class="text">不通过</view>
 				</view>
@@ -287,7 +287,11 @@
 				'subtaskDetails',
 				'selectHospitalList',
 				'timeMessage',
-				'ossMessage'
+				'ossMessage',
+				'isShowRejectBtn',
+				'isShowRevaluationBtn',
+				'disposeSubTaskData',
+				'mainTaskId'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -322,7 +326,10 @@
 				'changeSubtaskInfo',
 				'changeTimeMessage',
 				'changeOssMessage',
-				'changeEnterGradeSource'
+				'changeEnterGradeSource',
+				'changeIsSkipDetails',
+				'changeCacheIndex',
+				'changeTitleText'
 			]),
 			
 			setTipMsg (text) {
@@ -749,6 +756,15 @@
 					// 直接提交不跳转
 					this.sure(num)
 				} else {
+					if (num == 2) {
+						this.changeTitleText('扣分')
+					} else if (num == -1) {
+						this.changeTitleText('重新评价')
+					} else if (num == 5) {
+						this.changeTitleText('驳回')
+					} else if (num == 7) {
+						this.changeTitleText('不通过')
+					};
 					this.changeEnterGradeSource('/qualityPackage/pages/examineItemDetails/examineItemDetails');
 					uni.redirectTo({
 						url: '/qualityPackage/pages/grade/grade'
@@ -796,6 +812,7 @@
 					};
 					// 判断检查项状态
 					if (this.subtaskInfo.state === 0) {
+						console.log('第一次评价');
 						temporaryData['state'] = this.subtaskInfo.state + 1;
 						delete temporaryData.taskItemId;
 						this.addCheckRecordMethod(num,temporaryData)
@@ -839,7 +856,14 @@
 							this.dialogText = '已放弃';
 							this.iconColor = '#F2A15F'
 						};
-						this.getItemDetails(this.subtaskInfo['taskItemId']);
+						// 此时检查项还没有生成id,不能查询检查项详情,此处手动更改评价方式
+						let temporaryInfo = this.subtaskInfo;
+						if (num == 0) {
+							temporaryInfo['itemMode'] = 2
+						} else if (num == 1) {
+							temporaryInfo['itemMode'] = 1
+						};
+						this.changeSubtaskInfo(temporaryInfo)
 						if (this.subtaskInfo['majorState'] == 0) {
 							// 判断该任务是否为第一次提交(是则更改主任务状态为检查中)
 							if (!this.judgeSubTaskItemState(this.disposeSubTaskData,0)) {
@@ -1171,10 +1195,11 @@
 			flex: 1;
 			background: #f5f5f5;
 			border-radius: 4px;
-			color: black;
+			color: #101010;
 			padding-bottom: 140px;
 			box-sizing: border-box;
 			font-size: 14px;
+			font-weight: bold;
 			.examine-content-title {
 				padding-left: 8px;
 				box-sizing: border-box;

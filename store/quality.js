@@ -3,6 +3,8 @@ export default {
   state: getDefaultQualityState(),
   getters:{
 		enterTaskDetailsSource: state => state.enterTaskDetailsSource,
+		isShowRevaluationBtn: state => state.isShowRevaluationBtn,
+		isShowRejectBtn: state => state.isShowRejectBtn,
 		enterGradeSource: state => state.enterGradeSource,
     titleText: state => state.titleText,
 		taskMessage: state => state.taskMessage,
@@ -21,6 +23,12 @@ export default {
     changeTitleText (state, playLoad) {
       state.titleText = playLoad
     },
+		changeIsShowRevaluationBtn (state, playLoad) {
+		  state.isShowRevaluationBtn = playLoad
+		},
+		changeIsShowRejectBtn (state, playLoad) {
+		  state.isShowRejectBtn = playLoad
+		},
 		changeEnterTaskDetailsSource (state, playLoad) {
 		  state.enterTaskDetailsSource = playLoad
 		},

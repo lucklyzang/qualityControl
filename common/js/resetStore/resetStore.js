@@ -14,6 +14,8 @@ export function getDefaultQualityState() {
 			timeMessage: {},
 			ossMessage: {},
 			enterTaskDetailsSource: '',
-			enterGradeSource: ''
+			enterGradeSource: '',
+			isShowRevaluationBtn: true,
+			isShowRejectBtn: true
 		}	
 };

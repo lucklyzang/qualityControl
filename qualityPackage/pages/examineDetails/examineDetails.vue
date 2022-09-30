@@ -32,7 +32,7 @@
 				</view>
 				<view class="subtask-item-right">
 					<view class="subtask-item-right-top">
-							<u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#299f8f' : '#3e7dff'" :percent="item.complete">
+							<u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : '#1684FC'" :percent="item.complete">
 							</u-circle-progress>
 					</view>
 					<view class="subtask-item-right-bottom">
@@ -199,6 +199,8 @@
 		mounted () {
 			this.getMainTaskDetails(this.mainTaskId);
 		},
+		
+		options: { styleIsolation: 'shared' },
 		
 		methods: {
 			...mapMutations([
@@ -896,6 +898,10 @@
 				submitTotalTaskDetails(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
 						let temporaryIndex = {};
 						if (this.flowState != 5) {
 							if (this.judgeSubTaskItemState(this.subtaskList,7)) {};
@@ -1006,7 +1012,7 @@
 			height: 80px;
 			position: relative;
 			width: 100%;
-			/deep/ u-steps {
+			::v-deep u-steps {
 				width: 100%
 			};
 			>image {
@@ -1032,8 +1038,7 @@
 			padding: 10px 20px;
 			background: #fff;
 			margin-top: 10px;
-			border: 1px solid #e7e7e7;
-			box-shadow: 0px 1px 3px 0 #93b4f7;
+			box-shadow: 0px 1px 3px 0 rgba(147, 180, 247, 1);
 			border-radius: 50px;
 			box-sizing: border-box;
 			display: flex;
@@ -1045,7 +1050,7 @@
 				.examine-pandect-title {
 					word-break: break-all;
 					margin-bottom: 6px;
-					color: black;
+					color: #101010;
 					font-size: 14px
 				};
 				.examine-pandect-grade {
@@ -1088,10 +1093,9 @@
 				flex-flow: row nowrap;
 				justify-content: space-between;
 				align-items: center;
-				border: 1px solid #e7e7e7;
 				padding: 10px;
 				box-sizing: border-box;
-				box-shadow: 0px 15px 10px -15px #b0d2ff;
+				box-shadow: 0px 1px 3px 0 rgba(0, 0, 0, 0.23);
 				&:last-child {
 					margin-bottom: 0
 				};
@@ -1099,14 +1103,14 @@
 					width: 70%;
 					.subtask-item-title {
 						margin-bottom: 6px;
-						color: black;
+						color: #101010;
 						word-break: break-all;
 						font-size: 16px;
 					};
 					.subtask-item-oerson {
 						margin-bottom: 6px;
 						word-break: break-all;
-						color: #adada9;
+						color: #9E9E9A;
 						font-size: 14px;
 						margin: 12px 0
 					};
@@ -1114,8 +1118,8 @@
 						font-size: 12px;
 						width: 110px;
 						padding: 0 6px;
-						color: #3e7dff;
-						border: 1px solid #3e7dff;
+						color: #1864FF;
+						border: 1px solid #1864FF;
 						height: 24px;
 						border-radius: 20px;
 						text-align: center;
@@ -1132,15 +1136,15 @@
 					.subtask-item-right-bottom {
 						margin-top: 6px;
 						.textStyle {
-							color: #299f8f !important
+							color: #289E8E !important
 						};
 						text {
 							font-size: 12px;
 							&:first-child {
-								color: #adada9
+								color: #9E9E9A
 							};
 							&:last-child {
-								color: #3e7dff
+								color: #1684FC
 							}
 						}
 					}
@@ -1288,22 +1292,23 @@
 		.quit-account {
 			position: fixed;
 			bottom: 50px;
-			height: 50px;
-			width: 260px;
+			height: 48px;
+			width: 266px;
 			left: 50%;
 			transform: translateX(-50%);
 			font-size: 16px;
 			margin: 0 auto;
-			line-height: 50px;
+			line-height: 48px;
 			background: linear-gradient(to right, #6cd2f8, #2390fe);
+			box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
 			color: #fff;
 			border-radius: 30px;
-			font-weight: bold;
 			text-align: center
 		};
 		.btnRightStyle {
 			background: #e8e8e8;
-			color: #989898
+			color: #989898;
+			box-shadow: none;
 		}
 	}	
 </style>

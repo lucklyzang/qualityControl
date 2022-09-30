@@ -6,7 +6,7 @@
 		 @cancel="cancelSure">
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="评分" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" :title="taskTypeText" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content">
@@ -66,8 +66,10 @@
 				</view>
 			</view>
 		</view>
-		<view class="btn-box" @click="sure">
-			提交
+		<view class="btn-box-wrapper">
+			<view class="btn-box" @click="sure">
+				提交
+			</view>
 		</view>
 	</view>
 </template>
@@ -165,7 +167,9 @@
 				'changeIsSkipDetails',
 				'changeCacheIndex',
 				'changeTimeMessage',
-				'changeOssMessage'
+				'changeOssMessage',
+				'changeIsShowRevaluationBtn',
+				'changeIsShowRejectBtn'
 			]),
 			
 			// 操作按钮事件
@@ -377,6 +381,14 @@
 				addCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
+						// 此时检查项还没有生成id,不能查询检查项详情,此处手动更改评价方式
+						let temporaryInfo = this.subtaskInfo;
+						temporaryInfo['itemMode'] = 3;
+						this.changeSubtaskInfo(temporaryInfo);
 						if (this.subtaskInfo['majorState'] == 0) {
 							// 判断该任务是否为第一次提交(是则更改主任务状态为检查中)
 							if (!this.judgeSubTaskItemState(this.disposeSubTaskData,0)) {
@@ -411,6 +423,10 @@
 				updateCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
 						this.backToExaminePage();
 					} else {
 						this.$refs.uToast.show({
@@ -432,6 +448,16 @@
 				updateTaskItem(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
+						if (this.subtaskInfo['operation'] == 5) {
+							this.changeIsShowRejectBtn(false)
+						};
+						if (this.subtaskInfo['operation'] == -1) {
+							this.changeIsShowRevaluationBtn(false)
+						};
 						this.backToExaminePage();
 					} else {
 						this.$refs.uToast.show({
@@ -625,22 +651,6 @@
 									}
 								};
 								temporaryData['imagePaths'] = this.imgOnlinePathArr
-							};
-							if (this.subtaskInfo.majorState == 3) {
-								// 重新评价满分的情况
-								if (this.gradeValue == this.subtaskInfo['fullScore']) {
-									temporaryData['state'] = 6;
-									temporaryData['operation'] = 7
-								} else {
-									temporaryData['state'] = 4;
-									temporaryData['operation'] = 7
-								}
-							} else if (this.subtaskInfo.majorState == 5) { 
-								if (this.subtaskInfo.operation == 8) {
-									temporaryData['state'] = 8
-								} else if (this.subtaskInfo.operation == 7) {
-									temporaryData['state'] = 7
-								}
 							}
 							this.updateTaskItemRecordMethod(temporaryData)
 					} else {
@@ -697,7 +707,7 @@
 							} else if (this.subtaskInfo.operation == 7) {
 								temporaryData['state'] = 7
 							}
-						}
+						};
 						this.updateTaskItemRecordMethod(temporaryData)
 					}
 				}
@@ -747,7 +757,7 @@
 			box-sizing: border-box;
 			overflow: auto;
 			.score {
-				padding: 12px 4px;
+				padding: 12px 6px;
 				background: #fff;
 				@include bottom-border-1px(#9b9b9b);
 				>view {
@@ -756,10 +766,9 @@
 				.left {
 					vertical-align: middle;
 					width: 30%;
-					color: black;
+					color: #101010;
 					font-size: 16px;
-					padding-left: 4px;
-					box-sizing: border-box
+					font-weight: bold
 				};
 				.right {
 					width: 70%;
@@ -774,7 +783,7 @@
 				@include bottom-border-1px(#9b9b9b);
 			};
 			.problem-describe {
-				padding: 12px 4px;
+				padding: 12px 6px;
 				background: #fff;
 				> view {
 					width: 100%;
@@ -782,6 +791,9 @@
 					flex-flow: row nowrap;
 				};
 				.problem-describe-top {
+					font-size: 14px;
+					color: #101010;
+					font-weight: bold;
 					margin-bottom: 4px;
 					.problem-describe-top-left {
 						flex: 1;
@@ -864,8 +876,10 @@
 				.top {
 					width: 100%;
 					height: 30px;
+					font-weight: bold;
 					line-height: 30px;
-					color: #5d5d5d;
+					color: #101010;
+					font-size: 14PX;
 					padding-left: 6px;
 					box-sizing: border-box;
 				};
@@ -886,7 +900,9 @@
 						width: 100%;
 						height: 30px;
 						line-height: 30px;
-						color: #5d5d5d;
+						color: #101010;
+						font-weight: bold;
+						font-size: 14px;
 						padding-left: 6px;
 						box-sizing: border-box;
 					};
@@ -927,18 +943,26 @@
 				}
 			}
 		}
-		.btn-box {
-			height: 50px;
-			width: 260px;
-			font-size: 16px;
-			margin: 0 auto;
-			line-height: 50px;
-			background: linear-gradient(to right, #6cd2f8, #2390fe);
-			color: #fff;
-			border-radius: 30px;
-			font-weight: bold;
-			text-align: center
-		}
+		.btn-box-wrapper {
+			width: 100%;
+			height: 100px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			.btn-box {
+				height: 48px;
+				width: 266px;
+				font-size: 16px;
+				margin: 0 auto;
+				line-height: 48px;
+				background: linear-gradient(to right, #6cd2f8, #2390fe);
+				box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
+				color: #fff;
+				border-radius: 30px;
+				font-weight: bold;
+				text-align: center
+			}
+		}	
 	}	
 </style>
 

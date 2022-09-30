@@ -257,6 +257,8 @@
 			}
 		},
 		
+		options: { styleIsolation: 'shared' },
+		
 		mounted () {
 			let data = {
 				hospitals : this.proId, //检查项目(指的是医院)
@@ -877,7 +879,7 @@
 				}
 			};
 			.top-hospital {
-				width: 85%;
+				width: 90%;
 				height: 40px;
 				margin: 0 auto;
 				display: flex;
@@ -937,7 +939,7 @@
 			}	
 		}
 		.status-select-wrapper {
-			width: 100%;
+			width: 90%;
 			margin: 0 auto;
 			background: #fafafa;
 			margin-top: 2px;
@@ -948,8 +950,7 @@
 			> view {
 				height: 40px;
 				&:first-child {
-					margin-left: 5%;
-					width: 20%;
+					width: 30%;
 					text-align: left;
 					line-height: 40px;
 					color: #a8a8a8
@@ -995,8 +996,7 @@
 				padding-bottom: 10px;
 				box-sizing: border-box;
 				margin-bottom: 10px;
-				border: 1px solid #e7e7e7;
-				box-shadow: 0px 15px 10px -15px #d7d7d7;
+				box-shadow: 0px 1px 3px 0 rgba(0,0,0,.23);
 				border-radius: 8px;
 				background: #fff;
 				position: relative;
@@ -1124,7 +1124,7 @@
 					};
 					.status-content-middle-five-line {
 						margin-top: 10px;
-						@include bottom-border-1px(#8d8d8d);
+						@include bottom-border-1px(rgba(0, 0, 0, 0.23));
 					}
 				};
 				.status-content-bottom {

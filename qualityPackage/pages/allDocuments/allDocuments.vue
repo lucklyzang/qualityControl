@@ -319,17 +319,18 @@
 				box-sizing: border-box;
 				@include bottom-border-1px(#c9c9c9);
 				.file-list-top {
-					color: black;
+					color: #101010;
 					word-break: break-all;
-					font-size: 15px;
+					font-size: 16px;
+					font-weight: bold;
 					margin-bottom: 8px
 				};
 				.file-list-bottom {
 					display: flex;
 					flex-flow: row nowrap;
 					justify-content: space-between;
-					color: #acaca8;
-					font-size: 13px;
+					color: #9E9E9A;
+					font-size: 14px;
 				}
 			}
 		}

@@ -11,7 +11,7 @@
 		</view>
 		<view class="content-bottom-area">
 			<view class="details-tilte">
-				<u-icon name="order" color="orange" size="35"></u-icon>
+				<u-icon name="order" color="#FFC65B" size="35"></u-icon>
 				<text>
 					{{`${taskMessage.year}年${taskMessage.examinationTime}${taskMessage.checkName}${taskMessage.examinationType}检查`}}
 				</text>
@@ -254,14 +254,14 @@
 			box-sizing: border-box;
 			flex: 1;
 			background: #fff;
-			border: 1px solid #f2f2f2;
-			box-shadow: 0px 1px 3px 0 #93b4f7;
+			box-shadow: 0px 3px 10px 0 rgba(24,100,255,.31);
 			z-index: 1000;
 			border-radius: 8px;
 			.details-tilte {
 				>text {
 					margin-left: 4px;
 					font-size: 16px;
+					color: #101010;
 					font-weight: bold
 				}
 			};
@@ -269,8 +269,9 @@
 				margin-top: 6px;
 				.item-line {
 					font-size: 14px;
+					color: #101010;
 					width: 100%;
-					line-height: 25px;
+					line-height: 26px;
 					word-break: break-all
 				}
 			}
@@ -283,18 +284,17 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: flex-top;
-			font-size: 13px;
+			font-size: 16px;
 			position: relative;
 			.quit-account {
-				height: 45px;
-				width: 260px;
-				font-size: 16px;
+				height: 48px;
+				width: 266px;
 				margin: 0 auto;
-				line-height: 45px;
+				line-height: 48px;
 				background: linear-gradient(to right, #6cd2f8, #2390fe);
+				box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
 				color: #fff;
-				border-radius: 20px;
-				font-weight: bold;
+				border-radius: 26px;
 				text-align: center
 			}
 		}

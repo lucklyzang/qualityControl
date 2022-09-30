@@ -254,15 +254,15 @@
 					display: flex;
 					justify-content: center;
 					align-items: center;
-					width: 60px;
-					height: 60px;
+					width: 55px;
+					height: 55px;
 					border-radius: 50%;
 					background: #fff;
 					z-index: 1000;
 					image {
 						vertical-align: middle;
-						width: 55px;
-						height: 55px
+						width: 50px;
+						height: 50px
 					}
 				};
 				.user-message {
@@ -273,7 +273,8 @@
 						font-size: 16px
 					};
 					.account-name {
-						font-size: 14px
+						font-size: 14px;
+						margin-top: 2px
 					}
 				}
 			}
@@ -298,7 +299,8 @@
 				height: 45px;
 				line-height: 45px;
 				box-sizing: border-box;
-				color: black;
+				color: #101010;
+				font-size: 14px;
 				font-weight: bold;
 				position: relative;
 				.left {
@@ -351,23 +353,25 @@
 				line-height: 45px;
 				text-align: center;
 				box-sizing: border-box;
+				font-size: 14px;
 				margin: 30px 0 10px 0;
 				>text {
 					&:first-child {
 						margin-right: 10px;
 					};
-					color: $color-text-left;
+					color: #9E9E9A
 				}
 			}
 
 			;
 			.quit-account {
-				height: 50px;
-				width: 260px;
-				font-size: 16px;
+				height: 48px;
+				width: 266px;
+				font-size: 18px;
 				margin: 0 auto;
-				line-height: 50px;
+				line-height: 48px;
 				background: linear-gradient(to right, #6cd2f8, #2390fe);
+				box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
 				color: #fff;
 				border-radius: 30px;
 				font-weight: bold;

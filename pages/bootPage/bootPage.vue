@@ -66,9 +66,8 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			font-size: 17px;
-			font-weight: bold;
-			color: black
+			font-size: 18px;
+			color: #101010
 		};
 		.center-image {
 			display: flex;
@@ -84,7 +83,7 @@
 			justify-content: center;
 			align-items: center;
 			font-size: 14px;
-			color: #838383
+			color: #9E9E9A
 		};
 		.bottom-image {
 			flex: 1;
