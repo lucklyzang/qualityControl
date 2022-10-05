@@ -883,6 +883,7 @@
 				height: 40px;
 				margin: 0 auto;
 				display: flex;
+				align-items: center;
 				flex-flow: row nowrap;
 				.select-box {
 					flex: 1;
@@ -950,13 +951,12 @@
 			> view {
 				height: 40px;
 				&:first-child {
-					width: 30%;
 					text-align: left;
 					line-height: 40px;
 					color: #a8a8a8
 				};
 				&:last-child {
-					width: 70%;
+					flex: 1;
 					/deep/ .show-box {
 						height: 40px;
 						border: none;

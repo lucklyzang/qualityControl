@@ -1022,14 +1022,12 @@
 				top: 0;
 				left: 0
 			};
-			>view {
-				width: 100%;
-				::v-deep .u-steps{
-					.u-steps__item--row  {
-						.u-steps__item__line {
-							left: 55% !important;
-							width: 100% !important
-						}
+			width: 100%;
+			::v-deep .u-steps{
+				.u-steps__item--row  {
+					.u-steps__item__line {
+						left: 55% !important;
+						width: 100% !important
 					}
 				}
 			}
