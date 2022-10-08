@@ -18,7 +18,7 @@
 				</view>
 			</view>
 			<view class="top-hospital">
-				<u-icon name="map" color="#fff" size="35"></u-icon>
+				<image :src="buildingLogoPng" mode=""></image>
 				<view class="select-box">
 					<xfl-select 
 						:list="hospitalList"
@@ -253,6 +253,7 @@
 				checkPng: require("@/static/img/checking.png"),
 				confirmPng: require("@/static/img/confirm.png"),
 				completedPng: require("@/static/img/completed.png"),
+				buildingLogoPng: require("@/static/img/building-logo.png"),
 				noStartPng: require("@/static/img/no-start.png")
 			}
 		},
@@ -819,7 +820,7 @@
 	};
 	.container {
 		@include content-wrapper;
-		background: #fff;
+		background: #fafafa;
 		padding-bottom: 0;
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
@@ -840,6 +841,7 @@
 			height: 224px;
 			position: relative;
 			padding-top: 44px;
+			background: #fafafa;
 			width: 100%;
 			>image {
 				width: 100%;
@@ -849,7 +851,7 @@
 				left: 0
 			};
 			.top-name {
-				width: 85%;
+				width: 90%;
 				margin: 0 auto;
 				height: 40px;
 				margin-top: 10px;
@@ -882,15 +884,22 @@
 				width: 90%;
 				height: 40px;
 				margin: 0 auto;
+				margin-top: 4px;
 				display: flex;
 				align-items: center;
 				flex-flow: row nowrap;
+				> image {
+					width: 22px;
+					height: 22px;
+					z-index: 1
+				};
 				.select-box {
 					flex: 1;
 					/deep/ .show-box {
 						background: transparent !important;
 						border: none !important;
 						color: #fff !important;
+						padding: 0 12% 0 1%;
 						.placeholder {
 							color: #fff !important
 						}
@@ -914,11 +923,11 @@
 			.tabs-title-wrapper {
 					position: absolute;
 					top: 144px;
+					border: 1px solid #f4f4f4;
 					z-index: 10;
 					left: 3%;
 					background: #fff;
 					width: 94%;
-					box-shadow: 0px 15px 10px -15px #b0d2ff;
 					border-radius: 10px;
 				.tabs-name {
 					height: 40px;
@@ -929,6 +938,8 @@
 				};
 				/deep/ .tabs-title {
 					.u-tabs {
+						border-radius: 10px;
+						box-shadow: 0px 15px 10px -15px #b0d2ff;
 						.u-scroll-view {
 							.u-tab-item {
 								font-size: 15px !important;
@@ -960,6 +971,7 @@
 					/deep/ .show-box {
 						height: 40px;
 						border: none;
+						padding: 0 12% 0 2% !important;
 						background: #f9f9f9;
 						.list-container {
 							top: 0;

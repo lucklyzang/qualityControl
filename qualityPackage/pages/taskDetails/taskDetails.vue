@@ -3,7 +3,7 @@
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="检查详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="检查详情" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content-top-area">
@@ -235,12 +235,16 @@
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
 		.nav {
-			width: 100%
+			width: 100%;
+			height: 88px;
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 100
 		};
 		.content-top-area {
 			width: 100%;
-			z-index: 1000;
-			height: 160px;
+			height: 240px;
 			>image {
 				width: 100%;
 				height: 100%;
@@ -254,6 +258,7 @@
 			box-sizing: border-box;
 			flex: 1;
 			background: #fff;
+			overflow: auto;
 			box-shadow: 0px 3px 10px 0 rgba(24,100,255,.31);
 			z-index: 1000;
 			border-radius: 8px;

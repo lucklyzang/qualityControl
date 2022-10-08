@@ -15,8 +15,11 @@
 			</u-modal>
 		</view>	
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="检查项详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="检查项详情" @backClick="backTo">
 			</nav-bar>
+		</view>
+		<view class="image-wrapper">
+			<image :src="statusBackgroundPng"></image>
 		</view>
 		<!-- <view class="score-box">
 			<image src="/static/img/examine-item-background.png"></image>
@@ -263,6 +266,7 @@
 				recordList: [],
 				suggestionList: [],
 				examineItemDetailsBg: require("@/static/img/examine-item-details-bg.png"),
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				enlargePhotoShow: false,
 				enlargeImg: '',
 				content: '',
@@ -1077,8 +1081,22 @@
 		}
 
 		.nav {
-			width: 100%
-		}
+			position: fixed;
+			width: 100%;
+			height: 88px;
+			top: 0;
+			z-index: 10;
+			left: 0;
+		};
+		
+		.image-wrapper {
+			width: 100%;
+			height: 240px;
+			>image {
+				width: 100%;
+				height: 240px
+			}
+		};
 
 		.score-box {
 			width: 100%;
@@ -1193,9 +1211,11 @@
 			width: 100%;
 			margin: 0 auto;
 			flex: 1;
+			overflow: auto;
 			background: #f5f5f5;
 			border-radius: 4px;
 			color: #101010;
+			margin-top: -150px;
 			padding-bottom: 140px;
 			box-sizing: border-box;
 			font-size: 14px;

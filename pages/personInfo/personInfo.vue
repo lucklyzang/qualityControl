@@ -7,7 +7,7 @@
 		<ourLoading isFullScreen :active="showLoadingHint" :translateY="50" text="签退中,请稍候···" color="#fff" textColor="#fff"
 		 background-color="rgb(143 143 143)" />
 		<view class="nav">
-			<nav-bar backState="3000" :home="false" bgColor="#4993f5" fontColor="#FFF" title="个人中心" @backClick="backTo"></nav-bar>
+			<nav-bar backState="3000" :home="false" fontColor="#FFF"  bgColor="none" title="个人中心" @backClick="backTo"></nav-bar>
 		</view>
 		<view class="content-top-area">
 			<image :src="statusBackgroundPng"></image>
@@ -232,11 +232,19 @@
 
 	.content-box {
 		@include content-wrapper;
+		.nav {
+			position: fixed;
+			width: 100%;
+			height: 88px;
+			top: 0;
+			z-index: 10;
+			left: 0
+		};
 		.content-top-area {
 			position: relative;
 			width: 100%;
 			margin: 0 auto;
-			height: 170px;
+			height: 240px;
 			>image {
 				width: 100%;
 				height: 100%;
@@ -247,6 +255,7 @@
 			.content-top-content {
 				margin-left: 20px;
 				height: 140px;
+				margin-top: 60px;
 				display: flex;
 				flex-flow: row nowrap;
 				align-items: center;
@@ -280,10 +289,12 @@
 			}
 		};
 		.content-bottom-area {
+			flex: 1;
+			overflow: auto;
 			border-top-left-radius: 20px;
 			border-top-right-radius: 20px;
 			background: #fff;
-			margin-top: -35px;
+			margin-top: -55px;
 			padding-top: 10px;
 			box-sizing: border-box;
 			z-index: 10000;
@@ -338,7 +349,6 @@
 		;
 
 		.content-bottom {
-			flex: 1;
 			margin: 0 auto;
 			width: 100%;
 			display: flex;

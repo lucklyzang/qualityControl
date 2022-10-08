@@ -11,6 +11,7 @@
 							<view class="header_left_back" :class="{ header_btnMongol_left_back: isTwoBtn }" v-if="back && !firstPage" @click="onBackPage">
 								<image class="header_icon" v-if="isWhite" src="/static/zhouWei-navBar/icon_back_white.png" mode="aspectFit"></image>
 								<image class="header_icon" v-else src="/static/zhouWei-navBar/icon_back_black.png" mode="aspectFit"></image>
+								<text>返回</text>
 							</view>
 							<text class="header_left_line" :class="{ header_colorWhite_left_line: isWhite }" v-if="isTwoBtn"></text>
 							<view class="header_left_home" :class="{ header_btnMongol_left_home: isTwoBtn }" v-if="(firstPage && back) || home" @click="onBackHome">
@@ -403,18 +404,22 @@ export default {
 }
 
 .header_left_back {
-	width: 56rpx;
 	height: 100%;
 	/* #ifndef APP-PLUS-NVUE */
 	display: flex;
 	/* #endif */
 	align-items: center;
 	justify-content: center;
+	>text {
+		font-size: 14px;
+		color: #f2f2f2;
+		margin-left: 4px
+	}
 }
 
 .header_icon {
-	width: 30rpx;
-	height: 30rpx;
+	width: 36rpx;
+	height: 36rpx;
 }
 
 .header_left_home {

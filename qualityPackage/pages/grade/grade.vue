@@ -6,8 +6,11 @@
 		 @cancel="cancelSure">
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" :title="taskTypeText" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" :title="taskTypeText" @backClick="backTo">
 			</nav-bar>
+		</view>
+		<view class="image-wrapper">
+			<image :src="statusBackgroundPng"></image>
 		</view>
 		<view class="content">
 			<view class="score" v-show="isShowInput">
@@ -104,6 +107,7 @@
 				infoText: '',
 				isShowInput: true,
 				problemDescribeValue: '',
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				problemDescribeList: [
 					{
 						problemDescribeValue: '',
@@ -749,11 +753,25 @@
 			background-color: transparent;
 		}
 		.nav {
-			width: 100%
+			position: fixed;
+			width: 100%;
+			height: 88px;
+			top: 0;
+			z-index: 10;
+			left: 0
 		}
+		.image-wrapper {
+			width: 100%;
+			height: 240px;
+			>image {
+				width: 100%;
+				height: 240px
+			}
+		};
 		.content {
 			flex: 1;
 			padding: 6px 0 0 0;
+			margin-top: -150px;
 			box-sizing: border-box;
 			overflow: auto;
 			.score {

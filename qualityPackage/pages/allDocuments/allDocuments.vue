@@ -12,35 +12,40 @@
 			<u-empty text="暂无文件" mode="list"></u-empty>
 		</view>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#4993f5" fontColor="#FFF" title="全部文件" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="全部文件" @backClick="backTo">
 			</nav-bar>
 		</view>
-		<view class="content-top-area">
-			<view class="content-top-left">
-				<u-icon name="search" color="#e3e3e1" size="45"></u-icon>
-				<u-input v-model="textValue" type="text" height="65" :border="true" :clearable="false" placeholder="在全部文件中搜索" />
-			</view>
-			<view class="content-top-right">
-				<view class="search" @click="searchEvent">搜索</view>
-			</view>
+		<view class="image-wrapper">
+			<image :src="statusBackgroundPng"></image>
 		</view>
-		<view class="content-bottom-area">
-			<view class="file-list" v-for="(item,index) in fileList" :key="index" @click="fileListEvent(item)">
-				<view class="file-list-top">
-					<text>
-						{{ item.fileName }}
-					</text>
+		<view class="content-box">
+			<view class="content-top-area">
+				<view class="content-top-left">
+					<u-icon name="search" color="#e3e3e1" size="45"></u-icon>
+					<u-input v-model="textValue" type="text" height="65" :border="true" :clearable="false" placeholder="在全部文件中搜索" />
 				</view>
-				<view class="file-list-bottom">
-					<view class="left">
-						{{ `上传者: ${item.uploadAuthor}` }}
-					</view>
-					<view class="right">
-						{{ item.uploadDate }}
-					</view>
+				<view class="content-top-right">
+					<view class="search" @click="searchEvent">搜索</view>
 				</view>
 			</view>
-		</view>
+			<view class="content-bottom-area">
+				<view class="file-list" v-for="(item,index) in fileList" :key="index" @click="fileListEvent(item)">
+					<view class="file-list-top">
+						<text>
+							{{ item.fileName }}
+						</text>
+					</view>
+					<view class="file-list-bottom">
+						<view class="left">
+							{{ `上传者: ${item.uploadAuthor}` }}
+						</view>
+						<view class="right">
+							{{ item.uploadDate }}
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>	
 	</view>
 </template>
 
@@ -69,6 +74,7 @@
 			return {
 				textValue: '',
 				fileList: [],
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				noDataShow: false,
 				enlargePhotoShow: false,
 				enlargeImg: '',
@@ -271,69 +277,91 @@
 			margin: auto
 		};
 		.nav {
-			width: 100%
+			position: fixed;
+			width: 100%;
+			height: 88px;
+			top: 0;
+			z-index: 10;
+			left: 0
 		};
-		.content-top-area {
-			width: 96%;
-			font-size: 0;
-			height: 50px;
-			align-items: center;
-			margin: 0 auto;
+		.image-wrapper {
+			width: 100%;
+			height: 240px;
+			>image {
+				width: 100%;
+				height: 240px
+			}
+		};
+		.content-box {
+			margin-top: -150px;
+			background: #f8f8f8;
+			flex-direction: column;
+			flex: 1;
 			display: flex;
-			flex-flow: row nowrap;
-			.content-top-left {
-				position: relative;
-				flex: 1;
-				margin-right: 6px;
-				/deep/ .u-icon {
-					position: absolute;
-					left: 4px;
-					top: 50%;
-					transform: translateY(-50%)
+			width: 100%;
+			.content-top-area {
+				width: 96%;
+				font-size: 0;
+				height: 50px;
+				align-items: center;
+				margin: 0 auto;
+				display: flex;
+				flex-flow: row nowrap;
+				.content-top-left {
+					position: relative;
+					flex: 1;
+					margin-right: 6px;
+					/deep/ .u-icon {
+						position: absolute;
+						left: 4px;
+						top: 50%;
+						transform: translateY(-50%)
+					};
+					/deep/ .u-input {
+						padding: 0 10px 0 30px !important
+					}
 				};
-				/deep/ .u-input {
-					padding: 0 10px 0 30px !important
+				.content-top-right {
+					>view {
+						height: 32px;
+						line-height: 32px;
+						text-align: center;
+						border-radius: 8px;
+						font-size: 16px;
+						color: #fff
+					}
+					.search {
+						width: 60px;
+						background: #1864ff
+					}
 				}
 			};
-			.content-top-right {
-				>view {
-					height: 32px;
-					line-height: 32px;
-					text-align: center;
-					border-radius: 8px;
-					font-size: 16px;
-					color: #fff
-				}
-				.search {
-					width: 60px;
-					background: #1864ff
-				}
-			}
-		};
-		.content-bottom-area {
-			width: 96%;
-			margin: 0 auto;
-			flex: 1;
-			.file-list {
-				padding: 8px 4px;
-				box-sizing: border-box;
-				@include bottom-border-1px(#c9c9c9);
-				.file-list-top {
-					color: #101010;
-					word-break: break-all;
-					font-size: 16px;
-					font-weight: bold;
-					margin-bottom: 8px
-				};
-				.file-list-bottom {
-					display: flex;
-					flex-flow: row nowrap;
-					justify-content: space-between;
-					color: #9E9E9A;
-					font-size: 14px;
+			.content-bottom-area {
+				width: 96%;
+				margin: 0 auto;
+				flex: 1;
+				overflow: auto;
+				.file-list {
+					padding: 8px 4px;
+					box-sizing: border-box;
+					@include bottom-border-1px(#c9c9c9);
+					.file-list-top {
+						color: #101010;
+						word-break: break-all;
+						font-size: 16px;
+						font-weight: bold;
+						margin-bottom: 8px
+					};
+					.file-list-bottom {
+						display: flex;
+						flex-flow: row nowrap;
+						justify-content: space-between;
+						color: #9E9E9A;
+						font-size: 14px;
+					}
 				}
 			}
-		}
+		}	
 	}	
 </style>
 
