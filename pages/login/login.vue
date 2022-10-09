@@ -195,7 +195,7 @@
 								this.selectHospitalList = [];
 								for (let item of this.userInfo.hospitalList) {
 									this.hospitalList.push({
-										value: item.name,
+										value: item.hospitalName,
 										id: item.id
 									})
 								};
