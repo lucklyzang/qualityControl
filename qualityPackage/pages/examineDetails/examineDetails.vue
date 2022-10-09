@@ -33,7 +33,7 @@
 					</view>
 					<view class="subtask-item-right">
 						<view class="subtask-item-right-top">
-								<u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : '#1684FC'" :percent="item.complete">
+								<u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : item.complete == 0 ? '#ececec' : '#1684FC'" :percent="item.complete">
 								</u-circle-progress>
 						</view>
 						<view class="subtask-item-right-bottom">
@@ -1065,6 +1065,9 @@
 			background: #f5f5f5;
 			z-index: 1000;
 			flex: 1;
+			overflow: auto;
+			display: flex;
+			flex-direction: column;
 			.examine-pandect {
 				padding: 10px 20px;
 				background: #fff;
@@ -1072,7 +1075,7 @@
 				border-radius: 50px;
 				box-sizing: border-box;
 				display: flex;
-				margin-top: 15px;
+				margin-top: 10px;
 				flex-flow: row nowrap;
 				justify-content: space-between;
 				align-items: center;

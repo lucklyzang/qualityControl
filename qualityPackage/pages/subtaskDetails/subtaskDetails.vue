@@ -17,7 +17,7 @@
 					</view>
 					<view class="subtask-item-right">
 						<view class="subtask-item-right-top">
-								<u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#289E8E' : '#1684FC'" :percent="subtaskDetails.complete">
+								<u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#289E8E' : subtaskDetails.complete == 0 ? '#ececec' : '#1684FC'" :percent="subtaskDetails.complete">
 								</u-circle-progress>
 						</view>
 						<view class="subtask-item-right-bottom">
