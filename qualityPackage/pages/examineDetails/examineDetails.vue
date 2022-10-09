@@ -3,141 +3,119 @@
 		<u-toast ref="uToast" />
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查详情" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="检查详情" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="flow-wrapper">
-			<u-steps :list="flowList" mode="number" :current="flowState-1" active-color="#43c3f4"></u-steps>
+			<image :src="statusBackgroundPng">
+			<u-steps :list="flowList" dot :current="flowState-1" un-active-color="#82acfe" active-color="#fff"></u-steps>
 		</view>
-		<view class="examine-items-table-wrapper">
-			<view class="examine-items-table-top">  
-				<view class="image-wrapper">
-					<image src="/static/img/examine-background.png"></image>
-					<view class="examine-items-table-top-content">
-						<view class="left">
-							<text>总分值</text>
-							<text>{{ tableList.length > 0 ? tableList[0]['score'] : ''}}</text>
-						</view>
-						<view class="right">
-							<text>当前得分</text>
-							<text>{{tableList.length > 0 ? tableList[0]['resultScore'] : ''}}</text>
-						</view>
-						<view class="bottom">
-							<text>考核内容</text>
-							<text>{{tableList.length > 0 ? tableList[0]['checkName'] : ''}}</text>
-						</view>
+		<view class="content-box">
+			<view class="examine-pandect" @click="arrowEvent">
+				<view class="examine-pandect-left">
+					<view class="examine-pandect-title">
+						{{`${taskMessage.year}年${taskMessage.examinationTime}${taskMessage.checkName}${taskMessage.examinationType}检查`}}
 					</view>
+					<view class="examine-pandect-grade">
+						<text>{{`总得分 : ${tableList.length > 0 ? tableList[0]['resultScore'] : ''}/${tableList.length > 0 ? tableList[0]['score'] : ''}`}}</text>
+					</view>
+				</view>
+				<view class="examine-pandect-right">
+					<u-icon name="arrow-rightward" color="#fff" size="38"></u-icon>
 				</view>
 			</view>
-			<view class="examine-items-table-bottom">
-				<view class="examine-items-table-bottom-content">
-					<view class="start-time">
-						<view class="top">
-							<text></text>
-							<text>开始时间</text>
+			<view class="subtask-wrapper">
+				<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index" @click="subtaskClickEvent(item)">
+					<view class="subtask-item-left">
+						<view class="subtask-item-title">{{`${taskMessage.checkName}${taskMessage.examinationType}-${item.subtaskName}`}}</view>
+						<view class="subtask-item-oerson">负责人 : {{item.subtaskPrincipal}}</view>
+						<view class="subtask-item-grade">得分 : {{`${item.subtaskScore}/${item.subtaskFullMark}`}}</view>
+					</view>
+					<view class="subtask-item-right">
+						<view class="subtask-item-right-top">
+								<u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : item.complete == 0 ? '#ececec' : '#1684FC'" :percent="item.complete">
+								</u-circle-progress>
 						</view>
-						<view class="bottom">
-							{{tableList.length > 0 ? tableList[0]['startTime'] : ''}}
+						<view class="subtask-item-right-bottom">
+							<text>检查已完成:</text>
+							<text :class="{'textStyle': item.complete == 100}">{{`${item.complete}%`}}</text>
 						</view>
 					</view>
-					<view class="query-end-time">
-						<view class="top">
-							<text></text>
-							<text>质疑截止时间</text>
-						</view>
-						<view class="bottom">
-							{{tableList.length > 0 ? tableList[0]['questionTime'] : ''}}
-						</view>
-					</view>
-					<view class="examine-end-time">
-						<view class="top">
-							<text></text>
-							<text>检查截止时间</text>
-						</view>
-						<view class="bottom">
-							{{tableList.length > 0 ? tableList[0]['finishTime'] : ''}}
-						</view>
-					</view>
-				</view>
-			</view>
-		</view>
-		<view class="subtask-wrapper">
-			<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index">
-				<view class="subtask-list-title" @click="subtaskEvent(item,index)">
-					<view class="subtask-list-center-wrapper">
-						<view class="subtask-list-center" :class="{'animate-center':item.isScroll}">
-							<view class="subtask-name">
-								{{item.subtaskName}}
+					<!-- <view class="subtask-list-title" @click="subtaskEvent(item,index)">
+						<view class="subtask-list-center-wrapper">
+							<view class="subtask-list-center" :class="{'animate-center':item.isScroll}">
+								<view class="subtask-name">
+									{{item.subtaskName}}
+								</view>
+								<view class="subtask-principal">
+									<text>负责人/</text>
+									<text>{{item.subtaskPrincipal}}</text>
+								</view>
 							</view>
-							<view class="subtask-principal">
-								<text>负责人/</text>
-								<text>{{item.subtaskPrincipal}}</text>
-							</view>
-						</view>
-					</view>	
-					<view class="subtask-list-right">
-						<view class="subtask-score">
-							<text>
-								得分:
-							</text>
-							<text>
-								{{item.subtaskScore}}
-							</text>
-							<text>
-								{{`/${item.subtaskFullMark}`}}
-							</text>
-						</view>
-					</view>
-					<view class="subtask-list-left">
-						<view class="subtask-icon">
-							<u-icon name="play-right-fill" v-if="!item.unfold"></u-icon>
-							<u-icon name="arrow-down-fill" v-if="item.unfold"></u-icon>
-						</view>
-					</view>
-				</view>
-				<view class="subtask-list-content" v-if="item.unfold">
-					<view class="subtask-item-wrapper">
-						<view class="subtask-item" v-for="(itemInner,indexInner) in item.checkItem" :key="indexInner">
-							<view class="subtask-item-title" v-if="itemInner.checkItemList.length > 0">
+						</view>	
+						<view class="subtask-list-right">
+							<view class="subtask-score">
 								<text>
-									<u-icon name="file-text"></u-icon>
+									得分:
 								</text>
 								<text>
-									{{itemInner.checkItemName.length == 0 ? '无标签' : itemInner.checkItemName}}
+									{{item.subtaskScore}}
+								</text>
+								<text>
+									{{`/${item.subtaskFullMark}`}}
 								</text>
 							</view>
-							<view class="subtask-item-list" v-for="(checkItem,checkIndex) in itemInner.checkItemList" :key="checkIndex"
-								@click="checkItemEvent(item,checkItem,index)"
-							>
-								<view class="subtask-item-list-left">
+						</view>
+						<view class="subtask-list-left">
+							<view class="subtask-icon">
+								<u-icon name="play-right-fill" v-if="!item.unfold"></u-icon>
+								<u-icon name="arrow-down-fill" v-if="item.unfold"></u-icon>
+							</view>
+						</view>
+					</view> -->
+					<!-- <view class="subtask-list-content" v-if="item.unfold">
+						<view class="subtask-item-wrapper">
+							<view class="subtask-item" v-for="(itemInner,indexInner) in item.checkItem" :key="indexInner">
+								<view class="subtask-item-title" v-if="itemInner.checkItemList.length > 0">
 									<text>
-										{{checkItem.itemName}}
+										<u-icon name="file-text"></u-icon>
+									</text>
+									<text>
+										{{itemInner.checkItemName.length == 0 ? '无标签' : itemInner.checkItemName}}
 									</text>
 								</view>
-								<view class="subtask-item-list-right" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
-										{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
-										{'willChangeStyle': checkItem.checkState == 4 && flowState == 4},{'changedStyle': checkItem.checkState == 5},
-										{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
-										{'passStyle': checkItem.checkState == 8}]"
+								<view class="subtask-item-list" v-for="(checkItem,checkIndex) in itemInner.checkItemList" :key="checkIndex"
+									@click="checkItemEvent(item,checkItem,index)"
 								>
-									<text>{{taskItemStatusTransfer(checkItem.checkState)}}</text>
-								</view>
-								<view class="icon" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
-										{'willReviewdStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
-										{'willChangeStyle': checkItem.checkState == 4 && flowState == 4},{'changedStyle': checkItem.checkState == 5},
-										{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
-										{'passStyle': checkItem.checkState == 8}]">
-									<u-icon name="arrow-right"></u-icon>
+									<view class="subtask-item-list-left">
+										<text>
+											{{checkItem.itemName}}
+										</text>
+									</view>
+									<view class="subtask-item-list-right" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
+											{'queryedStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
+											{'willChangeStyle': checkItem.checkState == 4 && flowState == 4},{'changedStyle': checkItem.checkState == 5},
+											{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
+											{'passStyle': checkItem.checkState == 8}]"
+									>
+										<text>{{taskItemStatusTransfer(checkItem.checkState)}}</text>
+									</view>
+									<view class="icon" :class="[{'willEvaluateStyle': checkItem.checkState == 0},{'evaluateDStyle': checkItem.checkState == 1},
+											{'willReviewdStyle': checkItem.checkState == 2},{'queryedStyle': checkItem.checkState == 3},{'queryedStyle': checkItem.checkState == 4 && flowState == 3},
+											{'willChangeStyle': checkItem.checkState == 4 && flowState == 4},{'changedStyle': checkItem.checkState == 5},
+											{'suredStyle': checkItem.checkState == 6},{'noPassStyle': checkItem.checkState == 7},
+											{'passStyle': checkItem.checkState == 8}]">
+										<u-icon name="arrow-right"></u-icon>
+									</view>
 								</view>
 							</view>
 						</view>
-					</view>
+					</view> -->
 				</view>
 			</view>
-		</view>
-		<view class="subtask-btn-wrapper">
-			<text class="btn-left" :class="{'btnRightStyle': flowState == 2 || flowState == 4 || flowState == 6}" @click="submitResult">提 交</text>
-			<text class="btn-right" @click="backTo">返 回</text>
+			</view>
+		<view class="quit-account-box">
+			<view class="quit-account" :class="{'btnRightStyle': flowState == 2 || flowState == 4 || flowState == 6}" @click="submitResult">提 交</view>
 		</view>
 	</view>
 </template>
@@ -167,6 +145,7 @@
 				flowState: '',
 				infoText: '',
 				showLoadingHint: false,
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				flowList: [
 					{
 					name: '检查中'
@@ -191,6 +170,7 @@
 		computed: {
 			...mapGetters([
 				'titleText',
+				'taskMessage',
 				'userInfo',
 				'mainTaskId',
 				'selectHospitalList',
@@ -224,12 +204,17 @@
 			this.getMainTaskDetails(this.mainTaskId);
 		},
 		
+		options: { styleIsolation: 'shared' },
+		
 		methods: {
 			...mapMutations([
 				'changeSubtaskInfo',
 				'changeDisposeSubTaskData',
 				'changeIsSkipDetails',
-				'changeCacheIndex'
+				'changeSubtaskDetails',
+				'changeCacheIndex',
+				'changeEnterTaskDetailsSource',
+				'changeRecordExamineItemScrollTop'
 			]),
 			
 			// 返回上一页
@@ -237,6 +222,26 @@
 				uni.redirectTo({
 					url: '/qualityPackage/pages/qualityManagement/index/index'
 				})
+			},
+			
+			// 子任务完成进度计算
+			subtaskCompleteProgress (checkItems) {
+				let percent;
+				// 根据主任务流程判断对应子任务检查项是否全部完成
+				if (this.flowState == 0 || this.flowState == 1) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,0)
+				} else if (this.flowState == 2) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,1)
+				} else if (this.flowState == 3) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,2)
+				} else if (this.flowState == 4) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,4)
+				} else if (this.flowState == 5) {
+					flag = this.judgeSubTaskItemState(this.subtaskList,5)
+				};		
+				// if () {
+					
+				// }
 			},
 			
 			// 判断权限
@@ -249,6 +254,27 @@
 					flag = false
 				};
 				return flag
+			},
+			
+			// 进入主任务详情事件
+			arrowEvent () {
+				this.changeEnterTaskDetailsSource('/qualityPackage/pages/examineDetails/examineDetails');
+				uni.redirectTo({
+					url: '/qualityPackage/pages/taskDetails/taskDetails'
+				})
+			},
+			
+			// 子任务点击事件
+			subtaskClickEvent (item) {
+				let temporaryObject = {};
+				temporaryObject = item;
+				temporaryObject['flowState'] = this.flowState;
+				this.changeSubtaskDetails(temporaryObject);
+				// 重置检查项滚动距离
+				this.changeRecordExamineItemScrollTop(0);
+				uni.redirectTo({
+					url: '/qualityPackage/pages/subtaskDetails/subtaskDetails'
+				});
 			},
 			
 			// 检查项状态转换
@@ -329,6 +355,7 @@
 										subtaskScore: res.data.data.subTaskList[i].resultScore,
 										subtaskPrincipal: this.extractPrincipal(res.data.data.subTaskList[i]['persons']),
 										persons: res.data.data.subTaskList[i]['persons'],
+										complete: res.data.data.subTaskList[i]['complete'],
 										unfold: res.data.data.subTaskList[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
 										isScroll: getStringLength(res.data.data.subTaskList[i].name + this.extractPrincipal(res.data.data.subTaskList[i].persons)) >= 20 ? true : false,
 										checkItem: []
@@ -784,8 +811,7 @@
 										};
 										this.changeDisposeSubTaskData(this.subtaskList)
 									}	
-								};
-								console.log('子任务详情',this.subtaskList);
+								}
 							}
 						}
 					} else {
@@ -876,6 +902,10 @@
 				submitTotalTaskDetails(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
 						let temporaryIndex = {};
 						if (this.flowState != 5) {
 							if (this.judgeSubTaskItemState(this.subtaskList,7)) {};
@@ -977,288 +1007,348 @@
 			background-color: transparent;
 		}
 		.nav {
-			width: 100%
+			width: 100%;
+			height: 88px;
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 100
 		}
 		.flow-wrapper {
 			padding: 8px 0;
-			background: #fff
-		}
-		.examine-items-table-wrapper {
-			padding: 8px 0;
+			display: flex;
+			align-items: flex-start;
+			justify-content: center;
+			height: 240px;
 			position: relative;
-			.examine-items-table-top {
-				height: 100px;
-				.image-wrapper {
-					position: relative;
-					height: 100px;
-					width: 100%;
-					margin: 0 auto;
-					> image {
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 100%;
-						height: 100%
+			width: 100%;
+			::v-deep
+			>view {
+				width: 100%;
+				margin-top: 80px;
+				.u-steps__item--row  {
+					.u-steps__item__line {
+						left: 56% !important;
+						width: 100% !important
 					};
-					.examine-items-table-top-content {
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 100%;
-						height: 100px;
-						display: flex;
-						flex-flow: row wrap;
-						justify-content: center;
-						align-items: center;
-						> view {
-							width: 45%;
-							text-align: center;
-							text {
-								&:first-child {
-									color: #bfbfbf;
-									font-size: 12px;
-									margin-right: 8px
-								};
-								&:last-child {
-									color: #fff;
-									font-size: 22px;
-									font-weight: bold
-								}
-							}
-						};
-						.bottom {
-							width: 60%;
-							overflow: auto;
-							max-height: 60px;
-							> text {
-								&:last-child {
-									font-size: 15px
-								}
-							}
-						}
+					.u-steps__item__text--row {
+						font-size: 12px
 					}
 				}
 			};
-			.examine-items-table-bottom {
-				height: 75px;
-				position: relative;
-				background: #fff;
-				.examine-items-table-bottom-content {
-					position: absolute;
-					width: 100%;
-					height: 60px;
-					top: 50%;
-					left: 0;
-					transform: translateY(-50%);
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					flex-flow: row nowrap;
-					> view {
-						margin-right: 10px;
-						&:last-child {
-							margin-right: 0
-						};
-						.top {
-							font-size: 14px;
-							color: black;
-							text-align: center;
-							> text {
-								&:first-child {
-									display: inline-block;
-									width: 4px;
-									height: 4px;
-									background: black;
-									border-radius: 50%;
-									margin-right: 6px;
-									vertical-align: middle;
-								}
-							}
-						};
-						.bottom {
-							font-size: 15px;
-							color: #9a9a9a;
-							text-align: center
-						}
+			u-steps {
+				width: 100%
+			};
+			.u-steps {
+				margin-top: 98px;
+				width: 100%;
+				.u-steps__item--row  {
+					.u-steps__item__line {
+						left: 56% !important;
+						width: 100% !important
+					};
+					.u-steps__item__text--row {
+						font-size: 12px
 					}
 				}
+			};
+			>image {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0
 			}
 		}
-		.subtask-wrapper {
+		.content-box {
+			margin-top: -70px;
+			background: #f5f5f5;
+			z-index: 1000;
 			flex: 1;
 			overflow: auto;
-			margin-top: 8px;
-			.subtask-list {
+			display: flex;
+			flex-direction: column;
+			.examine-pandect {
+				padding: 10px 20px;
 				background: #fff;
-				margin-bottom: 8px;
-				&:last-child {
-					margin-bottom: 0
+				box-shadow: 0px 1px 3px 0 rgba(147, 180, 247, 1);
+				border-radius: 50px;
+				box-sizing: border-box;
+				display: flex;
+				margin-top: 10px;
+				flex-flow: row nowrap;
+				justify-content: space-between;
+				align-items: center;
+				.examine-pandect-left {
+					width: 80%;
+					.examine-pandect-title {
+						word-break: break-all;
+						margin-bottom: 6px;
+						color: #101010;
+						font-size: 14px
+					};
+					.examine-pandect-grade {
+						color: b3b3b0;
+						font-size: 12px;
+						width: 120px;
+						padding: 0 6px;
+						color: #E86F50;
+						background-color:rgba(232,111,80,0.27);
+						height: 24px;
+						border-radius: 20px;
+						text-align: center;
+						line-height: 24px
+					}
 				};
-				.subtask-list-title {
-					width: 100%;
-					padding: 10px 6px;
-					box-sizing: border-box;
+				.examine-pandect-right {
+					width: 20%;
 					display: flex;
-					flex-direction: row;
+					align-items: center;
+					justify-content: center;
+					width: 45px;
+					height: 45px;
+					border-radius: 50%;
+					background: #FFC65B
+				}
+			}
+			.subtask-wrapper {
+				flex: 1;
+				width: 96%;
+				margin: 0 auto;
+				overflow: auto;
+				padding-bottom: 10px;
+				box-sizing: border-box;
+				margin-top: 8px;
+				.subtask-list {
+					background: #fff;
+					margin-bottom: 8px;
+					display: flex;
+					border-radius: 6px;
+					flex-flow: row nowrap;
 					justify-content: space-between;
 					align-items: center;
-					@include bottom-border-1px(#9b9b9b);
-					.subtask-list-left {
-						width: 4%
-					}
-					.animate-center {
-						white-space: nowrap;
-						animation: 4s wordsLoop linear infinite normal
-					}
-					@keyframes wordsLoop {
-						0% {
-							transform: translateX(100%)
-						}
-						100% {
-							transform: translateX(-100%)
-						}
-					}
-					.subtask-list-center-wrapper {
-						width: 60%;
-						overflow: hidden;
-						.subtask-list-center {
-							width: 100%;
-							>view {
-								display: inline-block;
-								margin-right: 6px;
-								vertical-align: middle;
-								font-size: 16px;
-								color: #666
-							}
-							.subtask-name {
-								color: black;
-								font-weight: bold
-							};
-							.subtask-principal {
-								font-size: 15px;
-								color: #9a9a9a;
-								text {
-									&:first-child {
-										margin-right: 4px
-									}
-								}
-							}
-						}
-					}	
-					.subtask-list-right {
-						font-size: 15px;
-						color: #9a9a9a;
-						text-align: right;
-						.subtask-score {
-							text {
-								&:first-child {
-									margin-right: 4px
-								}
-							}
-						}
-					}
-				}
-				.subtask-list-content {
+					padding: 10px;
 					box-sizing: border-box;
-					.subtask-item-wrapper {
-						.subtask-item {
-							@include bottom-border-1px(#d5d5d6);
-							.subtask-item-title {
-								padding-left: 6px;
-								line-height: 30px;
-								font-weight: bold;
-								background: #fff;
+					box-shadow: 0px 1px 3px 0 rgba(0, 0, 0, 0.23);
+					&:last-child {
+						margin-bottom: 0
+					};
+					.subtask-item-left {
+						width: 70%;
+						.subtask-item-title {
+							margin-bottom: 6px;
+							color: #101010;
+							word-break: break-all;
+							font-size: 16px;
+						};
+						.subtask-item-oerson {
+							margin-bottom: 6px;
+							word-break: break-all;
+							color: #9E9E9A;
+							font-size: 14px;
+							margin: 12px 0
+						};
+						.subtask-item-grade {
+							font-size: 12px;
+							width: 110px;
+							padding: 0 6px;
+							color: #1864FF;
+							border: 1px solid #1864FF;
+							height: 24px;
+							border-radius: 20px;
+							text-align: center;
+							line-height: 24px;
+						}
+					};
+					.subtask-item-right {
+						width: 30%;
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+						align-items: center;
+						.subtask-item-right-top {};
+						.subtask-item-right-bottom {
+							margin-top: 6px;
+							.textStyle {
+								color: #289E8E !important
+							};
+							text {
+								font-size: 12px;
+								&:first-child {
+									color: #9E9E9A
+								};
+								&:last-child {
+									color: #1684FC
+								}
+							}
+						}
+					}
+					.subtask-list-title {
+						width: 100%;
+						padding: 10px 6px;
+						box-sizing: border-box;
+						display: flex;
+						flex-direction: row;
+						justify-content: space-between;
+						align-items: center;
+						@include bottom-border-1px(#9b9b9b);
+						.subtask-list-left {
+							width: 4%
+						}
+						.animate-center {
+							white-space: nowrap;
+							animation: 4s wordsLoop linear infinite normal
+						}
+						@keyframes wordsLoop {
+							0% {
+								transform: translateX(100%)
+							}
+							100% {
+								transform: translateX(-100%)
+							}
+						}
+						.subtask-list-center-wrapper {
+							width: 60%;
+							overflow: hidden;
+							.subtask-list-center {
+								width: 100%;
+								>view {
+									display: inline-block;
+									margin-right: 6px;
+									vertical-align: middle;
+									font-size: 16px;
+									color: #666
+								}
+								.subtask-name {
+									color: black;
+									font-weight: bold
+								};
+								.subtask-principal {
+									font-size: 15px;
+									color: #9a9a9a;
+									text {
+										&:first-child {
+											margin-right: 4px
+										}
+									}
+								}
+							}
+						}	
+						.subtask-list-right {
+							font-size: 15px;
+							color: #9a9a9a;
+							text-align: right;
+							.subtask-score {
 								text {
 									&:first-child {
 										margin-right: 4px
 									}
 								}
 							}
-							.subtask-item-list {
-								display: flex;
-								flex-flow: row nowrap;
-								justify-content: space-between;
-								align-items: center;
-								padding: 12px 4px;
-								&:last-child:after {
-									display: none
+						}
+					}
+					.subtask-list-content {
+						box-sizing: border-box;
+						.subtask-item-wrapper {
+							.subtask-item {
+								@include bottom-border-1px(#d5d5d6);
+								.subtask-item-title {
+									padding-left: 6px;
+									line-height: 30px;
+									font-weight: bold;
+									background: #fff;
+									text {
+										&:first-child {
+											margin-right: 4px
+										}
+									}
 								}
-								.subtask-item-list-left {
-									width: 70%;
-									color: #666;
-									padding-left: 20px
-								}
-								.subtask-item-list-right {
-									width: 20%;
-									color: #666;
-									text-align: right
-								}
-								.icon {
-									width: 10%;
-									color: #666;
-									text-align: right
-								}
-								.willEvaluateStyle {
-									color: #FF5722
-								}
-								.evaluateDStyle {
-									color: #FFB800
-								}
-								.willSureStyle {
-									color: #FFB800
-								}
-								.suredStyle {
-									color: #009688
-								}
-								.willReviewdStyle {
-									color: #ff0000
-								}
-								.queryedStyle {
-									color: #ff00ff
-								}
-								.willChangeStyle {
-									color: #1e9fff
-								}
-								.changedStyle {
-									color: #009688
-								}
-								.noPassStyle {
-									color: #ff5500
-								}
-								.passStyle {
-									color: #009688
+								.subtask-item-list {
+									display: flex;
+									flex-flow: row nowrap;
+									justify-content: space-between;
+									align-items: center;
+									padding: 12px 4px;
+									&:last-child:after {
+										display: none
+									}
+									.subtask-item-list-left {
+										width: 70%;
+										color: #666;
+										padding-left: 20px
+									}
+									.subtask-item-list-right {
+										width: 20%;
+										color: #666;
+										text-align: right
+									}
+									.icon {
+										width: 10%;
+										color: #666;
+										text-align: right
+									}
+									.willEvaluateStyle {
+										color: #FF5722
+									}
+									.evaluateDStyle {
+										color: #FFB800
+									}
+									.willSureStyle {
+										color: #FFB800
+									}
+									.suredStyle {
+										color: #009688
+									}
+									.willReviewdStyle {
+										color: #ff0000
+									}
+									.queryedStyle {
+										color: #ff00ff
+									}
+									.willChangeStyle {
+										color: #1e9fff
+									}
+									.changedStyle {
+										color: #009688
+									}
+									.noPassStyle {
+										color: #ff5500
+									}
+									.passStyle {
+										color: #009688
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-		}
-		.subtask-btn-wrapper {
-			height: 60px;
-			width: 80%;
-			margin: 0 auto;
+		};
+		.quit-account-box {
 			display: flex;
-			justify-content: space-between;
+			height: 80px;
+			width: 100%;
+			display: flex;
+			justify-content: center;
 			align-items: center;
-			text {
-				width: 130px;
-				height: 40px;
-				border-radius: 4px;
-				text-align: center;
-				line-height: 40px;
+			.quit-account {
+				height: 48px;
+				width: 266px;
+				font-size: 16px;
+				margin: 0 auto;
+				line-height: 48px;
+				background: linear-gradient(to right, #6cd2f8, #2390fe);
+				box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
 				color: #fff;
-				background-image: linear-gradient(to right, #37d5fc , #439bff)
-			}
+				border-radius: 30px;
+				text-align: center
+			};
 			.btnRightStyle {
 				background: #e8e8e8;
-				color: #989898
+				color: #989898;
+				box-shadow: none;
 			}
-			.btn-right {
-				background: #e8e8e8;
-				color: #666
-			}
-		}
+		}	
 	}	
 </style>
 

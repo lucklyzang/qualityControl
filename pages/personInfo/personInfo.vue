@@ -122,7 +122,7 @@
 		data() {
 			return {
 				content: '',
-				versionNumber: '1.8',
+				versionNumber: '1.9',
 				sureCancelShow: false,
 				showLoadingHint: false,
 				statusBackgroundPng: require("@/static/img/status-background.png"),

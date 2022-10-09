@@ -6,16 +6,19 @@
 		 @cancel="cancelSure">
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="评分" @backClick="backTo">
+			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" :title="taskTypeText" @backClick="backTo">
 			</nav-bar>
 		</view>
+		<view class="image-wrapper">
+			<image :src="statusBackgroundPng"></image>
+		</view>
 		<view class="content">
-			<view class="score">
+			<view class="score" v-show="isShowInput">
 				<view class="left">
 					<text>{{`得分 (满分${subtaskInfo.fullScore})`}}</text>
 				</view>
 				<view class="right">
-					<u-input v-model="gradeValue" placeholder="请输入分数" type="number" :border="true"  :disabled="isDisabled"/>
+					<u-input v-model="gradeValue" placeholder="请输入分数" :disabled="isDisabled" type="number" :border="true" />
 				</view>
 			</view>
 			<view class="problem-describe" v-show="subtaskInfo.operation == 2" :class="{'problemDescribeStyle': subtaskInfo.operation == 2}">
@@ -38,14 +41,14 @@
 						<input :value="item.deductMarksvalue" @input="(value) => buckleScoreChange(value,index)" placeholder="分数" type="number" />
 					</view>	
 					<view class="problem-describe-right">
-						<fa-icon type="plus-square" size="26" color="#43c3f4" @click="operateHandle('plus',item,index)"></fa-icon>
-						<fa-icon v-show="index != 0" type="minus-square" size="26" color="#43c3f4"  @click="operateHandle('minus',item,index)"></fa-icon>
+						<fa-icon type="plus-circle" size="26" color="#1864FF" @click="operateHandle('plus',item,index)"></fa-icon>
+						<fa-icon v-show="index != 0" type="minus-circle" size="26" color="#1864FF"  @click="operateHandle('minus',item,index)"></fa-icon>
 					</view>
 				</view>	
 			</view>
-			<view class="problem-photo" v-show="subtaskInfo.operation == 2">
+			<view class="problem-photo" v-show="subtaskInfo.operation == 2 || subtaskInfo.operation == 7 || subtaskInfo.operation == 5 || subtaskInfo.operation == -1">
 				<view> 
-					<text>问题拍照</text>
+					<text>{{subtaskInfo.operation == 2 ? '问题拍照' : '拍照'}}</text>
 				</view>
 				<view>
 					<view v-for="(item, index) in imgArr" :key='index'>
@@ -66,9 +69,10 @@
 				</view>
 			</view>
 		</view>
-		<view class="btn-box">
-			<text @click="sure">确认</text>
-			<text class="btn-right" @click="backTo">返回</text>
+		<view class="btn-box-wrapper">
+			<view class="btn-box" @click="sure">
+				提交
+			</view>
 		</view>
 	</view>
 </template>
@@ -101,7 +105,9 @@
 			return {
 				gradeValue: '0',
 				infoText: '',
+				isShowInput: true,
 				problemDescribeValue: '',
+				statusBackgroundPng: require("@/static/img/status-background.png"),
 				problemDescribeList: [
 					{
 						problemDescribeValue: '',
@@ -130,7 +136,8 @@
 				'mainTaskId',
 				'selectHospitalList',
 				'timeMessage',
-				'ossMessage'
+				'ossMessage',
+				'enterGradeSource'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -153,6 +160,7 @@
 		},
 		
 		onLoad(options) {
+			console.log('跳转源',this.enterGradeSource);
 			this.judgeScoreWay();
 			this.taskTypeText = this.titleText
 		},
@@ -163,7 +171,9 @@
 				'changeIsSkipDetails',
 				'changeCacheIndex',
 				'changeTimeMessage',
-				'changeOssMessage'
+				'changeOssMessage',
+				'changeIsShowRevaluationBtn',
+				'changeIsShowRejectBtn'
 			]),
 			
 			// 操作按钮事件
@@ -313,14 +323,15 @@
 			// 判断打分方式
 			judgeScoreWay () {
 				 this.subtaskInfo['recordRemarks'] ? this.remark = this.subtaskInfo['recordRemarks'].replace('备注:','') : this.remark = '';
-				 // 判断打分方式(1满分2扣分0不参评-1重新评价7不通过8通过);
+				// 判断打分方式(1满分2扣分0不参评-1重新评价5驳回7不通过8通过);
+				if (this.subtaskInfo['operation'] == 5 || this.subtaskInfo['operation'] == 7) {this.isShowInput = false};
 				if (this.subtaskInfo['operation'] == 1) {
 					this.isDisabled = true;
 					this.gradeValue = this.subtaskInfo['fullScore'].toString();
 				} else if (this.subtaskInfo['operation'] === 0) {
 					this.isDisabled = true;
 					this.gradeValue = '0'
-				} else if (this.subtaskInfo['operation'] == 2 ) {
+				} else if (this.subtaskInfo['operation'] == 2 || this.subtaskInfo['operation'] == 5) {
 					this.isDisabled = true;
 					this.gradeValue = this.subtaskInfo['score'].toString();
 					this.subtaskInfo['recordDesc'] ? this.problemDescribeValue = this.subtaskInfo['recordDesc'].replace('描述:','') : this.problemDescribeValue = ''
@@ -374,6 +385,14 @@
 				addCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
+						// 此时检查项还没有生成id,不能查询检查项详情,此处手动更改评价方式
+						let temporaryInfo = this.subtaskInfo;
+						temporaryInfo['itemMode'] = 3;
+						this.changeSubtaskInfo(temporaryInfo);
 						if (this.subtaskInfo['majorState'] == 0) {
 							// 判断该任务是否为第一次提交(是则更改主任务状态为检查中)
 							if (!this.judgeSubTaskItemState(this.disposeSubTaskData,0)) {
@@ -408,6 +427,10 @@
 				updateCheckRecord(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
 						this.backToExaminePage();
 					} else {
 						this.$refs.uToast.show({
@@ -429,6 +452,16 @@
 				updateTaskItem(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+							title: '提交成功',
+							type: 'success'
+						});
+						if (this.subtaskInfo['operation'] == 5) {
+							this.changeIsShowRejectBtn(false)
+						};
+						if (this.subtaskInfo['operation'] == -1) {
+							this.changeIsShowRevaluationBtn(false)
+						};
 						this.backToExaminePage();
 					} else {
 						this.$refs.uToast.show({
@@ -487,6 +520,7 @@
 					})
 				})
 			},
+			
 			// 确认事件
 			async sure () {
 				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
@@ -583,56 +617,117 @@
 						this.updateCheckRecordMethod(temporaryData)
 					}
 				} else {
-					let temporaryData = {
-						score: this.gradeValue,  //得分
-						describe: "问题描述:" + this.problemDescribeValue,
-						file: "",
-						remarks: "备注:" + this.remark,
-						majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
-						state: this.subtaskInfo.state,	     //检查项状态
-						majorId: this.subtaskInfo.majorId,		//主任务id
-						subId: this.subtaskInfo.subId,		//子任务id
-						fullScore: this.subtaskInfo.fullScore,		//满分
-						taskNum: this.subtaskInfo.taskNum,	//任务编号
-						operator: "检查者",		//检查者（固定）
-						itemId: this.subtaskInfo.checkId,			//检查项id
-						taskItemId: this.subtaskInfo.taskItemId, //检查项id
-						majorState: this.subtaskInfo.majorState,		//主任务当前状态
-						worker: this.userName,
-						additional: this.subtaskInfo.additional, //检查项类型	
-						operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
-					};
-					if (this.subtaskInfo.majorState == 3) {
-						// 重新评价满分的情况
-						if (this.gradeValue == this.subtaskInfo['fullScore']) {
-							temporaryData['state'] = 6;
-							temporaryData['operation'] = 7
-						} else {
-							temporaryData['state'] = 4;
-							temporaryData['operation'] = 7
-						}
-					} else if (this.subtaskInfo.majorState == 5) { 
-						if (this.subtaskInfo.operation == 8) {
-							temporaryData['state'] = 8
-						} else if (this.subtaskInfo.operation == 7) {
-							temporaryData['state'] = 7
-						}
+					// 驳回操作
+					if (this.subtaskInfo.operation == 5) {
+							let temporaryData = {
+								score: "",  //得分
+								describe: "",
+								file: "",
+								remarks: "备注:" + this.remark,
+								majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+								state: 4,	     //检查项状态
+								majorId: this.subtaskInfo.majorId,		//主任务id
+								subId: this.subtaskInfo.subId,		//子任务id
+								fullScore: this.subtaskInfo.fullScore,		//满分
+								taskNum: this.subtaskInfo.taskNum,	//任务编号
+								operator: "检查者",		//检查者（固定）
+								itemId: this.subtaskInfo.checkId,			//检查项id
+								taskItemId: this.subtaskInfo.taskItemId, //检查项id
+								majorState: this.subtaskInfo.majorState,		//主任务当前状态
+								worker: "项目经理",	
+								imagePaths: [], //上传图片集合 imageList this.imgArr
+								operation: 5			//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+							};
+							// 上传图片到阿里云服务器
+							if (this.temporaryImgPathArr.length > 0) {
+								for (let imgI of this.temporaryImgPathArr) {
+									if (Object.keys(this.timeMessage).length > 0) {
+										// 判断签名信息是否过期
+										if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+											await this.getSign();
+											await this.uploadImageToOss(imgI)
+										} else {
+											await this.uploadImageToOss(imgI)
+										}
+									} else {
+										await this.getSign();
+										await this.uploadImageToOss(imgI)
+									}
+								};
+								temporaryData['imagePaths'] = this.imgOnlinePathArr
+							}
+							this.updateTaskItemRecordMethod(temporaryData)
+					} else {
+						let temporaryData = {
+							score: this.gradeValue,  //得分
+							describe: "问题描述:" + this.problemDescribeValue,
+							file: "",
+							remarks: "备注:" + this.remark,
+							majorSubId: this.subtaskInfo.majorSubId,  //主任务子任务关联id
+							state: this.subtaskInfo.state,	     //检查项状态
+							majorId: this.subtaskInfo.majorId,		//主任务id
+							subId: this.subtaskInfo.subId,		//子任务id
+							fullScore: this.subtaskInfo.fullScore,		//满分
+							taskNum: this.subtaskInfo.taskNum,	//任务编号
+							operator: "检查者",		//检查者（固定）
+							itemId: this.subtaskInfo.checkId,			//检查项id
+							taskItemId: this.subtaskInfo.taskItemId, //检查项id
+							majorState: this.subtaskInfo.majorState,		//主任务当前状态
+							worker: this.userName,
+							additional: this.subtaskInfo.additional, //检查项类型	
+							imagePaths: [], //上传图片集合 imageList this.imgArr
+							operation: this.subtaskInfo.operation	//操作方式（0-待评价, 1-待确认,2-已质疑,3-已复核,4-待整改,5-已整改,6-已确认,7-整改未通过,8-整改完成）		
+						};
+						// 上传图片到阿里云服务器
+						if (this.temporaryImgPathArr.length > 0) {
+							for (let imgI of this.temporaryImgPathArr) {
+								if (Object.keys(this.timeMessage).length > 0) {
+									// 判断签名信息是否过期
+									if (new Date().getTime()/1000 - this.timeMessage['expire']  >= -30) {
+										await this.getSign();
+										await this.uploadImageToOss(imgI)
+									} else {
+										await this.uploadImageToOss(imgI)
+									}
+								} else {
+									await this.getSign();
+									await this.uploadImageToOss(imgI)
+								}
+							};
+							temporaryData['imagePaths'] = this.imgOnlinePathArr
+						};
+						if (this.subtaskInfo.majorState == 3) {
+							// 重新评价满分的情况
+							if (this.gradeValue == this.subtaskInfo['fullScore']) {
+								temporaryData['state'] = 6;
+								temporaryData['operation'] = 7
+							} else {
+								temporaryData['state'] = 4;
+								temporaryData['operation'] = 7
+							}
+						} else if (this.subtaskInfo.majorState == 5) { 
+							if (this.subtaskInfo.operation == 8) {
+								temporaryData['state'] = 8
+							} else if (this.subtaskInfo.operation == 7) {
+								temporaryData['state'] = 7
+							}
+						};
+						this.updateTaskItemRecordMethod(temporaryData)
 					}
-					this.updateTaskItemRecordMethod(temporaryData)
 				}
 			},
 			
 			// 返回上一页
 			backTo() {
 				uni.redirectTo({
-					url: '/qualityPackage/pages/examineItemDetails/examineItemDetails'
+					url: this.enterGradeSource
 				})
 			},
 			
 			// 返回任务详情页
 			backToExaminePage() {
 				uni.redirectTo({
-					url: '/qualityPackage/pages/examineDetails/examineDetails'
+					url: this.enterGradeSource
 				})
 			}	
 		}	
@@ -658,15 +753,29 @@
 			background-color: transparent;
 		}
 		.nav {
-			width: 100%
+			position: fixed;
+			width: 100%;
+			height: 88px;
+			top: 0;
+			z-index: 10;
+			left: 0
 		}
+		.image-wrapper {
+			width: 100%;
+			height: 240px;
+			>image {
+				width: 100%;
+				height: 240px
+			}
+		};
 		.content {
 			flex: 1;
 			padding: 6px 0 0 0;
+			margin-top: -150px;
 			box-sizing: border-box;
 			overflow: auto;
 			.score {
-				padding: 12px 4px;
+				padding: 12px 6px;
 				background: #fff;
 				@include bottom-border-1px(#9b9b9b);
 				>view {
@@ -674,13 +783,13 @@
 				};
 				.left {
 					vertical-align: middle;
-					width: 26%;
-					color: #5d5d5d;
-					padding-left: 4px;
-					box-sizing: border-box
+					width: 30%;
+					color: #101010;
+					font-size: 16px;
+					font-weight: bold
 				};
 				.right {
-					width: 74%;
+					width: 70%;
 					vertical-align: middle;
 					/deep/ .u-input--border {
 						border: none;
@@ -692,7 +801,7 @@
 				@include bottom-border-1px(#9b9b9b);
 			};
 			.problem-describe {
-				padding: 12px 4px;
+				padding: 12px 6px;
 				background: #fff;
 				> view {
 					width: 100%;
@@ -700,6 +809,9 @@
 					flex-flow: row nowrap;
 				};
 				.problem-describe-top {
+					font-size: 14px;
+					color: #101010;
+					font-weight: bold;
 					margin-bottom: 4px;
 					.problem-describe-top-left {
 						flex: 1;
@@ -779,17 +891,18 @@
 				padding: 8px 4px;
 				background: #fff;
 				margin-top: 6px;
-				>view {
-					display: inline-block
-				};
 				.top {
-					width: 26%;
-					padding-left: 4px;
-					vertical-align: top;
-					color: #5d5d5d
+					width: 100%;
+					height: 30px;
+					font-weight: bold;
+					line-height: 30px;
+					color: #101010;
+					font-size: 14PX;
+					padding-left: 6px;
+					box-sizing: border-box;
 				};
 				.bottom {
-					width:  74%;
+					width: 100%;
 					/deep/ .u-input--border {
 						border: none;
 						background: #f9f9f9
@@ -801,16 +914,18 @@
 				box-sizing: border-box;
 				padding: 8px 0;
 				>view {
-					display: inline-block;
 					&:first-child {
-						width: 26%;
-						vertical-align: top;
-						height: 100px;
-						color: #5d5d5d;
-						padding:4px 0 0 4px
+						width: 100%;
+						height: 30px;
+						line-height: 30px;
+						color: #101010;
+						font-weight: bold;
+						font-size: 14px;
+						padding-left: 6px;
+						box-sizing: border-box;
 					};
 					&:nth-child(2) {
-						width: 74%;
+						width: 100%;
 						font-size: 34px;
 						>view {
 							width: 32%;
@@ -846,27 +961,26 @@
 				}
 			}
 		}
-		.btn-box {
-			height: 60px;
-			width: 80%;
-			margin: 0 auto;
+		.btn-box-wrapper {
+			width: 100%;
+			height: 100px;
 			display: flex;
-			justify-content: space-between;
+			justify-content: center;
 			align-items: center;
-			text {
-				width: 140px;
-				height: 40px;
-				border-radius: 4px;
-				text-align: center;
-				line-height: 40px;
+			.btn-box {
+				height: 48px;
+				width: 266px;
+				font-size: 16px;
+				margin: 0 auto;
+				line-height: 48px;
+				background: linear-gradient(to right, #6cd2f8, #2390fe);
+				box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
 				color: #fff;
-				background-image: linear-gradient(to right, #37d5fc , #439bff);
-				&:last-child {
-					color: #666;
-					background: #e8e8e8
-				}
+				border-radius: 30px;
+				font-weight: bold;
+				text-align: center
 			}
-		}
+		}	
 	}	
 </style>
 

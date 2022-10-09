@@ -4,7 +4,7 @@
 	},
 	"pages": [
 		{
-			"path": "pages/login/login",
+			"path": "pages/bootPage/bootPage",
 			"style": {
 				"navigationBarTitleText": "",
 				"navigationBarBackgroundColor": "#75b0f0",
@@ -12,12 +12,11 @@
 			}
 		},
 		{
-			"path": "pages/index/index",
+			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "",
-				"navigationBarBackgroundColor": "#ffffff",
-				"backgroundColorTop": "#ffffff,",
-				"backgroundColorBottom": "#ffffff"
+				"navigationBarBackgroundColor": "#75b0f0",
+				"navigationBarTextStyle": "black"
 			}
 		},
 		{
@@ -39,6 +38,33 @@
 					"path": "pages/examineDetails/examineDetails",
 					"style": {
 						"navigationBarTitleText": "检查详情",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/taskDetails/taskDetails",
+					"style": {
+						"navigationBarTitleText": "检查详情",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/subtaskDetails/subtaskDetails",
+					"style": {
+						"navigationBarTitleText": "子任务详情",
+						"navigationBarBackgroundColor": "#ffffff",
+				    "backgroundColorTop": "#fff,",
+				    "backgroundColorBottom": "#fff"
+					}
+				},
+				{
+					"path": "pages/allDocuments/allDocuments",
+					"style": {
+						"navigationBarTitleText": "全部文件",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
 				    "backgroundColorBottom": "#fff"
@@ -96,25 +122,5 @@
 		"navigationBarBackgroundColor": "#fff",
 		"backgroundColor": "#FFFFFF",
 		"navigationStyle": "custom"
-	},
-	"tabBar":{
-	"color":"#333",
-	"selectedColor":"#75b0f0",
-	"backgroundColor":"#fff",
-	"borderStyle":"white",
-	"list":[
-			{
-				"pagePath":"pages/index/index",
-				"text":"首页",
-				"iconPath":"static/img/index.png",
-				"selectedIconPath":"static/img/index-current.png"
-			},
-			{
-				"pagePath":"pages/personInfo/personInfo",
-				"text":"我的",
-				"iconPath":"static/img/my.png",
-				"selectedIconPath":"static/img/my-current.png"
-			}
-		]
 	}
 }

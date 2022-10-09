@@ -10,7 +10,7 @@ const instance = axios.create({
 	retryDelay: 1000, // 每次重试间隔时间
 	timeout: 30000,
   headers: {
-    // common: {   
+    // common: {    
     //   'Accept': 'application/json, test/plain,'
     // }
     // post: {
@@ -27,7 +27,7 @@ instance.interceptors.request.use(function (config) {
 	// 请求头添加token
 	if (store.getters.token) {
 	   config.headers['Authorization'] = store.getters.token
-	};
+	}; 
 	return config;
 }, function (error) {
   //处理请求错误

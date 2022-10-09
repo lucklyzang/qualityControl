@@ -1,6 +1,7 @@
 export default {
 	state: {
 		userInfo: null,
+		roleNameList: [],
 		token: null, //请求token,
 		overDueWay: false,
 		selectHospitalList: [],
@@ -8,6 +9,7 @@ export default {
 	},
 	getters: {
 		userInfo: state => state.userInfo,
+		roleNameList: state => state.roleNameList,
 		token: state => state.token,
 		overDueWay: state => state.overDueWay,
 		selectHospitalList: state => state.selectHospitalList,
@@ -22,6 +24,10 @@ export default {
 			if (playLoad && playLoad != 'null') {
 				state.token = playLoad
 			}
+		},
+		// 修改角色列表
+		changeRoleNameList(state, playLoad) {
+			state.roleNameList = playLoad
 		},
 		// 修改过期方式
 		changeOverDueWay(state, playLoad) {

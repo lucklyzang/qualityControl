@@ -5,12 +5,39 @@
 			<u-empty text="数据为空" mode="list"></u-empty>
 		</view>
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="加载中···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
-		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="任务列表" @backClick="backTo">
-			</nav-bar>
-		</view>
-		<view class="tabs-title">
-			<u-tabs :list="statusList" :is-scroll="false" font-size="35" active-color="#2c9af1" inactive-color="#7d7d7d" bar-width="150" :current="current" @change="tabChange"></u-tabs>
+		<view class="top-area">
+			<image :src="statusBackgroundPng">
+			<view class="top-name">
+				<view class="top-image">
+					<image :src="juddgeAvatarUrl()" @click="headPhotoClickEvent">
+				</view>
+				<view class="top-text">
+					<text>
+						上午好! {{userName}}
+					</text>
+				</view>
+			</view>
+			<view class="top-hospital">
+				<image :src="buildingLogoPng" mode=""></image>
+				<view class="select-box">
+					<xfl-select 
+						:list="hospitalList"
+						:clearable="false"
+						:initValue="userInfo.hospitalList.length > 1 ? selectHospitalList[0].value : userInfo.hospitalList[0]['hospitalName']"
+						:showItemNum="8"
+						 @change="hosipitalChange"
+						placeholder = "请选择医院"
+						:selectHideType="'hideAll'"
+					>
+					</xfl-select>
+				</view>
+			</view>
+				<view class="tabs-title-wrapper">
+					<view class="tabs-name">任务列表</view>
+					<view class="tabs-title">
+							<u-tabs :list="statusList" :is-scroll="false" font-size="35" active-color="#1864FF" inactive-color="#101010" bar-width="100" :current="current" @change="tabChange"></u-tabs>
+					</view>
+				</view>	
 		</view>
 		<view class="status-select-wrapper" v-if="current === 1">
 			<view>状态筛选</view>
@@ -27,232 +54,152 @@
 				</xfl-select>
 			</view>
 		</view>
-		<view class="status-content-wrapper">
+		<view class="status-content-wrapper" :class="{'statusContentWrapperStyle': current != 1}">
 			<view class="not-start" v-if="current === 0" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-content-top">
-						<view class="content-number">
-							<text>编号 : </text>
-							<text>{{item.serialNumber}}</text>
+						<view class="content-status-sign">
+							<image :src="statusTransferImg(item.status)" alt=""></image>
 						</view>
-						<view class="specific-status">
+						<view class="specific-status" :class="{'noStartStyle': item.status == 0, 
+								'checkIngStyle': item.status == 1,
+								'confirmIngStyle': item.status == 2,
+								'queryIngStyle': item.status == 3,
+								'changIngStyle': item.status == 5 || item.status == 4,
+								'completedStyle': item.status == 6
+							}"
+							>
 							<text>{{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
 					<view class="status-content-middle">
 						<view class="status-content-middle-first-line">
 							<view class="content-examination-item">
-								<text>考核项目 : </text>
-								<text>{{item.examinationItem}}</text>
-							</view>
-							<view class="content-examination-time">
-								<text>考核时间 : </text>
-								<text>{{item.examinationTime}}</text>
+								<text>{{`${item.year}年${item.examinationTime}${item.checkName}${item.examinationType}检查`}}</text>
 							</view>
 						</view>
 						<view class="status-content-middle-two-line">
-							<view class="content-examination-type">
-								<text>检查类型 : </text>
-								<text>{{item.examinationType}}</text>
+							<view class="content-assessment-format">
+								<text>编号 : </text>
+								<text>{{item.serialNumber}}</text>
 							</view>
+						</view>
+						<view class="status-content-middle-three-line">
 							<view class="content-examination-principal">
 								<text>检查负责人 : </text>
 								<text>{{item.examinationPrincipal}}</text>
 							</view>
 						</view>
-						<view class="status-content-middle-three-line">
-							<view class="content-assessment-format">
-								<text>评价方式 : </text>
-								<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
-							</view>
-							<view class="content-isQuery">
-								<text>质 疑 : </text>
-								<text>{{queryTransfer(item.isQuery)}}</text>
-							</view>
-						</view>
-						<view class="status-content-middle-exam-line">
-							<view class="content-exam">
-								<text>考核内容 : </text>
-								<text>{{item.checkName}}</text>
-							</view>
-						</view>
 						<view class="status-content-middle-four-line">
-							<view class="content-fullMark">
-								<text>满 分 : </text>
-								<text>{{item.fullMark}}</text>
-							</view>
 							<view class="status-info">
+								<text>检查状态 : </text>
 								<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 							</view>
 						</view>
 						<view class="status-content-middle-five-line">
-							<view class="content-remark">
-								<text>备 注 : </text>
-								<text>{{item.remark}}</text>
-							</view>
-						</view>
-						<view class="status-content-middle-six-line">
-							<view class="start-time">
-								<text>开始时间 :</text>
-								<text>{{item.examinationStartTime}}</text>
-							</view>
 						</view>
 					</view>
 					<view class="status-content-bottom">
-						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 						<text @click="viewMore(item,index)">查看更多</text>
+						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 					</view>
 				</view>
 			</view>
 			<view class="is-going" v-if="current === 1">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-content-top">
-						<view class="content-number">
-							<text>编号 : </text>
-							<text>{{item.serialNumber}}</text>
+						<view class="content-status-sign">
+							<image :src="statusTransferImg(item.status)" alt=""></image>
 						</view>
-						<view class="specific-status">
+						<view class="specific-status" :class="{'noStartStyle': item.status == 0, 
+								'checkIngStyle': item.status == 1,
+								'confirmIngStyle': item.status == 2,
+								'queryIngStyle': item.status == 3,
+								'changIngStyle': item.status == 5 || item.status == 4,
+								'completedStyle': item.status == 6
+							}">
 							<text>{{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
 					<view class="status-content-middle">
 						<view class="status-content-middle-first-line">
 							<view class="content-examination-item">
-								<text>考核项目 : </text>
-								<text>{{item.examinationItem}}</text>
-							</view>
-							<view class="content-examination-time">
-								<text>考核时间 : </text>
-								<text>{{item.examinationTime}}</text>
+								<text>{{`${item.year}年${item.examinationTime}${item.checkName}${item.examinationType}检查`}}</text>
 							</view>
 						</view>
 						<view class="status-content-middle-two-line">
-							<view class="content-examination-type">
-								<text>检查类型 : </text>
-								<text>{{item.examinationType}}</text>
+							<view class="content-assessment-format">
+								<text>编号 : </text>
+								<text>{{item.serialNumber}}</text>
 							</view>
+						</view>
+						<view class="status-content-middle-three-line">
 							<view class="content-examination-principal">
 								<text>检查负责人 : </text>
 								<text>{{item.examinationPrincipal}}</text>
 							</view>
 						</view>
-						<view class="status-content-middle-three-line">
-							<view class="content-assessment-format">
-								<text>评价方式 : </text>
-								<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
-							</view>
-							<view class="content-isQuery">
-								<text>质 疑 : </text>
-								<text>{{queryTransfer(item.isQuery)}}</text>
-							</view>
-						</view>
-						<view class="status-content-middle-exam-line">
-							<view class="content-exam">
-								<text>考核内容 : </text>
-								<text>{{item.checkName}}</text>
-							</view>
-						</view>
 						<view class="status-content-middle-four-line">
-							<view class="content-fullMark">
-								<text>满 分 : </text>
-								<text>{{item.fullMark}}</text>
-							</view>
 							<view class="status-info">
+								<text>检查状态 : </text>
 								<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 							</view>
 						</view>
 						<view class="status-content-middle-five-line">
-							<view class="content-remark">
-								<text>备 注 : </text>
-								<text>{{item.remark}}</text>
-							</view>
-						</view>
-						<view class="status-content-middle-six-line">
-							<view class="start-time">
-								<text>开始时间 :</text>
-								<text>{{item.examinationStartTime}}</text>
-							</view>
 						</view>
 					</view>
 					<view class="status-content-bottom">
-						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 						<text @click="viewMore(item,index)">查看更多</text>
+						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 					</view>
 				</view>
 			</view>
 			<view class="is-completed" v-if="current === 2" :class="{'statusStyle':current != 1}">
 				<view class="status-content-list" v-for="(item,index) in statusContentList" :key="index">
 					<view class="status-content-top">
-						<view class="content-number">
-							<text>编号 : </text>
-							<text>{{item.serialNumber}}</text>
+						<view class="content-status-sign">
+							<image :src="statusTransferImg(item.status)" alt=""></image>
 						</view>
-						<view class="specific-status">
+						<view class="specific-status" :class="{'noStartStyle': item.status == 0, 
+								'checkIngStyle': item.status == 1,
+								'confirmIngStyle': item.status == 2,
+								'queryIngStyle': item.status == 3,
+								'changIngStyle': item.status == 5 || item.status == 4,
+								'completedStyle': item.status == 6
+							}">
 							<text>{{statusTransfer(item.status)}}</text>
 						</view>
 					</view>
 					<view class="status-content-middle">
 						<view class="status-content-middle-first-line">
 							<view class="content-examination-item">
-								<text>考核项目 : </text>
-								<text>{{item.examinationItem}}</text>
-							</view>
-							<view class="content-examination-time">
-								<text>考核时间 : </text>
-								<text>{{item.examinationTime}}</text>
+								<text>{{`${item.year}年${item.examinationTime}${item.checkName}${item.examinationType}检查`}}</text>
 							</view>
 						</view>
 						<view class="status-content-middle-two-line">
-							<view class="content-examination-type">
-								<text>检查类型 : </text>
-								<text>{{item.examinationType}}</text>
+							<view class="content-assessment-format">
+								<text>编号 : </text>
+								<text>{{item.serialNumber}}</text>
 							</view>
+						</view>
+						<view class="status-content-middle-three-line">
 							<view class="content-examination-principal">
 								<text>检查负责人 : </text>
 								<text>{{item.examinationPrincipal}}</text>
 							</view>
 						</view>
-						<view class="status-content-middle-three-line">
-							<view class="content-assessment-format">
-								<text>评价方式 : </text>
-								<text>{{evaluationMethodTransfer(item.assessmentFormat)}}</text>
-							</view>
-							<view class="content-isQuery">
-								<text>质 疑 : </text>
-								<text>{{queryTransfer(item.isQuery)}}</text>
-							</view>
-						</view>
-						<view class="status-content-middle-exam-line">
-							<view class="content-exam">
-								<text>考核内容 : </text>
-								<text>{{item.checkName}}</text>
-							</view>
-						</view>
 						<view class="status-content-middle-four-line">
-							<view class="content-fullMark">
-								<text>满 分 : </text>
-								<text>{{item.fullMark}}</text>
-							</view>
 							<view class="status-info">
+								<text>检查状态 : </text>
 								<text :class="{'animate-center':statusInfoTransfer(item,item['subTaskList'],item.status).length > 10}">{{statusInfoTransfer(item,item['subTaskList'],item.status)}}</text>
 							</view>
 						</view>
 						<view class="status-content-middle-five-line">
-							<view class="content-remark">
-								<text>备 注 : </text>
-								<text>{{item.remark}}</text>
-							</view>
-						</view>
-						<view class="status-content-middle-six-line">
-							<view class="start-time">
-								<text>开始时间 :</text>
-								<text>{{item.examinationStartTime}}</text>
-							</view>
 						</view>
 					</view>
 					<view class="status-content-bottom">
-						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 						<text @click="viewMore(item,index)">查看更多</text>
+						<text @click="enterTask(item,index)" :class="{'btnRightStyle': item.status === 0}">进入任务</text>
 					</view>
 				</view>
 			</view>	
@@ -287,6 +234,9 @@
 		},
 		data() {
 			return {
+				hospitalList: [],
+				selectHomeHospitalList: [],
+				temporaryIndex: {},
 				taskTypeText: '',
 				isFresh: false,
 				noDataShow: false,
@@ -296,9 +246,19 @@
 				initValue: '全部',
 				current: 0,
 				goingState: '',
-				statusContentList: []
+				statusContentList: [],
+				statusBackgroundPng: require("@/static/img/status-background.png"),
+				queryPng: require("@/static/img/querying.png"),
+				changPng: require("@/static/img/changing.png"),
+				checkPng: require("@/static/img/checking.png"),
+				confirmPng: require("@/static/img/confirm.png"),
+				completedPng: require("@/static/img/completed.png"),
+				buildingLogoPng: require("@/static/img/building-logo.png"),
+				noStartPng: require("@/static/img/no-start.png")
 			}
 		},
+		
+		options: { styleIsolation: 'shared' },
 		
 		mounted () {
 			let data = {
@@ -324,6 +284,8 @@
 				this.current = 1;
 				data.state = -1
 			};
+			// 获取医院列表数据
+			this.getHospitalListData();
 			this.changeIsSkipDetails(false);
 			this.getAllMainTasks(data)
 		},
@@ -389,13 +351,125 @@
 			...mapMutations([
 				'changeMainTaskId',
 				'changeCacheIndex',
-				'changeIsSkipDetails'
+				'changeSelectHospitalList',
+				'changeIsSkipDetails',
+				'changeTaskMessage',
+				'resetQualityState',
+				'changeEnterTaskDetailsSource'
 			]),
-			// 返回上一页
-			backTo() {
-				uni.switchTab({
-					url: '/pages/index/index'
+			
+			
+			// 判断头像
+			juddgeAvatarUrl() {
+				return '/static/img/default-person.png'
+			},
+			
+			// 头像点击事件
+			headPhotoClickEvent () {
+				this.temporaryIndex = {};
+				if (this.current == 0) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				} else if (this.current == 1) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = true;
+					this.temporaryIndex.selectIndex = this.goingState;
+				} else {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				};
+				this.changeIsSkipDetails(true);
+				this.changeCacheIndex(this.temporaryIndex);
+				uni.redirectTo({
+					url: '/pages/personInfo/personInfo'
 				})
+			},
+			
+			// 获取医院列表数据
+			getHospitalListData () {
+				this.hospitalList = [];
+				for (let item of this.userInfo.hospitalList) {
+					this.hospitalList.push({
+						value: item.name,
+						id: item.id
+					})
+				};
+			},
+			
+			// tab切换改变事件
+			tabChange (index) {
+				this.current = index;
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : "", //任务类型
+					person : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.current //主任务状态
+				};
+				if (index == 2) {
+					data.state = 6
+				};
+				if (index == 1) {
+					data.state = -1;
+					this.initValue = '全部'
+				};
+				this.getAllMainTasks(data)
+			},
+			
+			// 任务状态下拉事件
+			statusChange (val) {
+				this.goingState = val.index;
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : "", //任务类型
+					person : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.goingState //主任务状态
+				};
+				if (val.index == 0) {
+					data.state = -1
+				};
+				this.getAllMainTasks(data)
+			},
+			
+			// 医院下拉框下拉选择确定事件
+			hosipitalChange (val) {
+				this.selectHomeHospitalList = [];
+				this.selectHomeHospitalList.push(val.orignItem);
+				this.changeSelectHospitalList(this.selectHomeHospitalList);
+				setCache('selectHospitalList',this.selectHomeHospitalList);
+				this.$store.dispatch('resetQualityState');
+				let data = {
+					hospitals : this.proId, //检查项目(指的是医院)
+					mode : 1, //评价方式
+					type : "", //任务类型
+					person : this.workerId, //任务负责人
+					subPersons : "", //子任务负责人
+					startTime: "",//检查时间
+					createTime : "", //创建时间
+					state : this.goingState //主任务状态, //主任务状态
+				};
+				if (this.current == 1) {
+					if (this.goingState == 0) {
+						data.state = -1
+					}
+				} else if (this.current == 0) {
+					data.state = 0
+				} else if (this.current == 2) {
+					data.state = 6
+				};
+				this.getAllMainTasks(data)
+			},
+			
+			// 提取年份
+			extractYear (year) {
+				
 			},
 			
 			// 任务状态转换
@@ -421,6 +495,33 @@
 					break;
 					case 6 :
 					return '已完成'
+			    break;
+			  }
+			},
+			
+			// 任务状态转换图片
+			statusTransferImg (index) {
+			  switch(index) {
+					case 0 :
+					return this.noStartPng
+					break;
+			    case 1 :
+			    return this.checkPng
+			    break;
+			    case 2 :
+			    return this.confirmPng
+			    break;
+			    case 3 :
+			    return this.queryPng
+			    break;
+			    case 4 :
+			    return this.changPng
+					break;
+					case 5 :
+					return this.changPng
+					break;
+					case 6 :
+					return this.completedPng
 			    break;
 			  }
 			},
@@ -618,11 +719,17 @@
 									examinationPrincipal: this.extractPrincipal(item.persons),
 									examinationStartTime: item.startTime,
 									assessmentFormat: item.mode,
-									checkName: item.checkName,
+									companion: item.companion,
+									checkName: item.checkName ? item.checkName : '',
 									isQuery: item.question,
 									fullMark: item.score,
+									year: item.year,
 									id: item.id,
+									finishTime: item.finishTime,
+									questionTime: item.questionTime,
+									reformTime: item.reformTime,
 									persons: item.persons,
+									subPersons: item.subPersons,
 									remark: item.remarks,
 									subTaskList: item.subTaskList
 								})
@@ -636,8 +743,7 @@
 							title: `${res.data.data.msg}`,
 							type: 'warning'
 						});
-						this.showLoadingHint = false;
-						this.noDataShow = true
+						this.showLoadingHint = false
 					}
 				})
 				.catch((err) => {
@@ -646,81 +752,61 @@
 						type: 'error'
 					});
 					this.showLoadingHint = false;
-					this.noDataShow = true;
 					if (this.isFresh) {
 					  uni.stopPullDownRefresh();
 					  this.isFresh = false
 					}
 				})
 			},
-			
-			// tab切换改变事件
-			tabChange (index) {
-				this.current = index;
-				let data = {
-					hospitals : this.proId, //检查项目(指的是医院)
-					mode : 1, //评价方式
-					type : "", //任务类型
-					person : this.workerId, //任务负责人
-					subPersons : "", //子任务负责人
-					startTime: "",//检查时间
-					createTime : "", //创建时间
-					state : this.current //主任务状态
-				};
-				if (index == 2) {
-					data.state = 6
-				};
-				if (index == 1) {
-					data.state = -1;
-					this.initValue = '全部'
-				};
-				this.getAllMainTasks(data)
-			},
-			// 任务状态下拉事件
-			statusChange (val) {
-				this.goingState = val.index;
-				let data = {
-					hospitals : this.proId, //检查项目(指的是医院)
-					mode : 1, //评价方式
-					type : "", //任务类型
-					person : this.workerId, //任务负责人
-					subPersons : "", //子任务负责人
-					startTime: "",//检查时间
-					createTime : "", //创建时间
-					state : this.goingState //主任务状态
-				};
-				if (val.index == 0) {
-					data.state = -1
-				};
-				this.getAllMainTasks(data)
-			},
+	
 			// 进入任务
 			enterTask (item,index) {
 				// if (item.status === 0) {
 				// 	return
 				// };
-				let temporaryIndex = {};
+				this.temporaryIndex = {};
 				if (this.current == 0) {
-					temporaryIndex.current = this.current;
-					temporaryIndex.isGoingTask = false
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
 				} else if (this.current == 1) {
-					temporaryIndex.current = this.current;
-					temporaryIndex.isGoingTask = true;
-					temporaryIndex.selectIndex = this.goingState;
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = true;
+					this.temporaryIndex.selectIndex = this.goingState;
 				} else {
-					temporaryIndex.current = this.current;
-					temporaryIndex.isGoingTask = false
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
 				};
 				this.changeIsSkipDetails(true);
-				this.changeCacheIndex(temporaryIndex);
+				this.changeCacheIndex(this.temporaryIndex);
+				this.changeTaskMessage(item);
 				this.changeMainTaskId(item.id);
 				uni.redirectTo({
 					url: '/qualityPackage/pages/examineDetails/examineDetails'
-				});
+				})
 			},
 		
 			// 查看更多
 			viewMore (item,index) {
+				this.temporaryIndex = {};
+				if (this.current == 0) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				} else if (this.current == 1) {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = true;
+					this.temporaryIndex.selectIndex = this.goingState;
+				} else {
+					this.temporaryIndex.current = this.current;
+					this.temporaryIndex.isGoingTask = false
+				};
+				this.changeIsSkipDetails(true);
+				this.changeEnterTaskDetailsSource('/qualityPackage/pages/qualityManagement/index/index');
+				this.changeCacheIndex(this.temporaryIndex);
+				this.changeTaskMessage(item);
+				this.changeMainTaskId(item.id);
+				uni.redirectTo({
+					url: '/qualityPackage/pages/taskDetails/taskDetails'
+				})
 			}
 		}	
 	}	
@@ -734,7 +820,7 @@
 	};
 	.container {
 		@include content-wrapper;
-		background: #fff;
+		background: #fafafa;
 		padding-bottom: 0;
 		padding-bottom: constant(safe-area-inset-bottom);
 		padding-bottom: env(safe-area-inset-bottom);
@@ -751,89 +837,204 @@
 			right: 0;
 			margin: auto
 		};
-		.nav {
-			width: 100%
-		}
-		/deep/ .tabs-title {
-			.u-tabs {
-				.u-scroll-view {
-					.u-tab-item {
-						color: black !important;
-						font-weight: bold
+		.top-area {
+			height: 224px;
+			position: relative;
+			padding-top: 44px;
+			background: #fafafa;
+			width: 100%;
+			>image {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0
+			};
+			.top-name {
+				width: 90%;
+				margin: 0 auto;
+				height: 40px;
+				margin-top: 10px;
+				display: flex;
+				flex-flow: row nowrap;
+				align-items: center;
+				.top-image {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					width: 40px;
+					height: 40px;
+					border-radius: 50%;
+					background: #fff;
+					z-index: 1000;
+					margin-right: 8px;
+					image {
+						vertical-align: middle;
+						width: 35px;
+						height: 35px
+					}
+				};
+				.top-text {
+					color: #fff;
+					font-size: 12px;
+					z-index: 1000
+				}
+			};
+			.top-hospital {
+				width: 90%;
+				height: 40px;
+				margin: 0 auto;
+				margin-top: 4px;
+				display: flex;
+				align-items: center;
+				flex-flow: row nowrap;
+				> image {
+					width: 22px;
+					height: 22px;
+					z-index: 1
+				};
+				.select-box {
+					flex: 1;
+					/deep/ .show-box {
+						background: transparent !important;
+						border: none !important;
+						color: #fff !important;
+						padding: 0 12% 0 1%;
+						.placeholder {
+							color: #fff !important
+						}
+						> span {
+							color: #fff !important
+						};
+						.list-container {
+							top: 0;
+							.list {
+								.item {
+									color: black
+								};
+								.active {
+									color: #01a6ff;
+								}
+							}
+						}
 					}
 				}
-			}
-		};
+			};
+			.tabs-title-wrapper {
+					position: absolute;
+					top: 144px;
+					border: 1px solid #f4f4f4;
+					z-index: 10;
+					left: 3%;
+					background: #fff;
+					width: 94%;
+					border-radius: 10px;
+				.tabs-name {
+					height: 40px;
+					line-height: 40px;
+					text-align: center;
+					color: black !important;
+					@include bottom-border-1px(#c9c9c9);
+				};
+				/deep/ .tabs-title {
+					.u-tabs {
+						border-radius: 10px;
+						box-shadow: 0px 15px 10px -15px #b0d2ff;
+						.u-scroll-view {
+							.u-tab-item {
+								font-size: 15px !important;
+								color: black !important;
+							}
+						}
+					}
+				}
+			}	
+		}
 		.status-select-wrapper {
-			width: 100%;
-			padding: 14px 10px;
+			width: 90%;
 			margin: 0 auto;
-			font-size: 16px;
+			background: #fafafa;
+			margin-top: 2px;
+			font-size: 13px;
 			display: flex;
 			flex-flow: row;
 			justify-content: center;
 			> view {
 				height: 40px;
 				&:first-child {
-					width: 20%;
 					text-align: left;
 					line-height: 40px;
-					font-weight: bold;
-					color: #666666
+					color: #a8a8a8
 				};
 				&:last-child {
-					width: 80%;
-					.show-box {
+					flex: 1;
+					/deep/ .show-box {
 						height: 40px;
 						border: none;
-						color: black;
-						font-weight: bold;
+						padding: 0 12% 0 2% !important;
 						background: #f9f9f9;
+						.list-container {
+							top: 0;
+							.list {
+								.item {
+									color: #a8a8a8
+								};
+								.active {
+									color: #01a6ff;
+								}
+							}
+						};
 						/deep/ .iconfont {
-							color: black !important
+							color: #a8a8a8 !important
 						}
 					}
 				}
 			}
 		}
+		.statusContentWrapperStyle {
+			margin-top: 20px;
+		};
 		.status-content-wrapper {
 			width: 100%;
-			margin: 0 auto;
+			background: #fafafa;
 			flex: 1;
 			overflow: auto;
 			.statusStyle {
 				margin-top: 6px
 			}
 			.status-content-list {
+				width: 96%;
+				margin: 0 auto;
+				padding-bottom: 10px;
+				box-sizing: border-box;
 				margin-bottom: 10px;
+				box-shadow: 0px 1px 3px 0 rgba(0,0,0,.23);
+				border-radius: 8px;
 				background: #fff;
 				position: relative;
 				.status-content-top {
-					height: 52px;
-					line-height: 52px;
+					height: 30px;
+					position: relative;
 					padding: 0 10px;
-					background: #f6f6f6;
 					color: #43c3f4;
 					font-size: 15px;
-					display: flex;
-					flex-flow: row nowrap;
-					justify-content: space-between;
-					.content-number {
-						color: #666;
-						font-size: 15px;
-						line-height: 52px;
-						max-width: 200px;
-						overflow-x: auto;
-						white-space: nowrap;
-						> text {
-							&:first-child {
-								margin-right: 4px
-							}
+					.content-status-sign {
+						position: absolute;
+						top: 0;
+						left: 10px;
+						width: 22px;
+						height: 22px;
+						>image {
+							width: 100%;
+							height: 100%
 						}
 					}
 					.specific-status {
+						position: absolute;
+						top: 0;
+						right: 10px;
 						max-width: 150px;
-						font-size: 16px;
+						font-size: 12px;
 						text-align: center;
 						height: 30px;
 						line-height: 30px;
@@ -844,132 +1045,130 @@
 						border-radius: 10px;
 						overflow-x: auto;
 						white-space: nowrap
+					};
+					.noStartStyle {
+						color: #E8CB51 !important
+					};
+					.checkIngStyle {
+						color: #289E8E !important
+					};
+					.changIngStyle {
+						color: #E86F50 !important
+					};
+					.queryIngStyle {
+						color: #174E97 !important
+					};
+					.confirmIngStyle {
+						color: #F2A15F !important
+					};
+					.completedStyle {
+						color: #254550 !important
 					}
 				};
 				.status-content-middle {
 					padding: 10px;
 					font-size: 16px;
-					> view {
-						> view {
-							> text {
-								&:first-child {
-									color: #666666
-								}
-							}
-						};
-						display: flex;
-						flex-flow: row nowrap;
-						justify-content: space-between;
-						padding: 3px 0;
-						> view {
-							width: 50%;
-							height: 25px;
-							line-height: 25px;
-							overflow: auto;
-							text {
-								&:first-child {
-									margin-right: 6px
-								};
-								&:last-child {
-									font-weight: bold
-								}
-							}
-						};
-						.content-exam {
+					.status-content-middle-first-line {
+						.content-examination-item {
 							width: 100%;
+							line-height: 25px;
+							word-break: break-all;
+							>text {
+								color: #101010;
+								font-weight: bold;
+							}
+						}
+					};
+					.status-content-middle-two-line {
+						.content-assessment-format {
+							width: 100%;
+							line-height: 25px;
+							margin: 4px 0;
+							word-break: break-all;
+							font-size: 14px;
+							>text {
+								color: #9E9E9A
+							}
+						}
+					};
+					.status-content-middle-three-line {
+						.content-examination-principal {
+							width: 100%;
+							line-height: 25px;
+							word-break: break-all;
+							font-size: 14px;
+							>text {
+								color: #9E9E9A
+							}
 						}
 					};
 					.status-content-middle-four-line {
+						display: inline-block;
+						margin-top: 5px;
 						> view {
-							&:first-child {
-								width: 40%
-							};
-							&:last-child {
-								width: 60%;
-								padding-left: 4px;
-								box-sizing: border-box;
-								text-align: center;
-								height: 30px;
-								line-height: 30px;
-								font-size: 13px;
-								overflow: hidden;
-								> text {
-									width: 100%;
-									display: inline-block;
-									color: #43c3f4;
-								}
-								.animate-center {
-									white-space: nowrap;
-									animation: 4s wordsLoop linear infinite normal
-								}
-								@keyframes wordsLoop {
-									0% {
-										transform: translateX(100%)
-									}
-									100% {
-										transform: translateX(-100%)
-									}
-								}
+							max-width: 100%;
+							background: #dae6ff;
+							border-radius: 20px;
+							padding: 0 10px;
+							box-sizing: border-box;
+							text-align: left;
+							height: 23px;
+							line-height: 23px;
+							font-size: 12px;
+							// overflow: hidden;
+							> text {
+								display: inline-block;
+								color: #0455ff;
 							}
+							// .animate-center {
+							// 	white-space: nowrap;
+							// 	animation: 4s wordsLoop linear infinite normal
+							// }
+							// @keyframes wordsLoop {
+							// 	0% {
+							// 		transform: translateX(100%)
+							// 	}
+							// 	100% {
+							// 		transform: translateX(-100%)
+							// 	}
+							// }
 						}
 					};
 					.status-content-middle-five-line {
-						height: 80px;
-						background: #f6f6f6;
-						.content-remark {
-							width: 100%;
-							height: 80px;
-							overflow: auto;
-							padding: 8px;
-							box-sizing: border-box;
-							text {
-								display: inline-block;
-								&:first-child {
-									width: 15%;
-									vertical-align: top
-								};
-								&:last-child {
-									width: 82%;
-									margin-right: 0;
-									vertical-align: top
-								}
-							}
-						}
-					};
-					.status-content-middle-six-line {
-						font-size: 15px;
-						color: #666666 !important;
-						.start-time {
-							width: 100%
-						}
+						margin-top: 10px;
+						@include bottom-border-1px(rgba(0, 0, 0, 0.23));
 					}
 				};
 				.status-content-bottom {
+					padding: 0 10px;
+					box-sizing: border-box;
 					height: 40px;
-					width: 65%;
+					width: 100%;
 					margin: 0 auto;
 					display: flex;
-					justify-content: space-between;
+					justify-content: flex-end;
 					align-items: center;
 					.btnRightStyle {
-						background: #e8e8e8;
-						color: #666
+						background: #e8e8e8 !important;
+						color: #666 !important
 					};
 					text {
-						font-size: 16px;
-						width: 100px;
-						height: 40px;
-						border-radius: 4px;
+						font-size: 14px;
+						width: 90px;
+						height: 30px;
+						border-radius: 20px;
 						text-align: center;
-						line-height: 40px;
+						line-height: 30px;
 						color: #fff;
 						&:first-child {
-							color: #fff;
-							background-image: linear-gradient(to right, #37d5fc , #439bff);
+							margin-right: 10px;
+							background: #fff;
+							color: #2d72ff;
+							border: 1px solid #2d72ff;
 						};
 						&:last-child {
-							color: #666;
-							background: #e8e8e8
+							color: #fff;
+							background: #1864ff
 						}
 					}
 				}
