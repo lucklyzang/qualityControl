@@ -1,5 +1,5 @@
 <template>
-	<view class="container">
+	<view class="container-box">
 		<u-toast ref="uToast" />
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="nav">
@@ -33,8 +33,9 @@
 					</view>
 					<view class="subtask-item-right">
 						<view class="subtask-item-right-top">
-								<u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : item.complete == 0 ? '#ececec' : '#1684FC'" :percent="item.complete">
-								</u-circle-progress>
+							<!-- <u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : item.complete == 0 ? '#ececec' : '#1684FC'" :percent="item.complete">
+							</u-circle-progress> -->
+							<cCircle  :size="35" :percent="item.complete" :direction="180" :circleColor="item.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
 						</view>
 						<view class="subtask-item-right-bottom">
 							<text>检查已完成:</text>
@@ -135,9 +136,11 @@
 		submitTotalTaskDetails
 	} from '@/api/task.js'
 	import navBar from "@/components/zhouWei-navBar"
+	import cCircle from "@/components/my-circle/myCircle.vue"
 	export default {
 		components: {
-			navBar
+			navBar,
+			cCircle
 		},
 		data() {
 			return {
@@ -995,7 +998,7 @@
 		width: 100%;
 		height: 100%;
 	};
-	.container {
+	.container-box {
 		@include content-wrapper;
 		background: #f5f5f5;
 		padding-bottom: 0;
@@ -1115,9 +1118,8 @@
 				flex: 1;
 				width: 96%;
 				margin: 0 auto;
-				overflow: auto;
+				overflow-y: auto;
 				padding-bottom: 10px;
-				box-sizing: border-box;
 				margin-top: 8px;
 				.subtask-list {
 					background: #fff;

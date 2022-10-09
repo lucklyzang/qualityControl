@@ -17,8 +17,9 @@
 					</view>
 					<view class="subtask-item-right">
 						<view class="subtask-item-right-top">
-								<u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#289E8E' : subtaskDetails.complete == 0 ? '#ececec' : '#1684FC'" :percent="subtaskDetails.complete">
-								</u-circle-progress>
+								<!-- <u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#289E8E' : subtaskDetails.complete == 0 ? '#ececec' : '#1684FC'" :percent="subtaskDetails.complete">
+								</u-circle-progress> -->
+								<cCircle  :size="35" :percent="subtaskDetails.complete" :direction="180" :circleColor="subtaskDetails.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
 						</view>
 						<view class="subtask-item-right-bottom">
 							<text>检查已完成:</text>
@@ -116,12 +117,14 @@
 	import timeline from '@/components/chenbin-timeline/timeLine.vue'
 	import hintDialog from "@/components/hint-dialog/hint-dialog.vue"
 	import timelineItem from '@/components/chenbin-timeline/timelineItem.vue'
+	import cCircle from "@/components/my-circle/myCircle.vue"
 	export default {
 		components: {
 			navBar,
 			timeline,
 			timelineItem,
-			hintDialog
+			hintDialog,
+			cCircle
 		},
 		data() {
 			return {
