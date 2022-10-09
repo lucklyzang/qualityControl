@@ -7,48 +7,97 @@
 		<ourLoading isFullScreen :active="showLoadingHint" :translateY="50" text="签退中,请稍候···" color="#fff" textColor="#fff"
 		 background-color="rgb(143 143 143)" />
 		<view class="nav">
-			<nav-bar backState="2000" :home="false" bgColor="#2c9af1" fontColor="#FFF" title="个人资料" @backClick="backTo"></nav-bar>
+			<nav-bar backState="3000" :home="false" fontColor="#FFF"  bgColor="none" title="个人中心" @backClick="backTo"></nav-bar>
 		</view>
-		<view class="content-top">
-			<view class="content-top-name">
-				<text>头像</text>
-				<view>
+		<view class="content-top-area">
+			<image :src="statusBackgroundPng"></image>
+			<view class="content-top-content">
+				<view class="user-photo">
 					<image :src="juddgeAvatarUrl()">
+				</view>
+				<view class="user-message">
+					<view class="user-name">
+						{{userName}}
+					</view>
+					<view class="account-name">
+						{{accountName}}
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="content-bottom-area">
+			<view class="content-top-other">
+				<view class="left">
+					<text>
+						<image :src="hiredatePng"></image>
+					</text>
+					<text>入职时间</text>
+				</view>
+				<view class="right">
+					<text>
+						{{ userInfo.joinTime }}
+					</text>
 				</view>
 			</view>
 			<view class="content-top-other">
-				<text>姓名</text>
-				<text>
-					{{userName}}
-				</text>
+				<view class="left">
+					<text>
+						<image :src="phoneNumberPng"></image>
+					</text>
+					<text>手机号码</text>
+				</view>
+				<view class="right">
+					<text>
+						{{ userInfo.workPhone ? userInfo.workPhone : '无' }}
+					</text>
+				</view>
 			</view>
 			<view class="content-top-other">
-				<text>手机号码</text>
-				<text>
-					无
-				</text>
+				<view class="left">
+					<text>
+						<image :src="accountExpirationTimePng"></image>
+					</text>
+					<text>账号过期时间</text>
+				</view>
+				<view class="right">
+					<text>
+						无
+					</text>
+				</view>
+			</view>
+			<view class="content-top-other" @click="fileViewEvent">
+				<view class="left">
+					<text>
+						<image :src="fileViewPng"></image>
+					</text>
+					<text>文件查看</text>
+				</view>
+				<view class="right">
+					<u-icon name="arrow-right" color="#000" size="35"></u-icon>
+				</view>
 			</view>
 			<view class="content-top-other">
-				<text>科室名称</text>
-				<text>
-					{{depName}}
-				</text>
-			</view>
-			<view class="content-top-other">
-				<text>职位</text>
-				<text>
-					无
-				</text>
+				<view class="left">
+					<text>
+						<image :src="userRolePng"></image>
+					</text>
+					<text>用户角色</text>
+				</view>
+				<view class="right">
+					<text v-for="(item,index) in roleNameList" :key="index">
+						{{ item }}
+					</text>
+				</view>
 			</view>
 		</view>
 		<view class="content-bottom">
+			<view class="quit-account" @click="isLoginOut">退 出 账 号</view>
 			<view class="app-version">
 				<text>当前版本</text>
 				<text>
-					{{versionNumber}}
+					{{`V${versionNumber}`}}
 				</text>
 			</view>
-			<view class="quit-account" @click="isLoginOut">退出账号</view>
 		</view>
 	</view>
 </template>
@@ -75,14 +124,23 @@
 				content: '',
 				versionNumber: '1.8',
 				sureCancelShow: false,
-				showLoadingHint: false
+				showLoadingHint: false,
+				statusBackgroundPng: require("@/static/img/status-background.png"),
+				accountExpirationTimePng: require("@/static/img/account-expiration-time.png"),
+				fileViewPng: require("@/static/img/file-view.png"),
+				hiredatePng: require("@/static/img/hiredate.png"),
+				phoneNumberPng: require("@/static/img/phone-number.png"),
+				userRolePng: require("@/static/img/user-role.png")
 			}
 		},
-		onReady() {},
+		onReady() {
+			console.log('角色列表',this.roleNameList);
+		},
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'selectHospitalList'
+				'selectHospitalList',
+				'roleNameList'
 			]),
 			userName() {
 				return this.userInfo.name
@@ -114,15 +172,20 @@
 			// 返回上一页
 			backTo() {
 				uni.navigateTo({
-					url: '/pages/centerTransport/index/index'
+					url: '/qualityPackage/pages/qualityManagement/index/index'
 				})
 			},
 
 			// 判断头像
 			juddgeAvatarUrl() {
-				return '/static/img/default-person.jpg'
+				return '/static/img/default-person.png'
 			},
-
+			// 查看全部文件
+			fileViewEvent () {
+				uni.redirectTo({
+					url: '/qualityPackage/pages/allDocuments/allDocuments'
+				})
+			},
 			isLoginOut() {
 				this.sureCancelShow = true
 			},
@@ -169,49 +232,74 @@
 
 	.content-box {
 		@include content-wrapper;
-
-		.content-top {
-			height: auto;
-			font-size: 14px;
-			background: #fff;
-
-			.content-top-name {
-				height: 90px;
-				padding: 10px;
-				box-sizing: border-box;
-				position: relative;
-				@include bottom-border-1px($color-underline);
-
-				>text {
-					position: absolute;
-					display: inline-block;
-					left: 0;
-					top: 38px;
-					color: $color-text-left;
-					padding-left: 10px
-				}
-
-				;
-
-				>view {
-					position: absolute;
-					color: #271010;
-					font-weight: bold;
-					right: 10px;
-					top: 10px;
-					width: 65px;
-					height: 65px;
+		.nav {
+			position: fixed;
+			width: 100%;
+			height: 88px;
+			top: 0;
+			z-index: 10;
+			left: 0
+		};
+		.content-top-area {
+			position: relative;
+			width: 100%;
+			margin: 0 auto;
+			height: 240px;
+			>image {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0
+			};
+			.content-top-content {
+				margin-left: 20px;
+				height: 140px;
+				margin-top: 60px;
+				display: flex;
+				flex-flow: row nowrap;
+				align-items: center;
+				.user-photo {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					width: 55px;
+					height: 55px;
 					border-radius: 50%;
-
+					background: #fff;
+					z-index: 1000;
 					image {
-						width: 100%;
-						height: 100%
+						vertical-align: middle;
+						width: 50px;
+						height: 50px
+					}
+				};
+				.user-message {
+					z-index: 100;
+					margin-left: 16px;
+					color: #fff;
+					.user-name {
+						font-size: 16px
+					};
+					.account-name {
+						font-size: 14px;
+						margin-top: 2px
 					}
 				}
 			}
-
-			;
-
+		};
+		.content-bottom-area {
+			flex: 1;
+			overflow: auto;
+			border-top-left-radius: 20px;
+			border-top-right-radius: 20px;
+			background: #fff;
+			margin-top: -55px;
+			padding-top: 10px;
+			box-sizing: border-box;
+			z-index: 10000;
+			height: auto;
+			font-size: 14px;
 			.content-top-otherone {
 				height: 100px
 			}
@@ -222,32 +310,38 @@
 				height: 45px;
 				line-height: 45px;
 				box-sizing: border-box;
+				color: #101010;
+				font-size: 14px;
+				font-weight: bold;
 				position: relative;
-				@include bottom-border-1px($color-underline);
-
-				&:last-child {
-					@include bottom-border-1px(#fff);
-				}
-
-				>text {
+				.left {
 					position: absolute;
-					display: inline-block;
-
-					&:first-child {
-						left: 0;
-						top: 0;
-						color: $color-text-left;
-						padding-left: 10px;
-					}
-
-					;
-
-					&:last-child {
+					left: 0;
+					top: 0;
+					> text {
 						color: $color-text-right;
-						font-weight: bold;
-						right: 10px;
-						top: 0
+						&:first-child {
+							image {
+								vertical-align: middle;
+								width: 22px;
+								height: 22px;
+							};
+							padding-left: 20px;
+							margin-right: 10px
+						}
 					}
+				};
+				.right {
+						position: absolute;
+						right: 20px;
+						top: 0;
+						width: 60%;
+						text-align: right;
+						word-break: break-all;
+						> text {
+							color: $color-text-right;
+							padding-left: 20px;
+						}
 				}
 			}
 		}
@@ -255,74 +349,41 @@
 		;
 
 		.content-bottom {
-			flex: 1;
 			margin: 0 auto;
 			width: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
 			font-size: 13px;
-			background: #f6f6f6;
 			position: relative;
 
 			.app-version {
-				position: relative;
-				top: 14px;
-				left: 0;
 				height: 45px;
 				background: #fff;
 				line-height: 45px;
+				text-align: center;
 				box-sizing: border-box;
-
+				font-size: 14px;
+				margin: 30px 0 10px 0;
 				>text {
-					position: absolute;
-					display: inline-block;
-
 					&:first-child {
-						left: 0;
-						top: 0;
-						color: $color-text-left;
-						padding-left: 10px;
-					}
-
-					;
-
-					&:last-child {
-						color: $color-text-right;
-						font-weight: bold;
-						right: 10px;
-						top: 0
-					}
+						margin-right: 10px;
+					};
+					color: #9E9E9A
 				}
 			}
 
 			;
-
-			.back-home {
-				height: 45px;
-				width: 300px;
-				margin: 0 auto;
-				line-height: 45px;
-				left: 50%;
-				margin-left: -150px;
-				position: absolute;
-				bottom: 100px;
-				background: #fff;
-				color: #271010;
-				font-weight: bold;
-				text-align: center
-			}
-
-			;
-
 			.quit-account {
-				height: 45px;
-				width: 300px;
+				height: 48px;
+				width: 266px;
+				font-size: 18px;
 				margin: 0 auto;
-				line-height: 45px;
-				left: 50%;
-				margin-left: -150px;
-				position: absolute;
-				bottom: 30px;
-				background: #ff0000;
+				line-height: 48px;
+				background: linear-gradient(to right, #6cd2f8, #2390fe);
+				box-shadow: 0px 2px 6px 0 rgba(36,149,213,1);
 				color: #fff;
+				border-radius: 30px;
 				font-weight: bold;
 				text-align: center
 			}
