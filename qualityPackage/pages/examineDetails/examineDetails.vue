@@ -36,7 +36,7 @@
 						<view class="subtask-item-right-top">
 							<!-- <u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : item.complete == 0 ? '#ececec' : '#1684FC'" :percent="item.complete">
 							</u-circle-progress> -->
-							<cCircle  :size="30" :percent="item.complete" :direction="180" :circleColor="item.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
+							<cCircle :size="30" :percent="item.complete" :animation="true" :direction="180" :circleColor="item.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
 						</view>
 						<view class="subtask-item-right-bottom">
 							<text>检查已完成:</text>
