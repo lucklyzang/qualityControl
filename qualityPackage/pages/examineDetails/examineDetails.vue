@@ -23,6 +23,7 @@
 				<view class="examine-pandect-right">
 					<u-icon name="arrow-rightward" color="#fff" size="38"></u-icon>
 				</view>
+				
 			</view>
 			<view class="subtask-wrapper">
 				<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index" @click="subtaskClickEvent(item)">
@@ -35,7 +36,7 @@
 						<view class="subtask-item-right-top">
 							<!-- <u-circle-progress :width="80" :border-width="10" :active-color="item.complete == 100 ? '#289E8E' : item.complete == 0 ? '#ececec' : '#1684FC'" :percent="item.complete">
 							</u-circle-progress> -->
-							<cCircle  :size="35" :percent="item.complete" :direction="180" :circleColor="item.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
+							<cCircle  :size="30" :percent="item.complete" :direction="180" :circleColor="item.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
 						</view>
 						<view class="subtask-item-right-bottom">
 							<text>检查已完成:</text>
@@ -996,7 +997,7 @@
 	@import "~@/common/stylus/variable.scss";
 	page {
 		width: 100%;
-		height: 100%;
+		height: 100vh;
 	};
 	.container-box {
 		@include content-wrapper;

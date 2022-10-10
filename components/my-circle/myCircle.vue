@@ -219,3 +219,8 @@
 		}
 	}
 </script>
+<style scoped>
+	view {
+		box-sizing: content-box !important;
+	}
+</style>
