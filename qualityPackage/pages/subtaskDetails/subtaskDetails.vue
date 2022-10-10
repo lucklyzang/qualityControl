@@ -19,7 +19,7 @@
 						<view class="subtask-item-right-top">
 								<!-- <u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#289E8E' : subtaskDetails.complete == 0 ? '#ececec' : '#1684FC'" :percent="subtaskDetails.complete">
 								</u-circle-progress> -->
-								<cCircle  :size="35" :percent="subtaskDetails.complete" :direction="180" :circleColor="subtaskDetails.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
+								<cCircle  :size="30" :percent="subtaskDetails.complete" :direction="180" :circleColor="subtaskDetails.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
 						</view>
 						<view class="subtask-item-right-bottom">
 							<text>检查已完成:</text>
