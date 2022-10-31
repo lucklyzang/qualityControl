@@ -25,8 +25,8 @@
 				</view>
 				
 			</view>
-			<view class="subtask-wrapper">
-				<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index" @click="subtaskClickEvent(item)">
+			<view class="subtask-wrapper" v-if="isLoadingComplete">
+				<view class="subtask-list" v-for="(item,index) in subtaskList" v-show="item.extractPrincipalId.indexOf(workerId.toString()) != -1" :key="index" @click="subtaskClickEvent(item)">
 					<view class="subtask-item-left">
 						<view class="subtask-item-title">{{`${taskMessage.checkName}${taskMessage.examinationType}-${item.subtaskName}`}}</view>
 						<view class="subtask-item-oerson">负责人 : {{item.subtaskPrincipal}}</view>
@@ -148,6 +148,7 @@
 				taskTypeText: '',
 				flowState: '',
 				infoText: '',
+				isLoadingComplete: false,
 				showLoadingHint: false,
 				statusBackgroundPng: require("@/static/img/status-background.png"),
 				flowList: [
@@ -314,13 +315,22 @@
 				return transferStr
 			},
 			
-			//提取负责人
+			//提取负责人(名字)
 			extractPrincipal (data) {
 				let temporaryData = [];
 				for (let item of data) {
 					temporaryData.push(item.name)
 				};
 				return temporaryData.join("、")
+			},
+			
+			//提取负责人(id)
+			extractPrincipalId (data) {
+				let temporaryData = [];
+				for (let item of data) {
+					temporaryData.push(item.id)
+				};
+				return temporaryData
 			},
 			
 			// 查询主任务详情
@@ -358,6 +368,7 @@
 										subtaskFullMark: res.data.data.subTaskList[i].score,
 										subtaskScore: res.data.data.subTaskList[i].resultScore,
 										subtaskPrincipal: this.extractPrincipal(res.data.data.subTaskList[i]['persons']),
+										extractPrincipalId: this.extractPrincipalId(res.data.data.subTaskList[i]['persons']),
 										persons: res.data.data.subTaskList[i]['persons'],
 										complete: res.data.data.subTaskList[i]['complete'],
 										unfold: res.data.data.subTaskList[i].persons.filter((single) => {return single.id == this.workerId}).length > 0 ? true : false,
@@ -812,11 +823,12 @@
 													}
 												}
 											}
-										};
-										this.changeDisposeSubTaskData(this.subtaskList)
+										}
 									}	
 								}
-							}
+							};
+							this.isLoadingComplete = true;
+							console.log('测试id',this.subtaskList);
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -947,6 +959,14 @@
 		
 			// 检查结果提交
 			submitResult () {
+				// 判断是否有该登录人员名下的子任务
+				if (this.subtaskList.filter((item) => { return item.extractPrincipalId.indexOf(this.workerId.toString()) != -1 }).length == 0) {
+					this.$refs.uToast.show({
+						title: '暂无需要提交的子任务!',
+						type: 'warning'
+					});
+					return
+				};
 				// 判断是否为检查者
 				if (!this.judgePermission(this.permissionInfo)) {
 					this.$refs.uToast.show({

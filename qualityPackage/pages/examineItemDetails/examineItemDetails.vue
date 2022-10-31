@@ -97,7 +97,7 @@
 					<text>{{subtaskInfo.describe}}</text>
 				</view>
 				<view class="examine-describe">
-					<text>参考标准 : </text>
+					<text>评价标准 : </text>
 					<text>{{subtaskInfo.standard}}</text>
 				</view>
 				<view class="examine-describe">
@@ -479,6 +479,13 @@
 			
 			// 其它建议提交事件
 			async suggestEvent () {
+				if (!this.otherSuggest && this.temporaryImgPathArr.length == 0) {
+					this.$refs.uToast.show({
+						title: '请填写建议或上传图片',
+						type: 'warning'
+					});
+					return
+				};
 				this.showLoadingHint = true;
 				this.infoText = '提交中';
 				let temporaryData = {
@@ -625,7 +632,9 @@
 									images: item['images'],
 									files: item.hasOwnProperty('files') ? item['files'] : []
 								})
-							};
+							}
+						};
+						if (res.data.data.special.length > 0) {
 							for (let item of res.data.data.special) {
 								this.suggestionList.push({
 									scrutator: item['operator'],
@@ -1220,6 +1229,7 @@
 			box-sizing: border-box;
 			font-size: 14px;
 			font-weight: bold;
+			z-index: 1000;
 			.examine-content-title {
 				padding-left: 8px;
 				box-sizing: border-box;
@@ -1362,7 +1372,9 @@
 					.timelineItem {
 						.timeItem {
 							.leftTime {
+								width: 150px;
 								padding: 0 !important;
+								text-align: center;
 								.time {
 									padding: 0 4px;
 									color: black;
@@ -1371,9 +1383,11 @@
 								.scrutator {
 									color: #1864FF;
 									padding: 0 10px;
+									font-size: 12px;
 									border: 1px solid #1864FF;
 									margin-top: 4px;
-									border-radius: 10px
+									border-radius: 20px;
+									display: inline-block
 								}
 							};
 							.line {
@@ -1444,6 +1458,7 @@
 			position: fixed;
 			left: 0;
 			bottom: 0;
+			z-index: 2000;
 			>image {
 				width: 100%;
 				height: 100%;

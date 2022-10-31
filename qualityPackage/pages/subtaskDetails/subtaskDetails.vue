@@ -175,7 +175,8 @@
 		
 		
 		mounted() {
-			this.getSubtaskDetails(this.subtaskDetails.majorId,this.subtaskDetails.subId)
+			this.getSubtaskDetails(this.subtaskDetails.majorId,this.subtaskDetails.subId);
+			console.log('子任务详情',this.subtaskInfo);
 		},
 		
 		methods: {
@@ -770,7 +771,7 @@
 			
 			// 评价事件
 			gradeEvent(num,checkItem) {
-				// 操作过的当前不总重复操作
+				// 操作过的不允许重复操作
 				if (num == 0) {
 					if (checkItem.itemMode == 2) { return }
 				};
@@ -1045,10 +1046,10 @@
 			
 			// 检查项详情点击事件
 			checkItemClickEvent (checkItem) {
-				// 判断是否为检查者
+				// 判断有没有子任务权限
 				if (!this.judgePermission(this.permissionInfo)) {
 					this.$refs.uToast.show({
-						title: '你没有此操作权限!',
+						title: '你没有子任务操作权限!',
 						type: 'warning'
 					});
 					return
