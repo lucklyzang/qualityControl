@@ -176,7 +176,7 @@
 		
 		mounted() {
 			this.getSubtaskDetails(this.subtaskDetails.majorId,this.subtaskDetails.subId);
-			console.log('子任务详情',this.subtaskInfo);
+			console.log('子任务详情',this.subtaskDetails);
 		},
 		
 		methods: {
@@ -209,13 +209,23 @@
 				this.changeRecordExamineItemScrollTop(Math.ceil(event.detail.scrollTop))
 			},
 			
-			//提取负责人
+			//提取子任务负责人(姓名)
 			extractPrincipal (data) {
 				let temporaryData = [];
 				for (let item of data) {
 					temporaryData.push(item.name)
 				};
 				return temporaryData.join("、")
+			},
+			
+
+			//提取子任务负责人(id)
+			extractPrincipalId (data) {
+				let temporaryData = [];
+				for (let item of data) {
+					temporaryData.push(item.id)
+				};
+				return temporaryData
 			},
 			
 			// 查询子任务详情
@@ -239,6 +249,7 @@
 									majorSubId: this.subtaskMessage[i].majorSubId,
 									subtaskName: this.subtaskMessage[i].name,
 									subtaskFullMark: this.subtaskMessage[i].score,
+									mainTaskPerson: this.subtaskDetails['mainTaskPerson'],
 									subtaskScore: this.subtaskMessage[i].resultScore,
 									subtaskPrincipal: this.extractPrincipal(this.subtaskMessage[i]['persons']),
 									persons: this.subtaskMessage[i]['persons'],
@@ -834,9 +845,9 @@
 			
 			// 提交事件
 			sure (num) {
-				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
+				if (this.subtaskDetails['mainTaskPerson'].indexOf(this.workerId.toString()) == -1 && this.extractPrincipalId(this.subtaskList[0]['persons']).indexOf(this.workerId.toString()) == -1) {
 					this.$refs.uToast.show({
-						title: '该子任务为其它人负责，你无操作权限',
+						title: '你没有该子任务操作权限!',
 						type: 'warning'
 					});
 					return
@@ -1046,10 +1057,10 @@
 			
 			// 检查项详情点击事件
 			checkItemClickEvent (checkItem) {
-				// 判断有没有子任务权限
-				if (!this.judgePermission(this.permissionInfo)) {
+				// 同时没有主任务和子任务的权限
+				if (this.subtaskDetails['mainTaskPerson'].indexOf(this.workerId.toString()) == -1 && this.extractPrincipalId(this.subtaskList[0]['persons']).indexOf(this.workerId.toString()) == -1) {
 					this.$refs.uToast.show({
-						title: '你没有子任务操作权限!',
+						title: '你没有该子任务操作权限!',
 						type: 'warning'
 					});
 					return

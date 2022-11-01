@@ -132,6 +132,7 @@
 				'titleText',
 				'userInfo',
 				'subtaskInfo',
+				'subtaskDetails',
 				'disposeSubTaskData',
 				'mainTaskId',
 				'selectHospitalList',
@@ -312,6 +313,15 @@
 					 	}
 					})
 				})
+			},
+			
+			//提取子任务负责人(id)
+			extractPrincipalId (data) {
+				let temporaryData = [];
+				for (let item of data) {
+					temporaryData.push(item.id)
+				};
+				return temporaryData
 			},
 			
 			// 弹框确定按钮
@@ -523,9 +533,9 @@
 			
 			// 确认事件
 			async sure () {
-				if (this.subtaskInfo['persons'].indexOf(this.subtaskInfo['persons'].filter((k) => {return k.id == this.workerId})[0]) == -1) {
+				if (this.subtaskDetails['mainTaskPerson'].indexOf(this.workerId.toString()) == -1 && this.extractPrincipalId(this.subtaskInfo['persons']).indexOf(this.workerId.toString()) == -1) {
 					this.$refs.uToast.show({
-						title: '该子任务为其它人负责，你无操作权限',
+						title: '你没有该子任务操作权限!',
 						type: 'warning'
 					});
 					return
