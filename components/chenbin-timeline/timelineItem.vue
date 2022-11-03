@@ -5,11 +5,11 @@
 				<view class="time">
 					{{leftTime}}
 				</view>
-				<view class="scrutator">
-					<text>
+				<view class="scrutator" :class="{'scrutatorBoxStyle' : scrutator == '受查项目' }">
+					<!-- <text>
 						<u-icon name="man-add-fill"></u-icon>
-					</text> 
-					<text>
+					</text> -->
+					<text :class="{'scrutatorStyle' : scrutator == '受查项目' }">
 						{{scrutator}}
 					</text>
 				</view>
@@ -66,11 +66,19 @@
 					text-align: center;
 					color: #9a9a9a;
 					text {
+						max-width: 128px;
+						margin-top: 2px;
 						display: inline-block;
-						&:first-child {
-							margin-right: 6px
-						}
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					};
+					.scrutatorStyle {
+						color: #FF6712 !important
 					}
+				};
+				.scrutatorBoxStyle {
+					border: 1px solid #FF6712 !important
 				}
 			}
 			.line {
