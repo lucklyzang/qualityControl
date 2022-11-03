@@ -381,7 +381,7 @@
 			extractPrincipalId (data) {
 				let temporaryData = [];
 				for (let item of data) {
-					temporaryData.push(item.id)
+					temporaryData.push(Number(item.id))
 				};
 				return temporaryData
 			},
@@ -796,7 +796,7 @@
 			
 			// 提交事件
 			sure (num) {
-				if (this.subtaskDetails['mainTaskPerson'].indexOf(this.workerId.toString()) == -1 && this.extractPrincipalId(this.subtaskInfo['persons']).indexOf(this.workerId.toString()) == -1) {
+				if (this.subtaskDetails['mainTaskPerson'].indexOf(Number(this.workerId)) == -1 && this.extractPrincipalId(this.subtaskInfo['persons']).indexOf(Number(this.workerId)) == -1) {
 					this.$refs.uToast.show({
 						title: '你没有该子任务操作权限!',
 						type: 'warning'

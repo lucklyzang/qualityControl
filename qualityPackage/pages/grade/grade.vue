@@ -533,7 +533,7 @@
 			
 			// 确认事件
 			async sure () {
-				if (this.subtaskDetails['mainTaskPerson'].indexOf(this.workerId.toString()) == -1 && this.extractPrincipalId(this.subtaskInfo['persons']).indexOf(this.workerId.toString()) == -1) {
+				if (this.subtaskDetails['mainTaskPerson'].indexOf(Number(this.workerId)) == -1 && this.extractPrincipalId(this.subtaskInfo['persons']).indexOf(Number(this.workerId)) == -1) {
 					this.$refs.uToast.show({
 						title: '你没有该子任务操作权限!',
 						type: 'warning'

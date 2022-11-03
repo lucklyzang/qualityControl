@@ -176,7 +176,7 @@
 		
 		mounted() {
 			this.getSubtaskDetails(this.subtaskDetails.majorId,this.subtaskDetails.subId);
-			console.log('子任务详情',this.subtaskDetails);
+			console.log('子任务详情',this.subtaskInfo);
 		},
 		
 		methods: {
@@ -223,7 +223,7 @@
 			extractPrincipalId (data) {
 				let temporaryData = [];
 				for (let item of data) {
-					temporaryData.push(item.id)
+					temporaryData.push(Number(item.id))
 				};
 				return temporaryData
 			},
@@ -845,7 +845,7 @@
 			
 			// 提交事件
 			sure (num) {
-				if (this.subtaskDetails['mainTaskPerson'].indexOf(this.workerId.toString()) == -1 && this.extractPrincipalId(this.subtaskList[0]['persons']).indexOf(this.workerId.toString()) == -1) {
+				if (this.subtaskDetails['mainTaskPerson'].indexOf(Number(this.workerId)) == -1 && this.extractPrincipalId(this.subtaskList[0]['persons']).indexOf(Number(this.workerId)) == -1) {
 					this.$refs.uToast.show({
 						title: '你没有该子任务操作权限!',
 						type: 'warning'
@@ -1058,7 +1058,7 @@
 			// 检查项详情点击事件
 			checkItemClickEvent (checkItem) {
 				// 同时没有主任务和子任务的权限
-				if (this.subtaskDetails['mainTaskPerson'].indexOf(this.workerId.toString()) == -1 && this.extractPrincipalId(this.subtaskList[0]['persons']).indexOf(this.workerId.toString()) == -1) {
+				if (this.subtaskDetails['mainTaskPerson'].indexOf(Number(this.workerId)) == -1 && this.extractPrincipalId(this.subtaskList[0]['persons']).indexOf(Number(this.workerId)) == -1) {
 					this.$refs.uToast.show({
 						title: '你没有该子任务操作权限!',
 						type: 'warning'
@@ -1134,7 +1134,7 @@
 			.subtask-list {
 				width: 96%;
 				position: absolute;
-				top: 100px;
+				top: 88px;
 				left: 2%;
 				background: #fff;
 				margin-bottom: 8px;

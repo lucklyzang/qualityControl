@@ -27,7 +27,7 @@
 			</view>
 			<view class="subtask-wrapper" v-if="isLoadingComplete">
 				<view class="subtask-list" v-for="(item,index) in subtaskList" :key="index" @click="subtaskClickEvent(item)">
-					<view class="subtask-list-box" v-if="item.extractPrincipalId.indexOf(workerId.toString()) != -1 || extractPrincipalMainTaskId(tableList[0]['persons']).indexOf(workerId.toString()) != -1">
+					<view class="subtask-list-box" v-if="item.extractPrincipalId.indexOf(Number(workerId))!= -1 || extractPrincipalMainTaskId(tableList[0]['persons']).indexOf(Number(workerId)) != -1">
 						<view class="subtask-item-left">
 							<view class="subtask-item-title">{{`${taskMessage.checkName}${taskMessage.examinationType}-${item.subtaskName}`}}</view>
 							<view class="subtask-item-oerson">负责人 : {{item.subtaskPrincipal}}</view>
@@ -331,7 +331,7 @@
 			extractPrincipalId (data) {
 				let temporaryData = [];
 				for (let item of data) {
-					temporaryData.push(item.id)
+					temporaryData.push(Number(item.id))
 				};
 				return temporaryData
 			},
@@ -340,7 +340,7 @@
 			extractPrincipalMainTaskId (data) {
 				let temporaryData = [];
 				for (let item of data) {
-					temporaryData.push(item.id)
+					temporaryData.push(Number(item.id))
 				};
 				return temporaryData
 			},
@@ -973,7 +973,7 @@
 			// 检查结果提交
 			submitResult () {
 				// 判断是否有提交权限
-				if (this.extractPrincipalMainTaskId(this.tableList[0]['persons']).indexOf(this.workerId.toString()) == -1) {
+				if (this.extractPrincipalMainTaskId(this.tableList[0]['persons']).indexOf(Number(this.workerId)) == -1) {
 					this.$refs.uToast.show({
 						title: '你没有此操作权限!',
 						type: 'warning'
@@ -981,7 +981,7 @@
 					return
 				};
 				// 判断是否有该登录人员名下的子任务
-				if (this.subtaskList.filter((item) => { return item.extractPrincipalId.indexOf(this.workerId.toString()) != -1 }).length == 0 && this.extractPrincipalMainTaskId(this.tableList[0]['persons']).indexOf(this.workerId.toString()) == -1) {
+				if (this.subtaskList.filter((item) => { return item.extractPrincipalId.indexOf(Number(this.workerId)) != -1 }).length == 0 && this.extractPrincipalMainTaskId(this.tableList[0]['persons']).indexOf(Number(this.workerId)) == -1) {
 					this.$refs.uToast.show({
 						title: '暂无需要提交的子任务!',
 						type: 'warning'
