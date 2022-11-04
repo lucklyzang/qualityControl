@@ -8,7 +8,8 @@
 			"style": {
 				"navigationBarTitleText": "",
 				"navigationBarBackgroundColor": "#75b0f0",
-				"navigationBarTextStyle": "black"
+				"navigationBarTextStyle": "black",
+				"navigationStyle" : "custom"
 			}
 		},
 		{
@@ -16,7 +17,8 @@
 			"style": {
 				"navigationBarTitleText": "",
 				"navigationBarBackgroundColor": "#75b0f0",
-				"navigationBarTextStyle": "black"
+				"navigationBarTextStyle": "black",
+				"navigationStyle" : "custom"
 			}
 		},
 		{
@@ -25,7 +27,8 @@
 				"navigationBarTitleText": "个人资料",
 				"navigationBarBackgroundColor": "#75b0f0",
 				"navigationBarTextStyle": "white",
-				"backgroundColorBottom": "#f7f7f7"
+				"backgroundColorBottom": "#f7f7f7",
+				"navigationStyle" : "custom"
 			}
 		}
 	],
@@ -40,7 +43,8 @@
 						"navigationBarTitleText": "检查详情",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
-				    "backgroundColorBottom": "#fff"
+				    "backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
 					}
 				},
 				{
@@ -49,7 +53,8 @@
 						"navigationBarTitleText": "检查详情",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
-				    "backgroundColorBottom": "#fff"
+				    "backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
 					}
 				},
 				{
@@ -58,7 +63,8 @@
 						"navigationBarTitleText": "子任务详情",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
-				    "backgroundColorBottom": "#fff"
+				    "backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
 					}
 				},
 				{
@@ -67,7 +73,8 @@
 						"navigationBarTitleText": "全部文件",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
-				    "backgroundColorBottom": "#fff"
+				    "backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
 					}
 				},
 				{
@@ -76,7 +83,8 @@
 						"navigationBarTitleText": "评分",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
-				    "backgroundColorBottom": "#fff"
+				    "backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
 					}
 				},
 				{
@@ -86,7 +94,8 @@
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
 				    "backgroundColorBottom": "#fff",
-						"enablePullDownRefresh": true
+						"enablePullDownRefresh": true,
+						"navigationStyle" : "custom"
 					}
 				},
 				{
@@ -95,7 +104,8 @@
 						"navigationBarTitleText": "检查项详情",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
-				    "backgroundColorBottom": "#fff"
+				    "backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
 					}
 				},
 				{
@@ -104,7 +114,8 @@
 						"navigationBarTitleText": "检查记录",
 						"navigationBarBackgroundColor": "#ffffff",
 				    "backgroundColorTop": "#fff,",
-				    "backgroundColorBottom": "#fff"
+				    "backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
 					}
 				}
 			]

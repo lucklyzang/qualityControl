@@ -12,7 +12,7 @@
 			<u-empty text="暂无文件" mode="list"></u-empty>
 		</view>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="全部文件" @backClick="backTo">
+			<nav-bar backState="3000" :home="false" bgColor="none" fontColor="#FFF" title="全部文件" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="image-wrapper">

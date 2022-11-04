@@ -114,6 +114,7 @@
 		mounted () {
 			this.form.username = getCache('userName') ? getCache('userName') : '';
 			this.form.password = getCache('userPassword') ? getCache('userPassword') : '';
+			console.log('选择医院',getCache('selectHospitalList'));
 		},
 		methods: {
 			...mapMutations([
@@ -156,7 +157,7 @@
 						type: 'warning'
 					})
 				} else {
-					uni.navigateTo({
+					uni.redirectTo({
 						url: '/qualityPackage/pages/qualityManagement/index/index'
 					})
 				}
@@ -164,6 +165,20 @@
 				 
 			// 账号密码事件
 			sure () {
+				if (!this.form.username) {
+					this.$refs.uToast.show({
+						title: '请输入账号',
+						type: 'warning'
+					});
+					return
+				};
+				if (!this.form.password) {
+					this.$refs.uToast.show({
+						title: '请输入密码',
+						type: 'warning'
+					});
+					return
+				};
 				let loginMessage = {
 				  username: this.form.username,
 				  password: this.form.password
