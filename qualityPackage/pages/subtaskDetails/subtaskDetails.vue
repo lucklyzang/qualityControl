@@ -4,7 +4,7 @@
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="子任务详情" @backClick="backTo">
+			<nav-bar backState="3000" :home="false" bgColor="none" fontColor="#FFF" title="子任务详情" @backClick="backTo">
 			</nav-bar>
 		</view>	
 		<view class="content-top-area">
@@ -1134,7 +1134,7 @@
 			.subtask-list {
 				width: 96%;
 				position: absolute;
-				top: 88px;
+				top: 12vh;
 				left: 2%;
 				background: #fff;
 				margin-bottom: 8px;
@@ -1205,7 +1205,7 @@
 		.content-bottom-area {
 			width: 96%;
 			margin: 0 auto;
-			margin-top: 10px;
+			margin-top: 5vh;
 			flex: 1;
 			overflow: auto;
 			.subtask-item-list {

@@ -6,7 +6,7 @@
 		 @cancel="cancelSure">
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" :title="taskTypeText" @backClick="backTo">
+			<nav-bar backState="3000" :home="false" bgColor="none" fontColor="#FFF" :title="taskTypeText" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="image-wrapper">

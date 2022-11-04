@@ -15,7 +15,7 @@
 			</u-modal>
 		</view>	
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="检查项详情" @backClick="backTo">
+			<nav-bar backState="3000" :home="false" bgColor="none" fontColor="#FFF" title="检查项详情" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="image-wrapper">

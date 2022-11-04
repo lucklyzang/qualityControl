@@ -287,7 +287,7 @@
 			// 获取医院列表数据
 			this.getHospitalListData();
 			this.changeIsSkipDetails(false);
-			this.getAllMainTasks(data)
+			this.getAllMainTasks(data);
 		},
 		
 		// 监听页面下拉刷新事件

@@ -9,7 +9,7 @@
 			</view>
 		</u-modal>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="#43c3f4" fontColor="#FFF" title="检查记录" @backClick="backTo">
+			<nav-bar backState="3000" :home="false" bgColor="#43c3f4" fontColor="#FFF" title="检查记录" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="back-btn-box">

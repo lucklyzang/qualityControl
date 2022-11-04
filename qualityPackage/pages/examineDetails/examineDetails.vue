@@ -3,7 +3,7 @@
 		<u-toast ref="uToast" />
 		<ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" :text="infoText" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/>
 		<view class="nav">
-			<nav-bar backState="3000" bgColor="none" fontColor="#FFF" title="检查详情" @backClick="backTo">
+			<nav-bar backState="3000" :home="false" bgColor="none" fontColor="#FFF" title="检查详情" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="flow-wrapper">
@@ -1203,6 +1203,7 @@
 							.subtask-item-right-top {};
 							.subtask-item-right-bottom {
 								margin-top: 6px;
+								text-align: center;
 								.textStyle {
 									color: #289E8E !important
 								};

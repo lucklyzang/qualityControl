@@ -99,7 +99,7 @@ export default {
 		home: {
 			type: Boolean,
 			default: function() {
-				return false;
+				return true;
 			}
 		},
 		//导航背景色，支持渐变
@@ -258,7 +258,7 @@ export default {
 		let pageLen = currentPages.length;
 		//判断是否是第一个页面，如果是有设置back为true的页面，将不显示返回箭头，而显示返回首页按钮
 		if (pageLen == 1 && !mainPagePath.includes(currentPages[0].route)) {
-			this.firstPage = true;
+			this.firstPage = false;
 		}
 	},
 	//方法
