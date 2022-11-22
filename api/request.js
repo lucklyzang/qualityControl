@@ -7,8 +7,8 @@ const instance = axios.create({
 	// 开发域名 https://blink.blinktech.cn/nblink
 	// 准生产域名 https://ver.blinktech.cn/nblink
 	// 测试域名 https://show.blinktech.cn/nblink
-  baseURL: 'https://ver.blinktech.cn/nblink',
-	retry: 3, // 网络请求异常后，重试次数
+  baseURL: 'https://blink.blinktech.cn/nblink',
+	retry: 3, // 网络请求异常后，重试次数 
 	retryDelay: 1000, // 每次重试间隔时间
 	timeout: 30000,
   headers: {
