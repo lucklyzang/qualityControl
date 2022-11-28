@@ -19,7 +19,7 @@
 						<view class="subtask-item-right-top">
 								<!-- <u-circle-progress :width="80" :border-width="10" :active-color="subtaskDetails.complete == 100 ? '#289E8E' : subtaskDetails.complete == 0 ? '#ececec' : '#1684FC'" :percent="subtaskDetails.complete">
 								</u-circle-progress> -->
-								<cCircle :size="30" :percent="subtaskDetails.complete" :animation="true" :direction="180" :circleColor="subtaskDetails.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
+								<cCircle :size="30" v-if="isShowcCircle" :percent="subtaskDetails.complete" :animation="true" :direction="180" :circleColor="subtaskDetails.complete == 100 ? '#289E8E':'#1684FC'"></cCircle>
 						</view>
 						<view class="subtask-item-right-bottom">
 							<text>检查已完成:</text>
@@ -131,6 +131,7 @@
 				infoText: '加载中',
 				scrollTop: 0,
 				hintDialog: false,
+				isShowcCircle: true,
 				dialogText: '满分',
 				iconColor: '#1864FF',
 				subtaskList: [],
@@ -234,8 +235,10 @@
 				this.subtaskMessage = [];
 				this.infoText = '加载中···';
 				this.showLoadingHint = true;
+				this.isShowcCircle = false;
 				querySingleSubTask(majorId,subtaskId).then((res) => {
 					this.showLoadingHint = false;
+					this.isShowcCircle = true;
 					if ( res && res.data.code == 200) {
 						this.subtaskMessage.push(res.data.data);
 						if (this.subtaskMessage.length > 0) {
@@ -731,7 +734,8 @@
 						title: `${err}`,
 						type: 'warning'
 					});
-					this.showLoadingHint = false
+					this.showLoadingHint = false;
+					this.isShowcCircle = true
 				})
 			},
 			
